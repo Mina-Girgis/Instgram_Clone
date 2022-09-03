@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-Future<dynamic> ShowDialogMessage(String text1, String text2, String text3, context) {
+Widget defaultTextField(
+    {required String hintText ,
+     required controller,
+     bool obscure = false,
+    }) {
+  return TextFormField(
+    obscureText:obscure,
+    controller: controller,
+    cursorColor: Colors.white,
+    style: TextStyle(color: Colors.white),
+    decoration: InputDecoration(
+      hintText: hintText,
+      hintStyle: TextStyle(color: Color.fromRGBO(141, 141, 141, 1.0)),
+      filled: true,
+      fillColor: Color.fromRGBO(129, 128, 128, 0.5058823529411764),
+      focusedBorder: OutlineInputBorder(
+        gapPadding: 0.0,
+        borderSide: BorderSide(color: Colors.transparent),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+// borderSide: BorderSide(),
+      ),
+    ),
+  );
+}
+
+Future<dynamic> ShowDialogMessage(
+    String text1, String text2, String text3, context) {
   return showDialog(
       context: context,
       builder: (ctx) {
@@ -12,7 +41,8 @@ Future<dynamic> ShowDialogMessage(String text1, String text2, String text3, cont
               color: Colors.black,
             ),
           ),
-          content: Text(text2,
+          content: Text(
+            text2,
             style: TextStyle(
               color: Colors.grey,
             ),
@@ -38,7 +68,7 @@ Future<dynamic> ShowDialogMessage(String text1, String text2, String text3, cont
       });
 }
 
-void snackbarMessage(String text,context) {
+void snackbarMessage(String text, context) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     backgroundColor: Colors.green,
     content: Text(text),
@@ -46,7 +76,7 @@ void snackbarMessage(String text,context) {
   ));
 }
 
-void toastMessage(String s ){
+void toastMessage(String s) {
   Fluttertoast.showToast(
       msg: s,
       toastLength: Toast.LENGTH_SHORT,
@@ -54,11 +84,8 @@ void toastMessage(String s ){
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.red,
       textColor: Colors.white,
-      fontSize: 16.0
-  );
+      fontSize: 16.0);
 }
-
-
 
 /*
 XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
