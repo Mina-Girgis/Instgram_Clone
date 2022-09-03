@@ -74,7 +74,6 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                 ),
                               )),
-<<<<<<< HEAD
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1,
                           ),
@@ -171,19 +170,11 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-=======
-                        ],
                       ),
-                    ],
                   ),
                 ),
-              ],
->>>>>>> 7f656837bfb30fee839adb28dbd56ef6c3484ab7
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }
 
