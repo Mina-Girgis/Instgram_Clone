@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pro/shared/components/constants.dart';
+
+import '../../services/utils/size_config.dart';
 
 Widget defaultTextField(
     {required String hintText ,
      required controller,
      bool obscure = false,
+     required String ?Function (String ?s)validator,
+     required Function (String?) onChanged,
     }) {
   return TextFormField(
+    onChanged: onChanged,
+    validator: validator,
     obscureText:obscure,
     controller: controller,
     cursorColor: Colors.white,
@@ -86,6 +93,26 @@ void toastMessage(String s) {
       textColor: Colors.white,
       fontSize: 16.0);
 }
+
+Widget defaultButton({
+  required Widget child,
+  required  function,
+  Color color = BUTTON_COLOR,
+  bool reedOnly = false,
+}){
+  return  ButtonTheme(
+      minWidth: SizeConfig.screenWidth!,
+      height: SizeConfig.defaultSize! * 5,
+      child: RaisedButton(
+
+        onPressed: function,
+        color: color,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10)),
+        child: child,
+      ));
+}
+
 
 /*
 XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);

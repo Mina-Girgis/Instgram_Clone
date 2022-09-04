@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/services/utils/size_config.dart';
 
 import '../../shared/components/components.dart';
+import '../../shared/components/constants.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -47,33 +48,35 @@ class LoginScreen extends StatelessWidget {
                             height: SizeConfig.defaultSize! * 3,
                           ),
                           defaultTextField(
+                              onChanged: (String?s){},
                               hintText: "Phone number, email or username",
-                              controller: emailController),
+                              controller: emailController,
+                              validator: (String?value){
+                                if(value!.isEmpty){
+                                  return "Enter Valid Email";
+                                }
+                                return null;
+                              }
+                          ),
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1.5,
                           ),
                           defaultTextField(
+                              onChanged: (String?s){},
                               hintText: "Password",
                               controller: passwordController,
-                              obscure: true),
+                              obscure: true,
+                              validator: (String?value){
+                                if(value!.isEmpty){
+                                  return "Enter Valid Email";
+                                }
+                                return null;
+                              }
+                          ),
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1.5,
                           ),
-                          ButtonTheme(
-                              minWidth: SizeConfig.screenWidth!,
-                              height: SizeConfig.defaultSize! * 5,
-                              child: RaisedButton(
-                                onPressed: () {},
-                                color: Color.fromRGBO(0, 148, 245, 1.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Text(
-                                  "Log in",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              )),
+                          defaultButton(child: Text('Next'),function: (){}),
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1,
                           ),
@@ -83,8 +86,7 @@ class LoginScreen extends StatelessWidget {
                               Text(
                                 "Forgot your login details?",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(
-                                      129, 128, 128, 0.8235294117647058),
+                                  color: Color.fromRGBO(129, 128, 128, 0.8235294117647058),
                                 ),
                               ),
                               TextButton(
@@ -153,9 +155,16 @@ class LoginScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Don't have an account?"),
+                            Text(
+                              "Don't have an account?",
+                              style: TextStyle(
+                                color: GREY,
+                              ),
+                            ),
                             TextButton(
-                                onPressed: (){},
+                                onPressed: (){
+                                  print(WidgetsBinding.instance.window.locale.countryCode);
+                                },
                                 child: Text(
                                   "Sign up.",
                                   style: TextStyle(
