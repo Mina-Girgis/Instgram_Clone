@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pro/modules/signup/bloc/signin_cubit.dart';
+import 'package:pro/modules/login_screen/login_screen.dart';
+import 'package:pro/modules/signup/bloc/signup_cubit.dart';
+import 'package:pro/modules/signup/signup_screen/verification_screen.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
 
 import '../../../services/utils/size_config.dart';
@@ -11,25 +16,45 @@ import 'package:email_auth/email_auth.dart';
 class SignupScreen extends StatelessWidget {
   SignupScreen({Key? key}) : super(key: key);
 
-  var emailController = TextEditingController();
   var emailKey = GlobalKey<FormState>();
   var phoneKey = GlobalKey<FormState>();
 
+  bool emailFound(SignupCubit cubit, String email) {
+    bool x = false;
+    cubit.users.forEach((element) {
+      if (element.email == email) {
+        x = true;
+      }
+    });
+    return x;
+  }
+
+  static bool phoneNumberFound(SignupCubit cubit, String phoneNumber) {
+    bool x = false;
+    cubit.users.forEach((element) {
+      if (element.phoneNumber == cubit.phoneController.text ) {
+        x = true;
+      }
+    });
+    if(phoneNumber=="")x=false;
+    return x;
+  }
+
   @override
   Widget build(BuildContext context) {
-    var cubit = SigninCubit.get(context);
+    var cubit = SignupCubit.get(context);
     SizeConfig.init(context);
-    return BlocConsumer<SigninCubit, SigninState>(
+    return BlocConsumer<SignupCubit, SignupState>(
       listener: (context, state) {},
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.black,
           body: SafeArea(
             child: SingleChildScrollView(
               physics: ScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: SizeConfig.screenHeight! - 90,
+                  minHeight:
+                      SizeConfig.screenHeight! - SizeConfig.defaultSize! * 7,
                 ),
                 child: IntrinsicHeight(
                   child: Padding(
@@ -117,20 +142,18 @@ class SignupScreen extends StatelessWidget {
                           Form(
                             key: emailKey,
                             child: defaultTextField(
-                              onChanged: (String? s) {
-                                bool emailValid = RegExp(
-                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                    .hasMatch(s!);
-                                // cubit.changeValidEmail(emailValid);
-                              },
+                              onChanged: (String? s) {},
                               hintText: 'Email',
-                              controller: emailController,
+                              controller: cubit.emailController,
                               validator: (String? value) {
                                 bool emailValid = RegExp(
                                         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                    .hasMatch(emailController.text);
+                                    .hasMatch(cubit.emailController.text);
                                 if (!emailValid) {
-                                  return "Enter Valid Email";
+                                  return "Invalid Email";
+                                } else if (emailFound(
+                                    cubit, cubit.emailController.text)) {
+                                  return "Email is already exist";
                                 }
                                 return null;
                               },
@@ -157,10 +180,20 @@ class SignupScreen extends StatelessWidget {
                                     ),
                               function: () {
                                 if (emailKey.currentState!.validate()) {
-                                  cubit.sendOtp(emailController.value.text);
+                                  cubit.sendOtpEmail(
+                                      cubit.emailController.value.text,
+                                      context);
                                 }
                               }),
-                        if (cubit.signinMethodIndex == 0) phoneField(),
+                        if (cubit.signinMethodIndex == 0)
+                          Form(
+                            key: phoneKey,
+                            child: phoneField(
+                              controller: cubit.phoneController,
+                              context: context,
+                              cubit: cubit,
+                            ),
+                          ),
                         if (cubit.signinMethodIndex == 0)
                           Text(
                             "you may receive SMS notifications from us for security and login purposes",
@@ -179,10 +212,27 @@ class SignupScreen extends StatelessWidget {
                                   fontSize: 15.0,
                                 ),
                               ),
-                              function: () {}
-                      ),
-                        Spacer(),
-                        Spacer(),
+                              function: () {
+                                bool existPhoneNumber = phoneNumberFound(cubit, cubit.phoneController.text);
+                                if (phoneKey.currentState!.validate() &&
+                                    !existPhoneNumber) {
+                                  print(cubit.phoneNumber);
+                                  cubit
+                                      .sendOTPPhoneNumber(
+                                          cubit.phoneNumber, context)
+                                      .then((value) {});
+                                } else {
+
+                                  if(existPhoneNumber){
+                                       toastMessage(text: "Phone number is already exist", backgroundColor: GREY, textColor: WHITE,
+                                  );
+                                  }
+
+                                }
+                              }),
+                        Spacer(
+                          flex: 2,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -194,8 +244,10 @@ class SignupScreen extends StatelessWidget {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  print(WidgetsBinding
-                                      .instance.window.locale.countryCode);
+                                  AppNavigator.customNavigator(
+                                      context: context,
+                                      screen: LoginScreen(),
+                                      finish: true);
                                 },
                                 child: Text(
                                   "Log in.",

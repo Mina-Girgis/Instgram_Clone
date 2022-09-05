@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
 import '../../shared/components/components.dart';
 import '../../shared/components/constants.dart';
+import '../signup/signup_screen/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -76,7 +78,7 @@ class LoginScreen extends StatelessWidget {
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1.5,
                           ),
-                          defaultButton(child: Text('Next'),function: (){}),
+                          defaultButton(child: Text('Log in',style: TextStyle(color: WHITE),),function: (){}),
                           SizedBox(
                             height: SizeConfig.defaultSize! * 1,
                           ),
@@ -163,7 +165,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                             TextButton(
                                 onPressed: (){
-                                  print(WidgetsBinding.instance.window.locale.countryCode);
+                                  AppNavigator.customNavigator(context: context, screen: SignupScreen(), finish: true);
                                 },
                                 child: Text(
                                   "Sign up.",

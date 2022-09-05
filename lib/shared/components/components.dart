@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/shared/components/constants.dart';
 
 import '../../services/utils/size_config.dart';
@@ -10,6 +11,7 @@ Widget defaultTextField(
      bool obscure = false,
      required String ?Function (String ?s)validator,
      required Function (String?) onChanged,
+      Widget?suffixIcon,
     }) {
   return TextFormField(
     onChanged: onChanged,
@@ -19,6 +21,7 @@ Widget defaultTextField(
     cursorColor: Colors.white,
     style: TextStyle(color: Colors.white),
     decoration: InputDecoration(
+      suffixIcon: (suffixIcon==null)?null: suffixIcon,
       hintText: hintText,
       hintStyle: TextStyle(color: Color.fromRGBO(141, 141, 141, 1.0)),
       filled: true,
@@ -83,14 +86,14 @@ void snackbarMessage(String text, context) {
   ));
 }
 
-void toastMessage(String s) {
+void toastMessage({required String text ,required Color backgroundColor ,required Color textColor , }) {
   Fluttertoast.showToast(
-      msg: s,
+      msg: text,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
+      backgroundColor:backgroundColor,
+      textColor: textColor,
       fontSize: 16.0);
 }
 
