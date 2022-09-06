@@ -20,7 +20,7 @@ class SignupCubit extends Cubit<SignupState> {
   SignupCubit() : super(SigninInitial());
 
   static SignupCubit get(context) => BlocProvider.of(context);
-  List<UserModel>users=[];
+  // List<UserModel>users=[];
   var phoneController = TextEditingController();
   var emailController = TextEditingController();
   var OTPCodeController = TextEditingController();
@@ -29,8 +29,13 @@ class SignupCubit extends Cubit<SignupState> {
   var verId;
   String phoneNumber = "";
   bool? checkBoxBoolean = false;
-
   int signinMethodIndex = 1;
+
+  void changePhoneNumber(String value){
+    phoneNumber=value;
+    emit(ChangePhoneNumberSuccess());
+  }
+
 
   void changeCheckBoxBoolean(bool? x) {
     checkBoxBoolean = x;
@@ -186,25 +191,6 @@ class SignupCubit extends Cubit<SignupState> {
       );
       emit(AddNewUserFail());
     });
-  }
-
-  void getAllUsers(){
-    users.clear();
-    FirebaseFirestore.instance.collection('users').get()
-    .then((value){
-      value.docs.forEach((element) {
-        UserModel user = UserModel.fromJson(element.data());
-        users.add(user);
-      });
-      print(users.length);
-      emit(GetUsersSuccess());
-    })
-    .catchError((error){
-      print(error.toString());
-      emit(GetUsersFail());
-    });
-
-
   }
 
 

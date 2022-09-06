@@ -1,17 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pro/modules/login_screen/login_screen.dart';
+import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/signup/bloc/signup_cubit.dart';
-import 'package:pro/modules/signup/signup_screen/verification_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
-
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
+import '../../login/screens/login_screen.dart';
 import '../components/components.dart';
-import 'package:email_auth/email_auth.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({Key? key}) : super(key: key);
@@ -19,9 +16,9 @@ class SignupScreen extends StatelessWidget {
   var emailKey = GlobalKey<FormState>();
   var phoneKey = GlobalKey<FormState>();
 
-  bool emailFound(SignupCubit cubit, String email) {
+  bool emailFound(GlobalCubit cubit, String email) {
     bool x = false;
-    cubit.users.forEach((element) {
+    cubit.globalUsers.forEach((element) {
       if (element.email == email) {
         x = true;
       }
@@ -29,10 +26,10 @@ class SignupScreen extends StatelessWidget {
     return x;
   }
 
-  static bool phoneNumberFound(SignupCubit cubit, String phoneNumber) {
+  static bool phoneNumberFound(GlobalCubit cubit, String phoneNumber) {
     bool x = false;
-    cubit.users.forEach((element) {
-      if (element.phoneNumber == cubit.phoneController.text ) {
+    cubit.globalUsers.forEach((element) {
+      if (element.phoneNumber == phoneNumber ) {
         x = true;
       }
     });
@@ -43,6 +40,7 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var cubit = SignupCubit.get(context);
+    var globalCubit = GlobalCubit.get(context);
     SizeConfig.init(context);
     return BlocConsumer<SignupCubit, SignupState>(
       listener: (context, state) {},
@@ -152,7 +150,7 @@ class SignupScreen extends StatelessWidget {
                                 if (!emailValid) {
                                   return "Invalid Email";
                                 } else if (emailFound(
-                                    cubit, cubit.emailController.text)) {
+                                    globalCubit, cubit.emailController.text)) {
                                   return "Email is already exist";
                                 }
                                 return null;
@@ -213,7 +211,7 @@ class SignupScreen extends StatelessWidget {
                                 ),
                               ),
                               function: () {
-                                bool existPhoneNumber = phoneNumberFound(cubit, cubit.phoneController.text);
+                                bool existPhoneNumber = phoneNumberFound(globalCubit, cubit.phoneNumber);
                                 if (phoneKey.currentState!.validate() &&
                                     !existPhoneNumber) {
                                   print(cubit.phoneNumber);

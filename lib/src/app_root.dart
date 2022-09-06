@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:pro/modules/login_screen/login_screen.dart';
+import 'package:pro/modules/home/screens/home_screen.dart';
+import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
+import '../global_bloc/global_cubit.dart';
+import '../modules/login/bloc/login_cubit.dart';
+import '../modules/login/screens/login_screen.dart';
 import '../modules/signup/bloc/signup_cubit.dart';
 import '../modules/signup/signup_screen/signup_info_screen.dart';
 import '../modules/signup/signup_screen/signup_screen.dart';
@@ -13,8 +17,9 @@ class AppRoot extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (BuildContext context) => SignupCubit()..getAllUsers(),),
-
+        BlocProvider(create: (BuildContext context) => GlobalCubit()..getAllUsers()),
+        BlocProvider(create: (BuildContext context) => SignupCubit()),
+        BlocProvider(create: (BuildContext context) => LoginCubit()),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -23,11 +28,17 @@ class AppRoot extends StatelessWidget {
               bodyText2: TextStyle(
                 color: Colors.white,
               ),
-            )
-        ),
+            )),
         debugShowCheckedModeBanner: false,
-        home: LoginScreen(),
+        home: BlocConsumer<GlobalCubit, GlobalState>(
+          listener: (context, state) {},
+          builder: (context, state)  {
+            var screen = (CacheHelper.getData(key: 'username') == -1)?LoginScreen():HomeScreen();
+            return screen;
+          },
+        ),
       ),
-    );;
+    );
+    ;
   }
 }

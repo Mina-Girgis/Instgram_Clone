@@ -44,6 +44,8 @@ class GetUsersSuccess extends SignupState {}
 
 class GetUsersFail extends SignupState {}
 
+class ChangePhoneNumberSuccess extends SignupState {}
+
 
 
 

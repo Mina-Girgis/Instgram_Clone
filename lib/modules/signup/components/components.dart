@@ -19,7 +19,7 @@ Widget phoneField({
       return IntlPhoneField(
         controller: controller,
         onChanged: (value) {
-            cubit.phoneNumber=value.completeNumber;
+          cubit.changePhoneNumber(value.completeNumber);
         },
         initialValue: "+20",
         cursorColor: Colors.white,
