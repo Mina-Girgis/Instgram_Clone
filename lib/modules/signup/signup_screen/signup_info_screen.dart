@@ -51,7 +51,11 @@ class SignUpInfoScreen extends StatelessWidget {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Username must not be empty";
-                            } else
+                            }
+                            else if(value.length>15){
+                              return "Username must be less than 15 letters";
+                            }
+                            else
                               return null;
                           },
                           onChanged: (value) {},

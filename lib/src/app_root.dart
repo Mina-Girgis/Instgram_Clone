@@ -1,3 +1,4 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -32,9 +33,15 @@ class AppRoot extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: BlocConsumer<GlobalCubit, GlobalState>(
           listener: (context, state) {},
-          builder: (context, state)  {
+          builder: (context, state) {
             var screen = (CacheHelper.getData(key: 'username') == -1)?LoginScreen():HomeScreen();
-            return screen;
+
+            if(screen is LoginScreen)
+              return screen;
+            else
+              {
+                return (GlobalCubit.get(context).currentUser.username=="")?SplachScreen() : screen;
+              }
           },
         ),
       ),

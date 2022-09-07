@@ -13,7 +13,7 @@ class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
   static GlobalCubit get(context) => BlocProvider.of(context);
   List<UserModel>globalUsers=[];
-  UserModel ?currentUser;
+  UserModel currentUser =UserModel.empty();
 
   void changeCurrentUser(UserModel user){
     currentUser=user;
