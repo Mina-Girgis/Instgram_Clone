@@ -102,10 +102,11 @@ Widget defaultButton({
   required  function,
   Color color = BUTTON_COLOR,
   bool reedOnly = false,
+  double height = 5,
 }){
   return  ButtonTheme(
       minWidth: SizeConfig.screenWidth!,
-      height: SizeConfig.defaultSize! * 5,
+      height: SizeConfig.defaultSize! * height,
       child: RaisedButton(
 
         onPressed: function,

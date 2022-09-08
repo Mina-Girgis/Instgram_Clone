@@ -2,7 +2,9 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/modules/home/screens/home_screen.dart';
+import 'package:pro/modules/home/screens/start_screen.dart';
 import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
 import '../global_bloc/global_cubit.dart';
 import '../modules/login/bloc/login_cubit.dart';
@@ -21,6 +23,8 @@ class AppRoot extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => GlobalCubit()..getAllUsers()),
         BlocProvider(create: (BuildContext context) => SignupCubit()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
+        BlocProvider(create: (BuildContext context) => HomeCubit()),
+
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -34,7 +38,7 @@ class AppRoot extends StatelessWidget {
         home: BlocConsumer<GlobalCubit, GlobalState>(
           listener: (context, state) {},
           builder: (context, state) {
-            var screen = (CacheHelper.getData(key: 'username') == -1)?LoginScreen():HomeScreen();
+            var screen = (CacheHelper.getData(key: 'username') == -1)?LoginScreen():StartScreen();
 
             if(screen is LoginScreen)
               return screen;

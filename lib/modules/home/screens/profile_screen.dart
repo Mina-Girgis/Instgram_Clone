@@ -1,0 +1,145 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pro/shared/components/components.dart';
+import 'package:pro/shared/components/constants.dart';
+
+import '../../../services/utils/size_config.dart';
+import '../components/components.dart';
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          title: Row(
+            children: [
+              Icon(FontAwesomeIcons.lock,size: 20.0,),
+              SizedBox(width: 8.0,),
+              Text("mina_girgis",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ButtonTheme(
+                child: IconButton(
+                  splashRadius: 15,
+                  iconSize: 30.0,
+                  alignment: Alignment.centerLeft,
+                  onPressed: () {},
+                  icon: Icon(
+                    IconData(
+                      0xf13d,
+                      fontFamily: 'MaterialIcons',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              iconSize: 30.0,
+              splashRadius: 15,
+              onPressed: () {},
+              icon: Icon(
+                Icons.add_box_outlined,
+              ),
+            ),
+            IconButton(
+              iconSize: 30.0,
+              splashRadius: 15,
+              onPressed: () {},
+              icon: Icon(
+                Icons.menu,
+                size: 35.0,
+              ),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(left: 10.0 ,right: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  profilePicWithOvelCircle(
+                    radius: 50.0,
+                    size: SizeConfig.defaultSize!*11,
+                    ovelCircle: true,
+                    padding: 0,
+                  ),
+                  profileNumbers(text:'Posts' ,number: 5),
+                  profileNumbers(text:'Followers' ,number: 307),
+                  profileNumbers(text:'Following' ,number: 639),
+
+                ],
+              ),
+              SizedBox(height: 10,),
+              Text("Bio ..."),
+              SizedBox(height: 10,),
+              Row(
+                children: [
+                  Expanded(
+                    child: defaultButton(
+                        child: Text("Edit profile",
+                          style: TextStyle(
+                            color: WHITE,
+                          ),
+                        ),
+                        color: Color.fromRGBO(30, 30, 30, 1.0),
+                        function: (){},
+                        height: 4,
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                  Container(
+                    width: 40.0,
+                    height: SizeConfig.defaultSize!*4,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(30, 30, 30, 1.0),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      splashRadius: 25.0,
+                      onPressed: (){},
+                      icon :Icon(FontAwesomeIcons.user,color: WHITE,size: 20.0,)
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20,),
+              Container(
+                // color: Colors.grey,
+                height: 130.0,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 10,
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        width: 15.0,
+                      );
+                    },
+                    itemBuilder: (context, index) {
+                      return storyDesignItem(ovel: false);
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(height: 20,),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
