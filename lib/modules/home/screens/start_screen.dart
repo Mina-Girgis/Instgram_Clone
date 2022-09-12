@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/modules/home/screens/home_screen.dart';
-import 'package:pro/modules/home/screens/profile_screen.dart';
+import 'package:pro/modules/home/screens/profile/profile_screen.dart';
 import 'package:pro/modules/home/screens/reel_screen.dart';
 import 'package:pro/modules/home/screens/search_screen.dart';
 import 'package:pro/modules/home/screens/shop_screen.dart';

@@ -15,7 +15,7 @@ class GlobalCubit extends Cubit<GlobalState> {
   List<UserModel>globalUsers=[];
   UserModel currentUser =UserModel.empty();
 
-  void changeCurrentUser(UserModel user){
+   void changeCurrentUser(UserModel user){
     currentUser=user;
     emit(ChangeCurrentUserSuccess());
   }
@@ -40,6 +40,8 @@ class GlobalCubit extends Cubit<GlobalState> {
   void getCurrentUser(){
 
     String? username = CacheHelper.getData(key: 'username');
+    print(username);
+    // String? username = 'mina_girgis';
     if(username !='-1')
       {
         globalUsers.forEach((element) {

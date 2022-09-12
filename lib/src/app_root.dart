@@ -38,12 +38,13 @@ class AppRoot extends StatelessWidget {
         home: BlocConsumer<GlobalCubit, GlobalState>(
           listener: (context, state) {},
           builder: (context, state) {
-            var screen = (CacheHelper.getData(key: 'username') == -1)?LoginScreen():StartScreen();
+            var screen = (CacheHelper.getData(key: 'username') == '-1')?LoginScreen():StartScreen();
 
             if(screen is LoginScreen)
               return screen;
             else
               {
+                print(GlobalCubit.get(context).currentUser.username);
                 return (GlobalCubit.get(context).currentUser.username=="")?SplachScreen() : screen;
               }
           },

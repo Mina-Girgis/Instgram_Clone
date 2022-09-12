@@ -1,17 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pro/global_bloc/global_cubit.dart';
+import 'package:pro/modules/home/bloc/home_cubit.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
 import 'package:pro/shared/components/constants.dart';
 
-import '../../../services/utils/size_config.dart';
-import '../components/components.dart';
+import '../../../../services/utils/size_config.dart';
+import '../../components/components.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var cubit = HomeCubit.get(context);
+    return BlocConsumer<HomeCubit, HomeState>(
+  listener: (context, state) {
+    // TODO: implement listener
+  },
+  builder: (context, state) {
     return SafeArea(
         child: Scaffold(
           appBar: AppBar(
@@ -26,10 +37,14 @@ class ProfileScreen extends StatelessWidget {
                 SizedBox(
                   width: 8.0,
                 ),
-                Text(
-                  "mina_girgis",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                Container(
+                  width: SizeConfig.screenWidth!/2.5,
+                  child: Text(
+                    GlobalCubit.get(context).currentUser.username,
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 ButtonTheme(
@@ -97,7 +112,15 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(
                               height: 10,
                             ),
-                            Text("Bio ..."),
+                            Text(GlobalCubit.get(context).currentUser.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(GlobalCubit.get(context).currentUser.bio),
                             SizedBox(
                               height: 10,
                             ),
@@ -112,7 +135,12 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                     ),
                                     color: Color.fromRGBO(30, 30, 30, 1.0),
-                                    function: () {},
+                                    function: () {
+                                      cubit.changeNameController(GlobalCubit.get(context).currentUser.name);
+                                      cubit.changeUsernameController(GlobalCubit.get(context).currentUser.username);
+                                      cubit.changeBioController(GlobalCubit.get(context).currentUser.bio);
+                                      AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
+                                    },
                                     height: 4,
                                   ),
                                 ),
@@ -216,6 +244,8 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
         ));
+  },
+);
   }
 }
 

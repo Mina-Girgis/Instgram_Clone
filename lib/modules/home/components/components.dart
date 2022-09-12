@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insta_like_button/insta_like_button.dart';
+import 'package:pro/modules/home/bloc/home_cubit.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
+import '../screens/profile/update_profile_data_screen.dart';
 
 Widget storyDesignItem({bool ovel = true}) {
   return Container(
@@ -232,20 +235,92 @@ Widget postDesgin() {
   );
 }
 
-
-Widget profileNumbers({required String text , required int number}){
-  return  Column(
+Widget profileNumbers({required String text, required int number}) {
+  return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-      Text("${number}",style: TextStyle(
-        color: WHITE,
-        fontWeight: FontWeight.bold,
-        fontSize: 17.0
-      ),),
-      Text(text,
+      Text(
+        "${number}",
         style: TextStyle(
-          color: HINT_TEXT_COLOR,
-          fontSize: 15.0
+            color: WHITE, fontWeight: FontWeight.bold, fontSize: 17.0),
+      ),
+      Text(
+        text,
+        style: TextStyle(color: HINT_TEXT_COLOR, fontSize: 15.0),
+      ),
+    ],
+  );
+}
+
+Widget editProfileInputField({
+  required String label,
+  // String initialValue="",
+  required index,
+  required context,
+  required controller,
+  required Function(String value) onChange,
+  required Function ontab,
+  bool readOnly = true,
+}) {
+  return TextFormField(
+    controller: controller,
+    onChanged: onChange,
+    onTap: () {
+      if (readOnly) {
+        ontab();
+      }
+    },
+    autofocus: !readOnly,
+    readOnly: readOnly,
+    // initialValue: initialValue,
+    style: TextStyle(
+      color: WHITE,
+    ),
+    decoration: InputDecoration(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white54,
+        ),
+      ),
+      labelStyle: TextStyle(height: 0.3),
+      filled: true,
+      fillColor: Colors.black,
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: GREY, width: 3.0),
+      ),
+      border: UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.transparent),
+      ),
+    ),
+  );
+}
+
+AppBar appBar(
+    {required String title,
+    required context,
+    required Function()? onSave,
+    required HomeCubit cubit}) {
+  return AppBar(
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+    automaticallyImplyLeading: false,
+    title: Text(title),
+    leading: InkWell(
+        onTap: () {
+          Navigator.of(context,rootNavigator: true).pop();
+        },
+        child: Icon(FontAwesomeIcons.x)),
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 0.0),
+        child: IconButton(
+          onPressed: onSave,
+          icon: Icon(
+            FontAwesomeIcons.check,
+            size: 27.0,
+            color: BUTTON_COLOR,
+          ),
         ),
       ),
     ],

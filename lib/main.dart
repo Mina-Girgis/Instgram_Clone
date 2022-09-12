@@ -13,14 +13,14 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 bool shouldUseFirebaseEmulator = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await CacheHelper.init();
   if (shouldUseFirebaseEmulator) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await CacheHelper.init();
+
   Bloc.observer = MyBlocObserver();
   runApp(AppRoot());
 }

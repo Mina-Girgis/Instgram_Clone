@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/screens/home_screen.dart';
+import 'package:pro/modules/home/screens/start_screen.dart';
 import 'package:pro/modules/signup/bloc/signup_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
@@ -45,7 +46,7 @@ class LoginCubit extends Cubit<LoginState> {
           emit(validEmailAndPasswordSuccess());
           CacheHelper.putData(key: 'username', value: element.username);
           print(CacheHelper.getData(key: 'username'));
-          AppNavigator.customNavigator(context: context, screen: HomeScreen(), finish: true);
+          AppNavigator.customNavigator(context: context, screen: StartScreen(), finish: true);
         }
       }
       );
