@@ -38,7 +38,10 @@ class ProfileScreen extends StatelessWidget {
                   width: 8.0,
                 ),
                 Container(
-                  width: SizeConfig.screenWidth!/2.5,
+                  constraints: BoxConstraints(
+                    minWidth: 0.0,
+                    maxHeight: SizeConfig.screenWidth!/2.5,
+                  ),
                   child: Text(
                     GlobalCubit.get(context).currentUser.username,
                     style: TextStyle(
@@ -61,13 +64,16 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
               ],
             ),
             actions: [
               IconButton(
                 iconSize: 30.0,
                 splashRadius: 15,
-                onPressed: () {},
+                onPressed: () {
+
+                },
                 icon: Icon(
                   Icons.add_box_outlined,
                 ),

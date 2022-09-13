@@ -35,6 +35,7 @@ class UpdateUserDataSuccess extends HomeState {}
 
 class UpdateUserDataFail extends HomeState {}
 
+class ChangeDropdownButtonHintText extends HomeState {}
 
 
 

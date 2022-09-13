@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_storage_path/flutter_storage_path.dart';
 import 'package:meta/meta.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/models/user_model.dart';
 
+import '../../../models/file_model.dart';
 import '../../../shared/components/components.dart';
 import '../../../shared/components/constants.dart';
 import '../../../shared/network/local/cache_helper/cache_helper.dart';
@@ -114,4 +118,49 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddUserFail());
     });
   }
+
+
+
+  List<FileModel> files =[];
+  FileModel? selectedModel;
+  String value ="123";
+  void changeDropdownButtonHintText(String s){
+    value=s;
+    emit(ChangeDropdownButtonHintText());
+  }
+  getImagesPath() async {
+    var imagePath = await StoragePath.imagesPath;
+    var images = jsonDecode(imagePath!) as List;
+    files = images.map<FileModel>((e) => FileModel.fromJson(e)).toList();
+    if (files != null && files.length > 0)
+      {
+        selectedModel=files[0];
+      }
+    files.forEach((element) {
+      print(element.folderName);
+      print(element.files.length);
+      print(element.files[0].toString());
+      print("----------------------");
+    });
+  }
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
