@@ -26,6 +26,17 @@ class HomeCubit extends Cubit<HomeState> {
   String updatingValueField = "";
   UserModel userTmp = UserModel.empty();
 
+  List<FileModel> files =[];
+  FileModel? selectedModel;
+  int albumNameIndex=-1;
+  int imageIndex=-1;
+
+  void changeImageIndex(int idx){
+    imageIndex=idx;
+    emit(ChangeImageIndex());
+  }
+
+
   var nameController = TextEditingController();
   var usernameController = TextEditingController();
   var bioController = TextEditingController();
@@ -35,33 +46,23 @@ class HomeCubit extends Cubit<HomeState> {
     updateController.text=s;
     emit(ChangeUpdateController());
   }
-
   void changeNameController(String s){
     nameController.text=s;
     emit(ChangeNameController());
   }
-
   void changeUsernameController(String s){
     usernameController.text=s;
     emit(ChangeUsernameController());
   }
-
   void changeBioController(String s){
     bioController.text=s;
     emit(ChangeBioController());
   }
-
-
   void changeBottomNavigationBarIndex(int idx) {
     bottomNavigationBarIndex = idx;
     emit(ChangeBottomNavigationBarIndex());
   }
-
-  void updateUserData({
-  required String oldUsername,
-  required UserModel user,
-  required context,
-  }){
+  void updateUserData({required String oldUsername, required UserModel user, required context,}){
     try{
       String username = usernameController.text;
       String name  = nameController.text;
@@ -93,7 +94,6 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UpdateUserDataFail());
     }
   }
-
   void deleteUser(String username) async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -121,20 +121,21 @@ class HomeCubit extends Cubit<HomeState> {
 
 
 
-  List<FileModel> files =[];
-  FileModel? selectedModel;
-  String value ="123";
-  void changeDropdownButtonHintText(String s){
-    value=s;
+
+  void changeDropdownButtonHintText(int idx){
+    albumNameIndex=idx;
     emit(ChangeDropdownButtonHintText());
   }
-  getImagesPath() async {
+  void getImagesPath() async {
+    emit(GetImagesPathLoading());
     var imagePath = await StoragePath.imagesPath;
     var images = jsonDecode(imagePath!) as List;
     files = images.map<FileModel>((e) => FileModel.fromJson(e)).toList();
     if (files != null && files.length > 0)
       {
         selectedModel=files[0];
+        albumNameIndex = 0;
+        imageIndex = 0;
       }
     files.forEach((element) {
       print(element.folderName);
@@ -142,6 +143,10 @@ class HomeCubit extends Cubit<HomeState> {
       print(element.files[0].toString());
       print("----------------------");
     });
+    print("------------------------");
+    print(files[0].files[0]);
+
+    emit(GetImagesPathSuccess());
   }
 
 

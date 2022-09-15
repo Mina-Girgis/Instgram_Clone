@@ -12,3 +12,6 @@ class GlobalGetUsersFail extends GlobalState {}
 class ChangeCurrentUserSuccess extends GlobalState {}
 
 class GetCurrentUserSuccess extends GlobalState {}
+
+
+

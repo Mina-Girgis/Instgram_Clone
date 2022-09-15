@@ -93,6 +93,7 @@ class ProfileScreen extends StatelessWidget {
           body: LayoutBuilder(
             builder: (context, constraint) {
               return SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -197,7 +198,6 @@ class ProfileScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-
 
                       DefaultTabController(
                         length: 2,

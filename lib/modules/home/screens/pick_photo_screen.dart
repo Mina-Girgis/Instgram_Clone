@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/size_config.dart';
+
+import '../../../shared/components/constants.dart';
 
 class PickImageScreen extends StatefulWidget {
   const PickImageScreen({Key? key}) : super(key: key);
@@ -12,14 +16,11 @@ class PickImageScreen extends StatefulWidget {
 }
 
 class _PickImageScreenState extends State<PickImageScreen> {
+
+  late ScrollController _scrollController;
   @override
   Widget build(BuildContext context) {
-    List<String> items = [
-      '22222222',
-      '12222222sssssssssssssssssssssssssssssssssssssssssssssssssss',
-      'Galley',
-      '0',
-    ];
+    _scrollController = ScrollController();
     var cubit = HomeCubit.get(context);
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
@@ -27,12 +28,15 @@ class _PickImageScreenState extends State<PickImageScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.black,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
+            elevation: 0.0,
             automaticallyImplyLeading: false,
             leading: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
               icon: Icon(FontAwesomeIcons.x),
             ),
             title: Text("New post"),
@@ -41,9 +45,13 @@ class _PickImageScreenState extends State<PickImageScreen> {
                   onPressed: () {}, icon: Icon(FontAwesomeIcons.arrowRight))
             ],
           ),
-          body: CustomScrollView(
-            slivers: <Widget>[
+          body:(cubit.albumNameIndex==-1)
+              ? Container()
+              :CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
               SliverAppBar(
+                backgroundColor: Colors.black,
                 automaticallyImplyLeading: false,
                 pinned: true,
                 snap: true,
@@ -58,60 +66,97 @@ class _PickImageScreenState extends State<PickImageScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("0"),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: SizeConfig.screenWidth! / 2,
+                          ),
+                          // height: 10,
+                          child: Text(
+                            cubit.files[cubit.albumNameIndex].folderName,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         IconButton(
+                          color: WHITE,
+                          padding: EdgeInsets.only(left: 0.0),
                             onPressed: () {
-
                               showModalBottomSheet(
                                 backgroundColor: Colors.black,
                                 context: context,
                                 isScrollControlled: true,
+                                isDismissible: true,
+                                enableDrag: true,
                                 builder: (context) {
                                   return SingleChildScrollView(
-                                    child: Container(
-                                      width: SizeConfig.screenWidth!/1.5,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 5.0,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                width: SizeConfig.screenWidth!/4,
-                                                height: 7.0,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey,
-                                                  borderRadius: BorderRadius.circular(10.0),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          SizedBox(height: 5.0,),
-                                          ListView.separated(
-                                            shrinkWrap: true,
-                                              physics: ScrollPhysics(),
-                                              itemCount: items.length,
-                                              separatorBuilder: (context,index){
-                                                return SizedBox(height: 10.0,);
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 10.0),
+                                      child: Container(
+                                        width: SizeConfig.screenWidth! / 1.5,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              height: 5.0,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  width:
+                                                      SizeConfig.screenWidth! /
+                                                          4,
+                                                  height: 4.0,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 5.0,
+                                            ),
+                                            ListView.separated(
+                                              shrinkWrap: true,
+                                              physics: BouncingScrollPhysics(),
+                                              itemCount: cubit.files.length,
+                                              separatorBuilder:
+                                                  (context, index) {
+                                                return SizedBox(
+                                                  height: 10.0,
+                                                );
                                               },
-                                              itemBuilder: (context,index){
-                                                return Container(
-                                                  width: SizeConfig.screenWidth!/2,
-                                                  child: Text(
-                                                    items[index],
-                                                    overflow: TextOverflow.ellipsis,
-
+                                              itemBuilder: (context, index) {
+                                                return InkWell(
+                                                  onTap: (){
+                                                    print(cubit.files[index].folderName);
+                                                    cubit.changeDropdownButtonHintText(index);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(left: 10.0),
+                                                    child: Container(
+                                                      width: SizeConfig.screenWidth! / 2,
+                                                      height: 50,
+                                                      child: Text(
+                                                        cubit.files[index].folderName,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
                                                   ),
                                                 );
                                               },
-                                          ),
-                                        ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
                                 },
-
                               );
                             },
                             icon: Icon(
@@ -123,29 +168,50 @@ class _PickImageScreenState extends State<PickImageScreen> {
                       ],
                     ),
                   ),
-                  background: FlutterLogo(),
+                  background: Image.file(
+                      File(cubit.files[cubit.albumNameIndex].files[cubit.imageIndex]),
+                      fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 20,
-                  child: Center(
-                    child: Text('Scroll to see the SliverAppBar in effect.'),
-                  ),
+                  height: 2,
                 ),
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return Container(
-                      color: index.isOdd ? Colors.white : Colors.black12,
-                      height: 100.0,
-                      child: Center(
-                        child: Text('$index', textScaleFactor: 5),
-                      ),
+                    return GridView.count(
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 2,
+                      children: List.generate(cubit.files[cubit.albumNameIndex].files.length, (index) {
+                        String pic = cubit.files[cubit.albumNameIndex].files[index];
+                        return Container(
+                          width: SizeConfig.screenWidth! / 4,
+                          height: 100,
+                          color: Colors.grey,
+                          child: InkWell(
+                            onTap: (){
+                              cubit.changeImageIndex(index);
+                              // _scrollController.animateTo(
+                              //   _scrollController.position.,
+                              //   duration: Duration(milliseconds: 500),
+                              //   curve: Curves.decelerate,
+                              // );
+                            },
+                            child: Image.file(File(pic),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }),
                     );
                   },
-                  childCount: 20,
+                  childCount: 1,
                 ),
               ),
             ],

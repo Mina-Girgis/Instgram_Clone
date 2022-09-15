@@ -88,6 +88,7 @@ class HomeScreen extends StatelessWidget {
               child: Stack(
                 children: [
                   SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
                     child: Container(
                       width: SizeConfig.screenWidth,
                       child: Column(

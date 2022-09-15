@@ -37,6 +37,12 @@ class UpdateUserDataFail extends HomeState {}
 
 class ChangeDropdownButtonHintText extends HomeState {}
 
+class GetImagesPathLoading extends HomeState {}
+
+class GetImagesPathSuccess extends HomeState {}
+
+class ChangeImageIndex extends HomeState {}
+
 
 
 
