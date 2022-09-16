@@ -7,6 +7,22 @@ class PostModel{
   String postId = ""; // comes from database
   PostModel({required this.username,required this.imageUrl,required this.description,required this.time});
 
+  PostModel.empty(){
+    username="";
+    imageUrl="";
+    time="";
+    description="";
+  }
+
+  PostModel.copy(PostModel model){
+    username=model.username;
+    imageUrl=model.imageUrl;
+    time=model.time;
+    description=model.description;
+    postId=model.postId;
+  }
+
+
   PostModel.fromJson(Map<String,dynamic>json){
     username=json['username'];
     imageUrl=json['imageUrl'];

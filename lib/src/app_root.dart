@@ -47,6 +47,7 @@ class AppRoot extends StatelessWidget {
             else
               {
                 print(GlobalCubit.get(context).currentUser.username);
+                // CacheHelper.putData(key: 'username', value: '-1');
                 return (GlobalCubit.get(context).currentUser.username=="")?SplachScreen() : screen;
               }
           },

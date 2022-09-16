@@ -10,6 +10,7 @@ part 'global_state.dart';
 class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
   static GlobalCubit get(context) => BlocProvider.of(context);
+
   List<UserModel>globalUsers=[];
 
   UserModel currentUser =UserModel.empty();
@@ -24,6 +25,7 @@ class GlobalCubit extends Cubit<GlobalState> {
         .then((value){
       value.docs.forEach((element) {
         UserModel user = UserModel.fromJson(element.data());
+        globalUsers.add(user);
       });
       print(globalUsers.length);
       getCurrentUser();

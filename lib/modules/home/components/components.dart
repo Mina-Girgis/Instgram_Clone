@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insta_like_button/insta_like_button.dart';
+import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 
@@ -101,7 +102,7 @@ Widget postDesgin({required context, required HomeCubit cubit ,required PostMode
                   maxWidth: SizeConfig.screenWidth!/2,
                   minWidth: 10,
                 ),
-                child: Text('mina_girgis123',
+                child: Text("Mina",
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

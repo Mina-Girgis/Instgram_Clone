@@ -8,6 +8,7 @@ import 'package:pro/modules/home/screens/add%20post/pick_photo_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
+import '../../../models/post_model.dart';
 import '../../../shared/components/constants.dart';
 import '../components/components.dart';
 
@@ -65,7 +66,12 @@ class HomeScreen extends StatelessWidget {
                 IconButton(
                   iconSize: 30.0,
                   splashRadius: 15,
-                  onPressed: () {},
+                  onPressed: () async{
+                    await cubit.getPostById(postId: "5z50CIKKLB7jVDZgtXjp");
+                    print("------------*-------------");
+                    print(cubit.postTmp.description);
+                    print("------------*-------------");
+                    },
                   icon: Icon(
                     Icons.favorite_border,
                   ),

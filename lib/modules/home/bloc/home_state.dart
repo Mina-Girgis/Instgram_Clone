@@ -43,9 +43,9 @@ class GetImagesPathSuccess extends HomeState {}
 
 class ChangeImageIndex extends HomeState {}
 
-class UploadProfileImageSuccess extends HomeState {}
+class UploadNewPostImageSuccess extends HomeState {}
 
-class UploadProfileImageFail extends HomeState {}
+class UploadNewPostImageFail extends HomeState {}
 
 class AddNewPostSuccess extends HomeState {}
 
@@ -57,25 +57,14 @@ class AddToMyPostsFail extends HomeState {}
 
 class AddNewPostLoading extends HomeState {}
 
-
 class GetAllPostsSuccess extends HomeState {}
-
 
 class GetAllPostsFail extends HomeState {}
 
+class GetMyPostsSuccess extends HomeState {}
 
+class GetMyPostsFail extends HomeState {}
 
+class GetPostByIdSuccess extends HomeState {}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+class GetPostByIdFail extends HomeState {}

@@ -26,8 +26,10 @@ class HomeCubit extends Cubit<HomeState> {
   String updatingValueField = "";
   String PostImageUrlFromFireBaseStorage = "";
   UserModel userTmp = UserModel.empty();
+  PostModel postTmp = PostModel.empty();
   List<FileModel> files = [];
   List<PostModel> posts = [];
+  List<String> myPostsIds = [];
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
@@ -74,7 +76,14 @@ class HomeCubit extends Cubit<HomeState> {
     emit(ChangeImageIndex());
   }
 
+
   // Edit profile
+  void changePostTempData(PostModel model){
+    postTmp = PostModel.copy(model);
+  }
+
+
+
   Future<void> updateUserData({
     required String oldUsername,
     required UserModel user,
@@ -115,6 +124,26 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> deleteUser(String username) async {
+    // DELETE ALL COLLECTIONS
+    List<String> subCollections = ['myPosts'];
+
+    subCollections.forEach((element) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(username)
+          .collection(element)
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          element.reference.delete();
+        });
+        // emit(DeleteUserSuccess());
+      }).catchError((error) {
+        print(error.toString());
+        emit(DeleteUserFail());
+      });
+    });
+    // delete data
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -134,11 +163,60 @@ class HomeCubit extends Cubit<HomeState> {
         .set(mp)
         .then((value) {
       userTmp = UserModel.fromJson(mp);
+      myPostsIds.forEach((element) async {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(username)
+            .collection('myPosts')
+            .doc(element)
+            .set({})
+            .then((value) {})
+            .catchError((error) {
+              print(error.toString());
+            });
+      });
       emit(AddUserSuccess());
     }).catchError((error) {
       print(error.toString());
       emit(AddUserFail());
     });
+  }
+
+  // get all posts
+  Future<void> getMyPosts({required String username}) async {
+    myPostsIds.clear();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('myPosts')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        print(element.id);
+        myPostsIds.add(element.id);
+        emit(GetMyPostsSuccess());
+      });
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetMyPostsFail());
+    });
+  }
+
+  Future<void> getPostById({required String postId}) async {
+    // PostModel model = PostModel.empty();
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .get().then((value){
+         Map<String,dynamic>? mp =  value.data();
+         PostModel model = PostModel.fromJson(mp!);
+         changePostTempData(model);
+         emit(GetPostByIdSuccess());
+    }).catchError((error){
+        print(error.toString());
+        emit(GetPostByIdFail());
+    });
+
   }
 
   // add post
@@ -163,36 +241,44 @@ class HomeCubit extends Cubit<HomeState> {
     emit(GetImagesPathSuccess());
   }
 
-  Future<void> uploadProfileImage(String profileImage) async {
+  Future<void> uploadNewPostImage(
+      {required username, required String image}) async {
     // String profileImage = files[albumNameIndex].files[imageIndex]; // from imagePicker
-    File file = File(profileImage);
+    emit(AddNewPostLoading());
+    File file = File(image);
     await firebase_storage.FirebaseStorage.instance
         .ref()
         .child('posts/${Uri.file(file.path).pathSegments.last}')
         .putFile(file)
         .then((value) {
-      value.ref.getDownloadURL().then((value) {
-        PostImageUrlFromFireBaseStorage = value;
+      value.ref.getDownloadURL().then((value) async {
         print(value);
+        await addNewPost(
+          time: DateTime.now().toString(),
+          description: addPostController.text,
+          username: username,
+          image: value,
+        );
+
+        emit(UploadNewPostImageSuccess());
       }).catchError((error) {
         print(error.toString());
       });
     }).catchError((error) {
       print(error.toString());
-      emit(UploadProfileImageFail());
+      emit(UploadNewPostImageFail());
     });
   }
 
-  Future<void> addNewPost(
-      {required String image,
-      required String description,
-      required String username,
-      required String time}) async {
-    emit(AddNewPostLoading());
-    await uploadProfileImage(image);
+  Future<void> addNewPost({
+    required String image,
+    required String description,
+    required String username,
+    required String time,
+  }) async {
     PostModel model = PostModel(
       username: username,
-      imageUrl: PostImageUrlFromFireBaseStorage,
+      imageUrl: image,
       description: description,
       time: time,
     );
@@ -202,6 +288,7 @@ class HomeCubit extends Cubit<HomeState> {
         .then((value) async {
       print(value.id);
       await _addToMyPosts(postId: value.id, username: username);
+      await getMyPosts(username: username);
       toastMessage(
           text: "Post added successfully.",
           backgroundColor: GREY,
@@ -245,9 +332,4 @@ class HomeCubit extends Cubit<HomeState> {
       print(error.toString());
     });
   }
-
-
-
-
-
 }
