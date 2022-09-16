@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
-import 'package:pro/modules/home/screens/pick_photo_screen.dart';
+import 'package:pro/modules/home/screens/add%20post/pick_photo_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
@@ -21,7 +21,6 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: BlocConsumer<HomeCubit, HomeState>(
         listener: (context, state) {
-          // TODO: implement listener
         },
         builder: (context, state) {
           return Scaffold(
@@ -113,19 +112,26 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          ListView.separated(
+                          if(cubit.posts.isNotEmpty)
+                            ListView.separated(
                             shrinkWrap: true,
                             physics: ScrollPhysics(),
-                            itemCount: 5,
+                            itemCount: cubit.posts.length,
                             separatorBuilder: (context, index) {
                               return SizedBox(
                                 height: 10.0,
                               );
                             },
                             itemBuilder: (context, index) {
-                              return postDesgin();
+                              return postDesgin(context: context,model:cubit.posts[index],cubit: cubit);
                             },
-                          ),
+                          )
+                          else
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: CircularProgressIndicator(),
+                            ),
+
                           SizedBox(
                             height: 10,
                           ),

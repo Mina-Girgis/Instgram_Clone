@@ -4,15 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
-
 import '../models/user_model.dart';
-
 part 'global_state.dart';
 
 class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
   static GlobalCubit get(context) => BlocProvider.of(context);
   List<UserModel>globalUsers=[];
+
   UserModel currentUser =UserModel.empty();
 
    void changeCurrentUser(UserModel user){
@@ -25,7 +24,6 @@ class GlobalCubit extends Cubit<GlobalState> {
         .then((value){
       value.docs.forEach((element) {
         UserModel user = UserModel.fromJson(element.data());
-        globalUsers.add(user);
       });
       print(globalUsers.length);
       getCurrentUser();

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
-import '../../../shared/components/constants.dart';
+import '../../../../shared/components/constants.dart';
+import 'add_post_screen.dart';
 
 class PickImageScreen extends StatefulWidget {
   const PickImageScreen({Key? key}) : super(key: key);
@@ -42,7 +44,11 @@ class _PickImageScreenState extends State<PickImageScreen> {
             title: Text("New post"),
             actions: [
               IconButton(
-                  onPressed: () {}, icon: Icon(FontAwesomeIcons.arrowRight))
+                  onPressed: () {
+                    AppNavigator.customNavigator(context: context, screen: AddPostScreen(), finish: false);
+                  },
+                  icon: Icon(FontAwesomeIcons.arrowRight),
+              ),
             ],
           ),
           body:(cubit.albumNameIndex==-1)
@@ -197,6 +203,8 @@ class _PickImageScreenState extends State<PickImageScreen> {
                           child: InkWell(
                             onTap: (){
                               cubit.changeImageIndex(index);
+                              print(index);
+                              print(cubit.files[cubit.albumNameIndex].files[index]);
                               // _scrollController.animateTo(
                               //   _scrollController.position.,
                               //   duration: Duration(milliseconds: 500),

@@ -7,7 +7,7 @@ import 'package:pro/modules/home/screens/home_screen.dart';
 import 'package:pro/modules/home/screens/start_screen.dart';
 import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
 import '../global_bloc/global_cubit.dart';
-import '../modules/home/screens/pick_photo_screen.dart';
+import '../modules/home/screens/add post/pick_photo_screen.dart';
 import '../modules/login/bloc/login_cubit.dart';
 import '../modules/login/screens/login_screen.dart';
 import '../modules/signup/bloc/signup_cubit.dart';
@@ -24,7 +24,7 @@ class AppRoot extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => GlobalCubit()..getAllUsers()),
         BlocProvider(create: (BuildContext context) => SignupCubit()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
-        BlocProvider(create: (BuildContext context) => HomeCubit()),
+        BlocProvider(create: (BuildContext context) => HomeCubit()..getAllPosts()),
 
       ],
       child: MaterialApp(

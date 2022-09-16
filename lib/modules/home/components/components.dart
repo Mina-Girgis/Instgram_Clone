@@ -4,6 +4,7 @@ import 'package:insta_like_button/insta_like_button.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 
+import '../../../models/post_model.dart';
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
@@ -75,7 +76,7 @@ Widget profilePicWithOvelCircle({
   );
 }
 
-Widget postDesgin() {
+Widget postDesgin({required context, required HomeCubit cubit ,required PostModel model}) {
   return Container(
     width: SizeConfig.screenWidth,
     // color: Colors.grey,
@@ -95,7 +96,15 @@ Widget postDesgin() {
               SizedBox(
                 width: 10.0,
               ),
-              Text("mina_girgis"),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: SizeConfig.screenWidth!/2,
+                  minWidth: 10,
+                ),
+                child: Text('mina_girgis123',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               SizedBox(
                 width: 5.0,
               ),
@@ -128,7 +137,7 @@ Widget postDesgin() {
           width: SizeConfig.screenWidth,
           child: InstaLikeButton(
             onChanged: () {},
-            image: AssetImage('assets/postImage.jpg'),
+            image: NetworkImage(model.imageUrl),
             height: 300,
           ),
         ),
@@ -186,11 +195,11 @@ Widget postDesgin() {
               ),
               RichText(
                 text: TextSpan(
-                  text: 'mina_girgis ',
+                  text: 'mina_girgis  ',
                   style: TextStyle(color: WHITE, fontWeight: FontWeight.bold),
                   children: <TextSpan>[
                     TextSpan(
-                      text: 'Good Morning',
+                      text: model.description,
                       style: TextStyle(
                           color: Colors.white54, fontWeight: FontWeight.normal
                           // decoration: TextDecoration.underline,
