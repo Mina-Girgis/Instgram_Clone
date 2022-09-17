@@ -6,6 +6,7 @@ import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 
 import '../../../models/post_model.dart';
+import '../../../models/user_model.dart';
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
@@ -77,7 +78,7 @@ Widget profilePicWithOvelCircle({
   );
 }
 
-Widget postDesgin({required context, required HomeCubit cubit ,required PostModel model}) {
+Widget postDesgin({required UserModel?user ,required context, required HomeCubit cubit ,required PostModel model}) {
   return Container(
     width: SizeConfig.screenWidth,
     // color: Colors.grey,
@@ -102,7 +103,7 @@ Widget postDesgin({required context, required HomeCubit cubit ,required PostMode
                   maxWidth: SizeConfig.screenWidth!/2,
                   minWidth: 10,
                 ),
-                child: Text("Mina",
+                child: Text(user!.username,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

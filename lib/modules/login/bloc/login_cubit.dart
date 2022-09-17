@@ -46,6 +46,8 @@ class LoginCubit extends Cubit<LoginState> {
           emit(validEmailAndPasswordSuccess());
           CacheHelper.putData(key: 'username', value: element.username);
           print(CacheHelper.getData(key: 'username'));
+          usernameController.clear();
+          passwordController.clear();
           AppNavigator.customNavigator(context: context, screen: StartScreen(), finish: true);
         }
       }

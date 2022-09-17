@@ -26,6 +26,18 @@ class UserModel{
     bio="";
     imageUrl="";
   }
+
+  UserModel.copy(UserModel model){
+    username = model.username;
+    password = model.password;
+    email = model.email;
+    phoneNumber = model.phoneNumber;
+    name = model.name;
+    bio = model.bio;
+    imageUrl = model.imageUrl;
+  }
+
+
   UserModel.fromJson(Map<String,dynamic>json){
     username=json['username']??"";
     password=json['password']??"";

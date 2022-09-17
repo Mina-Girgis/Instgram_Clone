@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
+import 'package:pro/modules/home/screens/profile/side_bar/side_bar_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
 import 'package:pro/shared/components/constants.dart';
@@ -81,7 +82,9 @@ class ProfileScreen extends StatelessWidget {
               IconButton(
                 iconSize: 30.0,
                 splashRadius: 15,
-                onPressed: () {},
+                onPressed: () {
+                  AppNavigator.customNavigator(context: context, screen: SideBarScreen(), finish: false);
+                },
                 icon: Icon(
                   Icons.menu,
                   size: 35.0,
@@ -232,14 +235,14 @@ class ProfileScreen extends StatelessWidget {
                         shrinkWrap: true,
                         physics: ScrollPhysics(),
                         crossAxisCount: 3,
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 5.0,
-                        children: List.generate(10, (index){
+                        mainAxisSpacing: 3.0,
+                        crossAxisSpacing: 3.0,
+                        children: List.generate(cubit.userPosts.length, (index){
                           return Container(
                             width: SizeConfig.screenWidth!/3,
                             height: 100,
                             color: Colors.grey,
-                            child: Image.asset('assets/postImage.jpg',
+                            child: Image.network(cubit.userPosts[index].imageUrl,
                               fit: BoxFit.cover,
                             ),
                           );

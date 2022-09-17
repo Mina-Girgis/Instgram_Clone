@@ -61,10 +61,28 @@ class GetAllPostsSuccess extends HomeState {}
 
 class GetAllPostsFail extends HomeState {}
 
-class GetMyPostsSuccess extends HomeState {}
+class GetMyPostsIdsSuccess extends HomeState {}
 
-class GetMyPostsFail extends HomeState {}
+class GetMyPostsIdsFail extends HomeState {}
 
 class GetPostByIdSuccess extends HomeState {}
 
 class GetPostByIdFail extends HomeState {}
+
+class ChangeUserTmpData extends HomeState {}
+
+class GetSpecificUserSuccess extends HomeState {}
+
+class GetSpecificUserFail extends HomeState {}
+
+class GetAllUsersSuccess extends HomeState {}
+
+class GetAllUsersFail extends HomeState {}
+
+class GetAllPostsForSpecificUserSuccess extends HomeState {}
+
+
+
+
+
+

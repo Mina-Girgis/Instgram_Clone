@@ -74,9 +74,8 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                     editProfileInputField(
                       ontab: (){
-                        cubit.changeUpdateController(cubit.usernameController.text);
-                        AppNavigator.customNavigator(context: context, screen: UpdateProfileDataScreen(index: 1), finish: false);
-
+                        // cubit.changeUpdateController(cubit.usernameController.text);
+                        // AppNavigator.customNavigator(context: context, screen: UpdateProfileDataScreen(index: 1), finish: false);
                       },
                       controller: cubit.usernameController,
                       onChange: (value){},
@@ -84,6 +83,7 @@ class EditProfileScreen extends StatelessWidget {
                       label: "Username",
                       // initialValue: "123",
                       index: 0,
+                      readOnly: true,
                     ),
                     SizedBox(
                       height: 20.0,

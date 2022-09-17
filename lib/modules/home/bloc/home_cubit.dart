@@ -27,9 +27,14 @@ class HomeCubit extends Cubit<HomeState> {
   String PostImageUrlFromFireBaseStorage = "";
   UserModel userTmp = UserModel.empty();
   PostModel postTmp = PostModel.empty();
-  List<FileModel> files = [];
-  List<PostModel> posts = [];
-  List<String> myPostsIds = [];
+  List<FileModel> files   = [];
+
+  List<PostModel> allPosts   = [];
+  List<String> userPostsIds = [];
+  List<PostModel> userPosts =[];
+
+
+  Map<String, UserModel> users = {};
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
@@ -63,6 +68,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   void changeBottomNavigationBarIndex(int idx) {
     bottomNavigationBarIndex = idx;
+    if(idx==4){
+      getAllPostsForSpecificUser(username: 'mina_girgis_alfy');
+    }
     emit(ChangeBottomNavigationBarIndex());
   }
 
@@ -76,13 +84,15 @@ class HomeCubit extends Cubit<HomeState> {
     emit(ChangeImageIndex());
   }
 
-
   // Edit profile
-  void changePostTempData(PostModel model){
+  void changePostTempData(PostModel model) {
     postTmp = PostModel.copy(model);
   }
 
-
+  void changeUserTmpData(UserModel model) {
+    userTmp = model;
+    emit(ChangeUserTmpData());
+  }
 
   Future<void> updateUserData({
     required String oldUsername,
@@ -163,7 +173,7 @@ class HomeCubit extends Cubit<HomeState> {
         .set(mp)
         .then((value) {
       userTmp = UserModel.fromJson(mp);
-      myPostsIds.forEach((element) async {
+      userPostsIds.forEach((element) async {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(username)
@@ -183,8 +193,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // get all posts
-  Future<void> getMyPosts({required String username}) async {
-    myPostsIds.clear();
+  Future<void> getAllPostsIdsForSpecicUser({required String username}) async {
+    userPostsIds.clear();
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -193,29 +203,50 @@ class HomeCubit extends Cubit<HomeState> {
         .then((value) {
       value.docs.forEach((element) {
         print(element.id);
-        myPostsIds.add(element.id);
-        emit(GetMyPostsSuccess());
+        userPostsIds.add(element.id);
+        emit(GetMyPostsIdsSuccess());
       });
     }).catchError((error) {
       print(error.toString());
-      emit(GetMyPostsFail());
+      emit(GetMyPostsIdsFail());
     });
   }
-
   Future<void> getPostById({required String postId}) async {
     // PostModel model = PostModel.empty();
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
-        .get().then((value){
-         Map<String,dynamic>? mp =  value.data();
-         PostModel model = PostModel.fromJson(mp!);
-         changePostTempData(model);
-         emit(GetPostByIdSuccess());
-    }).catchError((error){
-        print(error.toString());
-        emit(GetPostByIdFail());
+        .get()
+        .then((value) {
+      Map<String, dynamic>? mp = value.data();
+      PostModel model = PostModel.fromJson(mp!);
+      changePostTempData(model);
+      emit(GetPostByIdSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetPostByIdFail());
     });
+  }
+
+  Future<void> getAllPostsForSpecificUser({required String username})async
+  {
+    userPosts.clear();
+    await getAllPostsIdsForSpecicUser(username:username).then((value){
+      userPostsIds.forEach((element) async{
+        await getPostById(postId: element)
+          .then((value){
+          PostModel model = PostModel.copy(postTmp);
+          userPosts.add(model);
+          userPosts.sort((a,b)=>b.time.compareTo(a.time));
+        }
+        );
+      });
+
+      emit(GetAllPostsForSpecificUserSuccess());
+    }
+
+    );
+
 
   }
 
@@ -288,7 +319,7 @@ class HomeCubit extends Cubit<HomeState> {
         .then((value) async {
       print(value.id);
       await _addToMyPosts(postId: value.id, username: username);
-      await getMyPosts(username: username);
+      await getAllPostsIdsForSpecicUser(username: username);
       toastMessage(
           text: "Post added successfully.",
           backgroundColor: GREY,
@@ -314,12 +345,16 @@ class HomeCubit extends Cubit<HomeState> {
 
   // get from database
   Future<void> getAllPosts() async {
-    await FirebaseFirestore.instance.collection('posts').get().then((value) {
-      posts.clear();
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('time' ,descending: true)
+        .get()
+        .then((value) {
+      allPosts.clear();
       value.docs.forEach((element) {
         PostModel model = PostModel.fromJson(element.data());
         model.changePostId(element.id);
-        posts.add(model);
+        allPosts.add(model);
         print(model.username);
         print(model.time);
         print(model.postId);
@@ -330,6 +365,19 @@ class HomeCubit extends Cubit<HomeState> {
     }).catchError((error) {
       emit(GetAllPostsFail());
       print(error.toString());
+    });
+  }
+
+  Future<void> getAllUsers() async {
+    users.clear();
+    await FirebaseFirestore.instance.collection('users').get().then((value) {
+      value.docs.forEach((element) {
+        users[element.id] = UserModel.fromJson(element.data());
+      });
+      emit(GetAllUsersSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetAllUsersFail());
     });
   }
 }

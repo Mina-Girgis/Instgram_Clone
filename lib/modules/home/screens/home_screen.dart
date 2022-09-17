@@ -9,6 +9,7 @@ import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
 import '../../../models/post_model.dart';
+import '../../../models/user_model.dart';
 import '../../../shared/components/constants.dart';
 import '../components/components.dart';
 
@@ -21,8 +22,7 @@ class HomeScreen extends StatelessWidget {
     var cubit = HomeCubit.get(context);
     return SafeArea(
       child: BlocConsumer<HomeCubit, HomeState>(
-        listener: (context, state) {
-        },
+        listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
@@ -57,7 +57,10 @@ class HomeScreen extends StatelessWidget {
                   splashRadius: 15,
                   onPressed: () {
                     cubit.getImagesPath();
-                    AppNavigator.customNavigator(context: context, screen: PickImageScreen(), finish: false);
+                    AppNavigator.customNavigator(
+                        context: context,
+                        screen: PickImageScreen(),
+                        finish: false);
                   },
                   icon: Icon(
                     Icons.add_box_outlined,
@@ -66,12 +69,9 @@ class HomeScreen extends StatelessWidget {
                 IconButton(
                   iconSize: 30.0,
                   splashRadius: 15,
-                  onPressed: () async{
-                    await cubit.getPostById(postId: "5z50CIKKLB7jVDZgtXjp");
-                    print("------------*-------------");
-                    print(cubit.postTmp.description);
-                    print("------------*-------------");
-                    },
+                  onPressed: () async {
+
+                  },
                   icon: Icon(
                     Icons.favorite_border,
                   ),
@@ -87,7 +87,6 @@ class HomeScreen extends StatelessWidget {
                         ))),
               ],
             ),
-
             body: RefreshIndicator(
               onRefresh: () async {},
               child: Stack(
@@ -102,8 +101,8 @@ class HomeScreen extends StatelessWidget {
                             // color: Colors.grey,
                             height: 130.0,
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0, right: 8.0),
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, right: 8.0),
                               child: ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 10,
@@ -118,26 +117,31 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if(cubit.posts.isNotEmpty)
+                          if (cubit.allPosts.isNotEmpty)
                             ListView.separated(
-                            shrinkWrap: true,
-                            physics: ScrollPhysics(),
-                            itemCount: cubit.posts.length,
-                            separatorBuilder: (context, index) {
-                              return SizedBox(
-                                height: 10.0,
-                              );
-                            },
-                            itemBuilder: (context, index) {
-                              return postDesgin(context: context,model:cubit.posts[index],cubit: cubit);
-                            },
-                          )
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              itemCount: cubit.allPosts.length,
+                              separatorBuilder: (context, index) {
+                                return SizedBox(
+                                  height: 10.0,
+                                );
+                              },
+                              itemBuilder: (context, index) {
+                                String username =
+                                    cubit.allPosts[index].username;
+                                return postDesgin(
+                                    user: cubit.users[username],
+                                    context: context,
+                                    model: cubit.allPosts[index],
+                                    cubit: cubit);
+                              },
+                            )
                           else
                             Padding(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: CircularProgressIndicator(),
                             ),
-
                           SizedBox(
                             height: 10,
                           ),
@@ -153,6 +157,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }
