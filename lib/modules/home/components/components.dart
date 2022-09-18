@@ -150,8 +150,10 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
                 onPressed: () {},
                 icon: Icon(
                   FontAwesomeIcons.heart,
-                  color: WHITE,
-                )),
+                  color: (model.isLiked==true)?Colors.red:Colors.white,
+
+                ),
+            ),
             IconButton(
                 splashRadius: 15.0,
                 onPressed: () {},
@@ -190,7 +192,7 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "114 likes",
+                "${model.likes.length} likes",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -216,7 +218,7 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
                 height: 10.0,
               ),
               Text(
-                "View 1 comment",
+                "View 0 comment",
                 style: TextStyle(
                   color: GREY,
                 ),

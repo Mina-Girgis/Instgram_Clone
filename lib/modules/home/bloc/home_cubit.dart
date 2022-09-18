@@ -50,35 +50,29 @@ class HomeCubit extends Cubit<HomeState> {
     updateController.text = s;
     emit(ChangeUpdateController());
   }
-
   void changeNameController(String s) {
     nameController.text = s;
     emit(ChangeNameController());
   }
-
   void changeUsernameController(String s) {
     usernameController.text = s;
     emit(ChangeUsernameController());
   }
-
   void changeBioController(String s) {
     bioController.text = s;
     emit(ChangeBioController());
   }
-
   void changeBottomNavigationBarIndex(int idx) {
     bottomNavigationBarIndex = idx;
-    if(idx==4){
+    if(idx ==4 && userPosts.isEmpty){
       getAllPostsForSpecificUser(username: 'mina_girgis_alfy');
     }
     emit(ChangeBottomNavigationBarIndex());
   }
-
   void changeDropdownButtonHintText(int idx) {
     albumNameIndex = idx;
     emit(ChangeDropdownButtonHintText());
   }
-
   void changeImageIndex(int idx) {
     imageIndex = idx;
     emit(ChangeImageIndex());
@@ -88,17 +82,11 @@ class HomeCubit extends Cubit<HomeState> {
   void changePostTempData(PostModel model) {
     postTmp = PostModel.copy(model);
   }
-
   void changeUserTmpData(UserModel model) {
     userTmp = model;
     emit(ChangeUserTmpData());
   }
-
-  Future<void> updateUserData({
-    required String oldUsername,
-    required UserModel user,
-    required context,
-  }) async {
+  Future<void> updateUserData({required String oldUsername, required UserModel user, required context,}) async {
     try {
       String username = usernameController.text;
       String name = nameController.text;
@@ -132,7 +120,6 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UpdateUserDataFail());
     }
   }
-
   Future<void> deleteUser(String username) async {
     // DELETE ALL COLLECTIONS
     List<String> subCollections = ['myPosts'];
@@ -164,9 +151,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(DeleteUserFail());
     });
   }
-
-  Future<void> addUser(
-      String username, Map<String, dynamic> mp, context) async {
+  Future<void> addUser(String username, Map<String, dynamic> mp, context) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -227,15 +212,15 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetPostByIdFail());
     });
   }
-
-  Future<void> getAllPostsForSpecificUser({required String username})async
-  {
+  Future<void> getAllPostsForSpecificUser({required String username})async {
     userPosts.clear();
-    await getAllPostsIdsForSpecicUser(username:username).then((value){
+    await getAllPostsIdsForSpecicUser(username:username)
+        .then((value){
       userPostsIds.forEach((element) async{
         await getPostById(postId: element)
           .then((value){
           PostModel model = PostModel.copy(postTmp);
+          model.changePostId(element);
           userPosts.add(model);
           userPosts.sort((a,b)=>b.time.compareTo(a.time));
         }
@@ -249,6 +234,44 @@ class HomeCubit extends Cubit<HomeState> {
 
 
   }
+  Future<void> getAllPosts() async {
+    String? username = CacheHelper.getData(key: 'username');
+    await getPostsILiked(username:username.toString())
+        .then((value)async{
+
+          Map<String,bool>isLikedMap=value;
+
+          await FirebaseFirestore.instance.collection('posts').orderBy('time' ,descending: true).get().then((value) {
+            allPosts.clear();
+            value.docs.forEach((element) async {
+              PostModel model = PostModel.fromJson(element.data());
+              model.changePostId(element.id);
+
+              await getLikesForSpecificPost(postId: element.id)
+                  .then((value){
+                model.changeLikesList(list: value);
+                if(isLikedMap[element.id]==true){
+                  model.changeIsliked(true);
+                }
+                allPosts.add(model);
+              })
+                .catchError((error){
+                print(error.toString());
+              });
+            });
+            emit(GetAllPostsSuccess());
+          }).catchError((error) {
+            print(error.toString());
+            emit(GetAllPostsFail());
+          });
+        })
+        .catchError((error){
+            emit(GetAllPostsFail());
+         });
+
+
+  }
+
 
   // add post
   Future<void> getImagesPath() async {
@@ -271,9 +294,7 @@ class HomeCubit extends Cubit<HomeState> {
     print(files[0].files[0]);
     emit(GetImagesPathSuccess());
   }
-
-  Future<void> uploadNewPostImage(
-      {required username, required String image}) async {
+  Future<void> uploadNewPostImage({required username, required String image}) async {
     // String profileImage = files[albumNameIndex].files[imageIndex]; // from imagePicker
     emit(AddNewPostLoading());
     File file = File(image);
@@ -300,13 +321,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UploadNewPostImageFail());
     });
   }
-
-  Future<void> addNewPost({
-    required String image,
-    required String description,
-    required String username,
-    required String time,
-  }) async {
+  Future<void> addNewPost({required String image, required String description, required String username, required String time,}) async {
     PostModel model = PostModel(
       username: username,
       imageUrl: image,
@@ -331,9 +346,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddNewPostFail());
     });
   }
-
-  Future<void> _addToMyPosts(
-      {required String postId, required String username}) async {
+  Future<void> _addToMyPosts({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -343,34 +356,15 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
+
   // get from database
-  Future<void> getAllPosts() async {
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .orderBy('time' ,descending: true)
-        .get()
-        .then((value) {
-      allPosts.clear();
-      value.docs.forEach((element) {
-        PostModel model = PostModel.fromJson(element.data());
-        model.changePostId(element.id);
-        allPosts.add(model);
-        print(model.username);
-        print(model.time);
-        print(model.postId);
-        print(model.description);
-        print(model.imageUrl);
-      });
-      emit(GetAllPostsSuccess());
-    }).catchError((error) {
-      emit(GetAllPostsFail());
-      print(error.toString());
-    });
-  }
 
   Future<void> getAllUsers() async {
     users.clear();
-    await FirebaseFirestore.instance.collection('users').get().then((value) {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) {
       value.docs.forEach((element) {
         users[element.id] = UserModel.fromJson(element.data());
       });
@@ -380,4 +374,116 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetAllUsersFail());
     });
   }
+
+
+  // likes
+
+  Future<Map<String,bool>> getPostsILiked({required String username})async{
+      Map<String,bool>mp={};
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(username)
+          .collection('postsLiked')
+          .get()
+          .then((value){
+            value.docs.forEach((element) {
+              mp[element.id]=true;
+            });
+          emit(GetPostsILikedSuccess());
+      })
+          .catchError((error){
+          emit(GetPostsILikedFail());
+      });
+      return mp;
+  }
+
+  Future<List<String>>getLikesForSpecificPost({required String postId})async{
+    List<String>list=[];
+    await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('likes')
+          .get()
+          .then((value) {
+            value.docs.forEach((element) {
+              list.add(element.id);
+            });
+            emit(GetLikesForSpecificPostSuccess());
+            // print(list.length);
+      })
+          .catchError((error){
+            print(error.toString());
+            emit(GetLikesForSpecificPostFail());
+    });
+    return list;
+  }
+
+  Future<void> addLike({required String postId, required String username})async{
+  await FirebaseFirestore.instance
+      .collection('posts')
+      .doc(postId)
+      .collection('likes')
+      .doc(username)
+      .set({}).then((value) {
+        emit(AddLikeSuccess());
+  }).catchError((error){
+        emit(AddLikeFail());
+  });
+
+
+
+
+
+}
+  Future<void> removeLike({required String postId, required String username}) async {
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(username)
+        .delete()
+        .then((value) {
+          emit(RemoveLikeSuccess());
+    })
+        .catchError((error){
+          print("removeLikeMethod");
+          print(error.toString());
+          emit(RemoveLikeFail());
+    });
+  }
+
+  Future<void> addToPostsLiked({required String postId, required String username})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('postsLiked')
+        .doc(postId)
+        .set({})
+        .then((value){
+          emit(AddToPostsLikedSuccess());
+    })
+        .catchError((error){
+          print("postsLikedMethod");
+          print(error.toString());
+          emit(AddToPostsLikedFail());
+    });
+  }
+  Future<void> removeFromPostsLiked({required String postId, required String username})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('postsLiked')
+        .doc(postId)
+        .delete()
+        .then((value){
+          emit(RemoveFromPostsLikedSuccess());
+    })
+        .catchError((error){
+         print("removeFromPostsLikedMethod");
+         print(error.toString());
+         emit(RemoveFromPostsLikedFail());
+    });
+  }
+
+
 }

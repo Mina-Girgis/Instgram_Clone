@@ -4,7 +4,9 @@ class PostModel{
   late String imageUrl;
   late String time;
   late String description;
+  bool isLiked = false;
   String postId = ""; // comes from database
+  List<String>likes=[];
   PostModel({required this.username,required this.imageUrl,required this.description,required this.time});
 
   PostModel.empty(){
@@ -41,6 +43,15 @@ class PostModel{
 
   void changePostId(String id){
     postId = id;
+  }
+
+  void changeLikesList({required List<String>list})
+  {
+    likes = list;
+  }
+
+  void changeIsliked(bool b){
+    isLiked = b;
   }
 
 }

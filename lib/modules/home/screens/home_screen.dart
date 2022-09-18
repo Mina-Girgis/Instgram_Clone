@@ -88,7 +88,9 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             body: RefreshIndicator(
-              onRefresh: () async {},
+              onRefresh: () async {
+                await cubit.getAllPosts();
+              },
               child: Stack(
                 children: [
                   SingleChildScrollView(
@@ -128,13 +130,17 @@ class HomeScreen extends StatelessWidget {
                                 );
                               },
                               itemBuilder: (context, index) {
-                                String username =
-                                    cubit.allPosts[index].username;
-                                return postDesgin(
-                                    user: cubit.users[username],
-                                    context: context,
-                                    model: cubit.allPosts[index],
-                                    cubit: cubit);
+                                String username = cubit.allPosts[index].username;
+                                return InkWell(
+                                  onTap: ()async{
+                                    // await cubit.getPostsILiked(username: 'mina_girgis_alfy');
+                                  },
+                                  child: postDesgin(
+                                      user: cubit.users[username],
+                                      context: context,
+                                      model: cubit.allPosts[index],
+                                      cubit: cubit),
+                                );
                               },
                             )
                           else

@@ -81,6 +81,34 @@ class GetAllUsersFail extends HomeState {}
 
 class GetAllPostsForSpecificUserSuccess extends HomeState {}
 
+class GetLikesForSpecificPostSuccess extends HomeState {}
+
+class GetLikesForSpecificPostFail extends HomeState {}
+
+class AddLikeSuccess extends HomeState {}
+
+class AddLikeFail extends HomeState {}
+
+class RemoveLikeSuccess extends HomeState {}
+
+class RemoveLikeFail extends HomeState {}
+
+
+class AddToPostsLikedSuccess extends HomeState {}
+
+class AddToPostsLikedFail extends HomeState {}
+
+class RemoveFromPostsLikedSuccess extends HomeState {}
+
+class RemoveFromPostsLikedFail extends HomeState {}
+
+class GetPostsILikedSuccess extends HomeState {}
+
+class GetPostsILikedFail extends HomeState {}
+
+
+
+
 
 
 
