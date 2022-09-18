@@ -79,7 +79,6 @@ class HomeCubit extends Cubit<HomeState> {
     imageIndex = idx;
     emit(ChangeImageIndex());
   }
-
   void changeLikeStateInAllPosts({required String postId}){
     allPosts.forEach((element) {
       if(element.postId==postId){
@@ -258,28 +257,30 @@ class HomeCubit extends Cubit<HomeState> {
           Map<String,bool>isLikedMap=value;
 
           await FirebaseFirestore.instance
-              .collection('posts')
-              .get().then((value) {
+              .collection('posts').get().then((value) {
                allPosts.clear();
                userPosts.clear();
                value.docs.forEach((element) async {
                PostModel model = PostModel.fromJson(element.data());
                model.changePostId(element.id);
 
-              await getLikesForSpecificPost(postId: element.id)
-                  .then((value){
+              await getLikesForSpecificPost(postId: element.id).then((value) async {
                 model.changeLikesList(list: value);
-                if(isLikedMap[element.id]==true){
-                  model.changeIsliked(true);
-                }
-                allPosts.add(model);
-                if(model.username == username){
-                  userPosts.add(model);
-                }
-                allPosts.sort((PostModel a,PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
+                await getCommentsForSprcificPost(postId: element.id).then((value){
+                  model.changeCommentList(list: value);
+                  if(isLikedMap[element.id]==true){
+                    model.changeIsliked(true);
+                  }
+                  allPosts.add(model);
+                  if(model.username == username){
+                    userPosts.add(model);
+                  }
+                  allPosts.sort((PostModel a,PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
+                });
               })
                 .catchError((error){
                 print(error.toString());
+                emit(GetAllPostsFail());
               });
             }
 
@@ -517,5 +518,54 @@ class HomeCubit extends Cubit<HomeState> {
     await _removeFromPostsLiked(postId: postId,username: username);
     emit(UnlikePostSuccess());
   }
+
+
+  // comments
+  Future<void> addComment({required String time , required String postId , required String text , required String username})async {
+    CommentModel comment = CommentModel(
+      username: username,
+      text: text,
+      time: time,
+    );
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .add(comment.toMap(comment))
+        .then((value){
+          emit(AddCommentSuccess());
+    })
+        .catchError((error){
+          print("addCommentMethod");
+          print(error.toString());
+         emit(AddCommentFail());
+    });
+  }
+
+  Future<List<CommentModel>> getCommentsForSprcificPost({required String postId})async{
+      List<CommentModel>comments=[];
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('comments')
+          .get()
+          .then((value){
+                value.docs.forEach((element) {
+                  CommentModel comment = CommentModel.fromJson(element.data());
+                  comments.add(comment);
+                });
+                emit(GetCommentsForSprcificPostSuccess());
+          })
+          .catchError((error){
+            print("emit(GetCommentsForSprcificPostMethod");
+            print(error.toString());
+            emit(GetCommentsForSprcificPostFail());
+    });
+      return comments;
+  }
+
+
+
+
 
 }

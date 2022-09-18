@@ -112,6 +112,16 @@ class UnlikePostSuccess extends HomeState {}
 
 class ChangeLikeStateInAllPosts extends HomeState {}
 
+class AddCommentSuccess extends HomeState {}
+
+class AddCommentFail extends HomeState {}
+
+class GetCommentsForSprcificPostSuccess extends HomeState {}
+
+class GetCommentsForSprcificPostFail extends HomeState {}
+
+
+
 
 
 

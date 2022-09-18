@@ -205,7 +205,7 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
               ),
               RichText(
                 text: TextSpan(
-                  text: 'mina_girgis  ',
+                  text: user.username+"  ",
                   style: TextStyle(color: WHITE, fontWeight: FontWeight.bold),
                   children: <TextSpan>[
                     TextSpan(
@@ -224,7 +224,7 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
                 height: 10.0,
               ),
               Text(
-                "View 0 comment",
+                "View ${model.comments.length} comments",
                 style: TextStyle(
                   color: GREY,
                 ),

@@ -134,6 +134,12 @@ class HomeScreen extends StatelessWidget {
                                 return InkWell(
                                   onTap: ()async{
 
+                                    // await cubit.addComment(
+                                    //     time: GlobalCubit.get(context).getCurrentTime(),
+                                    //     postId: cubit.allPosts[index].postId,
+                                    //     text: "it works !!",
+                                    //     username: GlobalCubit.get(context).currentUser.username,
+                                    // );
                                     // await cubit.getPostsILiked(username: 'mina_girgis_alfy');
                                   },
                                   child: postDesgin(
