@@ -133,6 +133,7 @@ class HomeScreen extends StatelessWidget {
                                 String username = cubit.allPosts[index].username;
                                 return InkWell(
                                   onTap: ()async{
+
                                     // await cubit.getPostsILiked(username: 'mina_girgis_alfy');
                                   },
                                   child: postDesgin(

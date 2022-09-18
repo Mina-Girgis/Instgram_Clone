@@ -106,6 +106,17 @@ class GetPostsILikedSuccess extends HomeState {}
 
 class GetPostsILikedFail extends HomeState {}
 
+class LikePostSuccess extends HomeState {}
+
+class UnlikePostSuccess extends HomeState {}
+
+class ChangeLikeStateInAllPosts extends HomeState {}
+
+
+
+
+
+
 
 
 

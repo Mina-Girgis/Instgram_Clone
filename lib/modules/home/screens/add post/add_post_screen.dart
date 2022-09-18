@@ -41,6 +41,7 @@ class AddPostScreen extends StatelessWidget {
                 IconButton(
                     onPressed: () {
                       cubit.uploadNewPostImage(
+                        context: context,
                         username: GlobalCubit.get(context).currentUser.username,
                         image: cubit.files[cubit.albumNameIndex].files[cubit.imageIndex],
                       );

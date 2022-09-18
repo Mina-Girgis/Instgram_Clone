@@ -4,6 +4,7 @@ import 'package:insta_like_button/insta_like_button.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
+import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
 
 import '../../../models/post_model.dart';
 import '../../../models/user_model.dart';
@@ -147,7 +148,12 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
           children: [
             IconButton(
                 splashRadius: 15.0,
-                onPressed: () {},
+                onPressed: () {
+                  String username = CacheHelper.getData(key: 'username').toString();
+                  if(model.isLiked)cubit.unlikePost(postId: model.postId, username: username);
+                  else cubit.likePost(postId: model.postId, username: username);
+                    cubit.changeLikeStateInAllPosts(postId: model.postId);
+                  },
                 icon: Icon(
                   FontAwesomeIcons.heart,
                   color: (model.isLiked==true)?Colors.red:Colors.white,

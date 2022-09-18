@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_storage_path/flutter_storage_path.dart';
 import 'package:meta/meta.dart';
+import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/models/user_model.dart';
 import '../../../models/file_model.dart';
 import '../../../models/post_model.dart';
@@ -64,18 +65,33 @@ class HomeCubit extends Cubit<HomeState> {
   }
   void changeBottomNavigationBarIndex(int idx) {
     bottomNavigationBarIndex = idx;
-    if(idx ==4 && userPosts.isEmpty){
-      getAllPostsForSpecificUser(username: 'mina_girgis_alfy');
+    if(idx ==4){
+      userPosts.sort((PostModel a , PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
     }
     emit(ChangeBottomNavigationBarIndex());
   }
   void changeDropdownButtonHintText(int idx) {
     albumNameIndex = idx;
+    imageIndex=0;
     emit(ChangeDropdownButtonHintText());
   }
   void changeImageIndex(int idx) {
     imageIndex = idx;
     emit(ChangeImageIndex());
+  }
+
+  void changeLikeStateInAllPosts({required String postId}){
+    allPosts.forEach((element) {
+      if(element.postId==postId){
+        if(element.isLiked){
+          element.likes.remove(CacheHelper.getData(key: 'username').toString());
+        }else{
+         element.likes.add(CacheHelper.getData(key: 'username').toString());
+        }
+        element.changeIsliked(!element.isLiked);
+        emit(ChangeLikeStateInAllPosts());
+      }
+    });
   }
 
   // Edit profile
@@ -241,11 +257,14 @@ class HomeCubit extends Cubit<HomeState> {
 
           Map<String,bool>isLikedMap=value;
 
-          await FirebaseFirestore.instance.collection('posts').orderBy('time' ,descending: true).get().then((value) {
-            allPosts.clear();
-            value.docs.forEach((element) async {
-              PostModel model = PostModel.fromJson(element.data());
-              model.changePostId(element.id);
+          await FirebaseFirestore.instance
+              .collection('posts')
+              .get().then((value) {
+               allPosts.clear();
+               userPosts.clear();
+               value.docs.forEach((element) async {
+               PostModel model = PostModel.fromJson(element.data());
+               model.changePostId(element.id);
 
               await getLikesForSpecificPost(postId: element.id)
                   .then((value){
@@ -254,11 +273,18 @@ class HomeCubit extends Cubit<HomeState> {
                   model.changeIsliked(true);
                 }
                 allPosts.add(model);
+                if(model.username == username){
+                  userPosts.add(model);
+                }
+                allPosts.sort((PostModel a,PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
               })
                 .catchError((error){
                 print(error.toString());
               });
-            });
+            }
+
+          );
+
             emit(GetAllPostsSuccess());
           }).catchError((error) {
             print(error.toString());
@@ -294,7 +320,7 @@ class HomeCubit extends Cubit<HomeState> {
     print(files[0].files[0]);
     emit(GetImagesPathSuccess());
   }
-  Future<void> uploadNewPostImage({required username, required String image}) async {
+  Future<void> uploadNewPostImage({required context,required username, required String image}) async {
     // String profileImage = files[albumNameIndex].files[imageIndex]; // from imagePicker
     emit(AddNewPostLoading());
     File file = File(image);
@@ -306,7 +332,7 @@ class HomeCubit extends Cubit<HomeState> {
       value.ref.getDownloadURL().then((value) async {
         print(value);
         await addNewPost(
-          time: DateTime.now().toString(),
+          time: GlobalCubit.get(context).getCurrentTime(),
           description: addPostController.text,
           username: username,
           image: value,
@@ -377,7 +403,6 @@ class HomeCubit extends Cubit<HomeState> {
 
 
   // likes
-
   Future<Map<String,bool>> getPostsILiked({required String username})async{
       Map<String,bool>mp={};
       await FirebaseFirestore.instance
@@ -396,7 +421,6 @@ class HomeCubit extends Cubit<HomeState> {
       });
       return mp;
   }
-
   Future<List<String>>getLikesForSpecificPost({required String postId})async{
     List<String>list=[];
     await FirebaseFirestore.instance
@@ -417,8 +441,7 @@ class HomeCubit extends Cubit<HomeState> {
     });
     return list;
   }
-
-  Future<void> addLike({required String postId, required String username})async{
+  Future<void> _addLike({required String postId, required String username})async{
   await FirebaseFirestore.instance
       .collection('posts')
       .doc(postId)
@@ -435,7 +458,7 @@ class HomeCubit extends Cubit<HomeState> {
 
 
 }
-  Future<void> removeLike({required String postId, required String username}) async {
+  Future<void> _removeLike({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -451,8 +474,7 @@ class HomeCubit extends Cubit<HomeState> {
           emit(RemoveLikeFail());
     });
   }
-
-  Future<void> addToPostsLiked({required String postId, required String username})async{
+  Future<void> _addToPostsLiked({required String postId, required String username})async{
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -468,7 +490,7 @@ class HomeCubit extends Cubit<HomeState> {
           emit(AddToPostsLikedFail());
     });
   }
-  Future<void> removeFromPostsLiked({required String postId, required String username})async{
+  Future<void> _removeFromPostsLiked({required String postId, required String username})async{
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -485,5 +507,15 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
+  void likePost({required String postId, required String username})async{
+    await _addLike(postId: postId,username: username);
+    await _addToPostsLiked(postId: postId,username: username);
+    emit(LikePostSuccess());
+  }
+  void unlikePost({required String postId, required String username})async{
+    await _removeLike(postId: postId,username: username);
+    await _removeFromPostsLiked(postId: postId,username: username);
+    emit(UnlikePostSuccess());
+  }
 
 }
