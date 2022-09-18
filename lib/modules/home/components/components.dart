@@ -79,7 +79,11 @@ Widget profilePicWithOvelCircle({
   );
 }
 
-Widget postDesgin({required UserModel?user ,required context, required HomeCubit cubit ,required PostModel model}) {
+Widget postDesgin(
+    {required UserModel? user,
+    required context,
+    required HomeCubit cubit,
+    required PostModel model}) {
   return Container(
     width: SizeConfig.screenWidth,
     // color: Colors.grey,
@@ -101,10 +105,11 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
               ),
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: SizeConfig.screenWidth!/2,
+                  maxWidth: SizeConfig.screenWidth! / 2,
                   minWidth: 10,
                 ),
-                child: Text(user!.username,
+                child: Text(
+                  user!.username,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -147,18 +152,20 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
         Row(
           children: [
             IconButton(
-                splashRadius: 15.0,
-                onPressed: () {
-                  String username = CacheHelper.getData(key: 'username').toString();
-                  if(model.isLiked)cubit.unlikePost(postId: model.postId, username: username);
-                  else cubit.likePost(postId: model.postId, username: username);
-                    cubit.changeLikeStateInAllPosts(postId: model.postId);
-                  },
-                icon: Icon(
-                  FontAwesomeIcons.heart,
-                  color: (model.isLiked==true)?Colors.red:Colors.white,
-
-                ),
+              splashRadius: 15.0,
+              onPressed: () {
+                String username =
+                    CacheHelper.getData(key: 'username').toString();
+                if (model.isLiked)
+                  cubit.unlikePost(postId: model.postId, username: username);
+                else
+                  cubit.likePost(postId: model.postId, username: username);
+                cubit.changeLikeStateInAllPosts(postId: model.postId);
+              },
+              icon: Icon(
+                FontAwesomeIcons.heart,
+                color: (model.isLiked == true) ? Colors.red : Colors.white,
+              ),
             ),
             IconButton(
                 splashRadius: 15.0,
@@ -205,16 +212,13 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
               ),
               RichText(
                 text: TextSpan(
-                  text: user.username+"  ",
+                  text: user.username + "  ",
                   style: TextStyle(color: WHITE, fontWeight: FontWeight.bold),
                   children: <TextSpan>[
                     TextSpan(
                       text: model.description,
                       style: TextStyle(
-                          color: Colors.white54, fontWeight: FontWeight.normal
-                          // decoration: TextDecoration.underline,
-                          // decorationStyle: TextDecorationStyle.wavy,
-                          ),
+                          color: Colors.white54, fontWeight: FontWeight.normal),
                       // recognizer: _longPressRecognizer,
                     ),
                   ],
@@ -238,10 +242,32 @@ Widget postDesgin({required UserModel?user ,required context, required HomeCubit
                   SizedBox(
                     width: 10.0,
                   ),
-                  Text(
-                    "Add a comment...",
-                    style: TextStyle(
-                      color: GREY,
+                  InkWell(
+                    radius: 1.0,
+                    splashColor: Colors.transparent,
+                    onTap: () {
+                      cubit.commentController.clear();
+                      commentSection(
+                          cubit: cubit,
+                          context: context,
+                          model: model,
+                          function: ()async{
+                            await cubit.addComment(
+                                time: GlobalCubit.get(context).getCurrentTime(),
+                                postId: model.postId,
+                                text: cubit.commentController.text,
+                                username: CacheHelper.getData(key: 'username').toString(),
+                            ).then((value){
+                              Navigator.pop(context);
+                            });
+                          },
+                      );
+                    },
+                    child: Text(
+                      "Add a comment...",
+                      style: TextStyle(
+                        color: GREY,
+                      ),
                     ),
                   ),
                 ],
@@ -308,18 +334,14 @@ Widget editProfileInputField({
       enabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: GREY, width: 3.0),
       ),
-      border: UnderlineInputBorder(
+      border: const UnderlineInputBorder(
         borderSide: BorderSide(color: Colors.transparent),
       ),
     ),
   );
 }
 
-AppBar appBar(
-    {required String title,
-    required context,
-    required Function()? onSave,
-    required HomeCubit cubit}) {
+AppBar appBar({required String title, required context, required Function()? onSave, required HomeCubit cubit}) {
   return AppBar(
     backgroundColor: Colors.transparent,
     elevation: 0.0,
@@ -327,15 +349,15 @@ AppBar appBar(
     title: Text(title),
     leading: InkWell(
         onTap: () {
-          Navigator.of(context,rootNavigator: true).pop();
+          Navigator.of(context, rootNavigator: true).pop();
         },
-        child: Icon(FontAwesomeIcons.x)),
+        child: const Icon(FontAwesomeIcons.x)),
     actions: [
       Padding(
         padding: const EdgeInsets.only(right: 0.0),
         child: IconButton(
           onPressed: onSave,
-          icon: Icon(
+          icon: const Icon(
             FontAwesomeIcons.check,
             size: 27.0,
             color: BUTTON_COLOR,
@@ -344,4 +366,64 @@ AppBar appBar(
       ),
     ],
   );
+}
+
+Future<dynamic> commentSection({required context , required cubit,required PostModel model , required  Function() function}){
+  return showModalBottomSheet(
+      elevation: 0.0,
+      backgroundColor: Colors.black,
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 100),
+            padding: MediaQuery.of(context).viewInsets,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 10,),
+                      CircleAvatar(
+                        backgroundImage: AssetImage(
+                          'assets/person.jpg',
+                        ),
+                        radius: 25.0,
+                      ),
+                      SizedBox(width: 10,),
+                      Expanded(
+                        child: Container(
+                          child: TextFormField(
+                            controller: cubit.commentController,
+                            autofocus: true,
+                            decoration: InputDecoration(
+                                hintText: "Add a comment...",
+                                hintStyle: TextStyle(
+                                  color: Colors.white54,
+                                )
+                            ),
+                            style: TextStyle(
+                              color: WHITE,
+                            ),
+                          ),
+                          height: 50,
+                        ),
+                      ),
+                      SizedBox(width: 10,),
+                      TextButton(
+                        onPressed: function,
+                        child: Text("post"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      });
 }

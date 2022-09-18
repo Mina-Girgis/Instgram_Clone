@@ -40,12 +40,12 @@ class HomeCubit extends Cubit<HomeState> {
   int albumNameIndex = -1;
   int imageIndex = -1;
 
-  var nameController = TextEditingController();
+  var nameController     = TextEditingController();
   var usernameController = TextEditingController();
-  var bioController = TextEditingController();
-  var updateController = TextEditingController();
-  var addPostController = TextEditingController();
-
+  var bioController      = TextEditingController();
+  var updateController   = TextEditingController();
+  var addPostController  = TextEditingController();
+  var commentController  = TextEditingController();
   // change controllers
   void changeUpdateController(String s) {
     updateController.text = s;
@@ -119,13 +119,11 @@ class HomeCubit extends Cubit<HomeState> {
           'name': name,
           'imageUrl': user.imageUrl,
         };
-        await deleteUser(oldUsername);
-        await addUser(username, mp, context);
+        // await deleteUser(oldUsername);
+        // await addUser(username, mp, context);
+        FirebaseFirestore.instance.collection('users').doc(username).set(mp);
         userTmp = UserModel.fromJson(mp);
-        toastMessage(
-            text: 'Data changed successfully.',
-            backgroundColor: GREY,
-            textColor: WHITE);
+        toastMessage(text: 'Data changed successfully.', backgroundColor: GREY, textColor: WHITE);
         CacheHelper.putData(key: 'username', value: username);
         print(CacheHelper.getData(key: 'username'));
         emit(UpdateUserDataSuccess());
@@ -541,7 +539,6 @@ class HomeCubit extends Cubit<HomeState> {
          emit(AddCommentFail());
     });
   }
-
   Future<List<CommentModel>> getCommentsForSprcificPost({required String postId})async{
       List<CommentModel>comments=[];
       await FirebaseFirestore.instance
@@ -563,8 +560,6 @@ class HomeCubit extends Cubit<HomeState> {
     });
       return comments;
   }
-
-
 
 
 
