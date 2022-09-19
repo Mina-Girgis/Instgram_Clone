@@ -233,7 +233,7 @@ class HomeCubit extends Cubit<HomeState> {
     return model;
   }
 
-  Future<List<PostModel>> getAllPostsForSpecificUser({required String username})async {
+  Future<void> getAllPostsForSpecificUser({required String username})async {
       List<String>ids=[];
      await getAllPostsIdsForSpecicUser(username:username)
         .then((value){
@@ -242,21 +242,20 @@ class HomeCubit extends Cubit<HomeState> {
       print(error.toString());
       emit(GetAllPostsForSpecificUserFail());
     });
-
-      userPosts.clear();
+      // users[username]!.posts.clear();
       ids.forEach((element) async{
         await getPostById(postId: element)
             .then((value){
           PostModel model = PostModel.copy(value);
           // print(element);
           model.changePostId(element);
-          userPosts.add(model);
+          users[username]!.posts.add(model);
           // userPosts.sort((a,b)=>b.time.compareTo(a.time));
           emit(GetAllPostsForSpecificUserSuccess());
         }
         );
       });
-      return userPosts;
+      // return userPosts;
   }
 
   Future<void> getAllPosts() async {
@@ -393,8 +392,8 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
-  // get from database
-
+  // get all users info and store them in a map
+  // each user with their info ,posts 
   Future<void> getAllUsers() async {
     users.clear();
     await FirebaseFirestore.instance
@@ -403,12 +402,11 @@ class HomeCubit extends Cubit<HomeState> {
         .then((value) {
       value.docs.forEach((element) async{
 
-        await getAllPostsForSpecificUser(username: element.id)
-          .then((value){
-          UserModel user = UserModel.fromJson(element.data());
-          user.changePostsList([...value]);
-          users[element.id] = user;
-        });
+        UserModel user = UserModel.fromJson(element.data());
+        users[element.id] = user;
+        users[element.id]!.posts.clear();
+        await getAllPostsForSpecificUser(username: element.id);
+
       });
       emit(GetAllUsersSuccess());
     }).catchError((error) {
