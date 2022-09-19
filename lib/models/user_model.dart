@@ -1,3 +1,5 @@
+import 'package:pro/models/post_model.dart';
+
 class UserModel{
   late String username;
   late String password;
@@ -6,6 +8,7 @@ class UserModel{
   late String name;
   late String bio;
   late String imageUrl;
+  List<PostModel>posts=[];
 
   UserModel({
     required this.phoneNumber,
@@ -48,6 +51,9 @@ class UserModel{
     imageUrl=json['imageUrl']??"https://i.pinimg.com/564x/66/ff/cb/66ffcb56482c64bdf6b6010687938835.jpg";
   }
 
+  void changePostsList(List<PostModel>list){
+    posts=list;
+  }
 
 
 }

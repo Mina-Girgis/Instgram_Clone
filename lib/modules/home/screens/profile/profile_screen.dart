@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
                     maxHeight: SizeConfig.screenWidth!/2.5,
                   ),
                   child: Text(
-                    GlobalCubit.get(context).currentUser.username,
+                    "${cubit.users['mina_girgis_alfy']!.posts.length}",
                     style: TextStyle(
                       overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold,
@@ -145,7 +145,12 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                     ),
                                     color: Color.fromRGBO(30, 30, 30, 1.0),
-                                    function: () {
+                                    function: () async{
+                                      // print(cubit.userPosts.length);
+                                       // await cubit.getAllPostsForSpeci/ficUser(username: 'mina_girgis_alfy').then((value){
+                                       //   print(cubit.userPosts.length);
+                                       // });
+                                       print(cubit.userPosts.length);
                                       cubit.changeNameController(GlobalCubit.get(context).currentUser.name);
                                       cubit.changeUsernameController(GlobalCubit.get(context).currentUser.username);
                                       cubit.changeBioController(GlobalCubit.get(context).currentUser.bio);

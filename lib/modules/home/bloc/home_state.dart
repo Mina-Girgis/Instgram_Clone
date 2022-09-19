@@ -120,6 +120,9 @@ class GetCommentsForSprcificPostSuccess extends HomeState {}
 
 class GetCommentsForSprcificPostFail extends HomeState {}
 
+class GetAllPostsForSpecificUserFail extends HomeState {}
+
+
 
 
 

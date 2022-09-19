@@ -191,8 +191,10 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // get all posts
-  Future<void> getAllPostsIdsForSpecicUser({required String username}) async {
+  // check is done .. its working well
+  Future<List<String>> getAllPostsIdsForSpecicUser({required String username}) async {
     userPostsIds.clear();
+    List<String>list=[];
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -200,53 +202,63 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       value.docs.forEach((element) {
-        print(element.id);
-        userPostsIds.add(element.id);
+        // print(element.id);
+        // userPostsIds.add(element.id);
+        list.add(element.id);
         emit(GetMyPostsIdsSuccess());
       });
     }).catchError((error) {
       print(error.toString());
       emit(GetMyPostsIdsFail());
     });
+    return list;
   }
-  Future<void> getPostById({required String postId}) async {
-    // PostModel model = PostModel.empty();
+
+  // check is done .. its working well
+  Future<PostModel> getPostById({required String postId}) async {
+    PostModel model = PostModel.empty();
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
         .get()
         .then((value) {
       Map<String, dynamic>? mp = value.data();
-      PostModel model = PostModel.fromJson(mp!);
+      model = PostModel.fromJson(mp!);
       changePostTempData(model);
       emit(GetPostByIdSuccess());
     }).catchError((error) {
       print(error.toString());
       emit(GetPostByIdFail());
     });
+    return model;
   }
-  Future<void> getAllPostsForSpecificUser({required String username})async {
-    userPosts.clear();
-    await getAllPostsIdsForSpecicUser(username:username)
+
+  Future<List<PostModel>> getAllPostsForSpecificUser({required String username})async {
+      List<String>ids=[];
+     await getAllPostsIdsForSpecicUser(username:username)
         .then((value){
-      userPostsIds.forEach((element) async{
+           ids=value;
+    }).catchError((error){
+      print(error.toString());
+      emit(GetAllPostsForSpecificUserFail());
+    });
+
+      userPosts.clear();
+      ids.forEach((element) async{
         await getPostById(postId: element)
-          .then((value){
-          PostModel model = PostModel.copy(postTmp);
+            .then((value){
+          PostModel model = PostModel.copy(value);
+          // print(element);
           model.changePostId(element);
           userPosts.add(model);
-          userPosts.sort((a,b)=>b.time.compareTo(a.time));
+          // userPosts.sort((a,b)=>b.time.compareTo(a.time));
+          emit(GetAllPostsForSpecificUserSuccess());
         }
         );
       });
-
-      emit(GetAllPostsForSpecificUserSuccess());
-    }
-
-    );
-
-
+      return userPosts;
   }
+
   Future<void> getAllPosts() async {
     String? username = CacheHelper.getData(key: 'username');
     await getPostsILiked(username:username.toString())
@@ -381,7 +393,6 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
-
   // get from database
 
   Future<void> getAllUsers() async {
@@ -390,8 +401,14 @@ class HomeCubit extends Cubit<HomeState> {
         .collection('users')
         .get()
         .then((value) {
-      value.docs.forEach((element) {
-        users[element.id] = UserModel.fromJson(element.data());
+      value.docs.forEach((element) async{
+
+        await getAllPostsForSpecificUser(username: element.id)
+          .then((value){
+          UserModel user = UserModel.fromJson(element.data());
+          user.changePostsList([...value]);
+          users[element.id] = user;
+        });
       });
       emit(GetAllUsersSuccess());
     }).catchError((error) {
