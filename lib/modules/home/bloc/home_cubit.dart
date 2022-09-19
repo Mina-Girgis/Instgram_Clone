@@ -26,7 +26,7 @@ class HomeCubit extends Cubit<HomeState> {
   List initialValues = [];
   String updatingValueField = "";
   String PostImageUrlFromFireBaseStorage = "";
-  UserModel userTmp = UserModel.empty();
+  UserModel userTmp = UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
   List<FileModel> files   = [];
 
@@ -393,7 +393,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // get all users info and store them in a map
-  // each user with their info ,posts 
+  // each user with their info ,posts
   Future<void> getAllUsers() async {
     users.clear();
     await FirebaseFirestore.instance
@@ -406,7 +406,10 @@ class HomeCubit extends Cubit<HomeState> {
         users[element.id] = user;
         users[element.id]!.posts.clear();
         await getAllPostsForSpecificUser(username: element.id);
-
+        if(element.id==CacheHelper.getData(key: 'username').toString()){
+          UserModel? user= users[element.id];
+          changeUserTmpData(user!);
+        }
       });
       emit(GetAllUsersSuccess());
     }).catchError((error) {

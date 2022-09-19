@@ -9,16 +9,18 @@ import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
 import 'package:pro/shared/components/constants.dart';
 
+import '../../../../models/user_model.dart';
 import '../../../../services/utils/size_config.dart';
 import '../../components/components.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  ProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
+    UserModel user = cubit.userTmp;
     return BlocConsumer<HomeCubit, HomeState>(
   listener: (context, state) {
     // TODO: implement listener
@@ -44,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
                     maxHeight: SizeConfig.screenWidth!/2.5,
                   ),
                   child: Text(
-                    "${cubit.users['mina_girgis_alfy']!.posts.length}",
+                    user.username,
                     style: TextStyle(
                       overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold,
@@ -114,15 +116,15 @@ class ProfileScreen extends StatelessWidget {
                                   ovelCircle: true,
                                   padding: 0,
                                 ),
-                                profileNumbers(text: 'Posts', number: 5),
-                                profileNumbers(text: 'Followers', number: 307),
-                                profileNumbers(text: 'Following', number: 639),
+                                profileNumbers(text: 'Posts', number: user.posts.length),
+                                profileNumbers(text: 'Followers', number: 0),
+                                profileNumbers(text: 'Following', number: 0),
                               ],
                             ),
                             SizedBox(
                               height: 10,
                             ),
-                            Text(GlobalCubit.get(context).currentUser.name,
+                            Text(user.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -130,7 +132,7 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(
                               height: 10,
                             ),
-                            Text(GlobalCubit.get(context).currentUser.bio),
+                            Text(user.bio),
                             SizedBox(
                               height: 10,
                             ),
@@ -146,7 +148,6 @@ class ProfileScreen extends StatelessWidget {
                                     ),
                                     color: Color.fromRGBO(30, 30, 30, 1.0),
                                     function: () async{
-                                      print(cubit.users['mina_girgis_alfy']!.posts.length);
                                       cubit.changeNameController(GlobalCubit.get(context).currentUser.name);
                                       cubit.changeUsernameController(GlobalCubit.get(context).currentUser.username);
                                       cubit.changeBioController(GlobalCubit.get(context).currentUser.bio);
@@ -238,12 +239,12 @@ class ProfileScreen extends StatelessWidget {
                         crossAxisCount: 3,
                         mainAxisSpacing: 3.0,
                         crossAxisSpacing: 3.0,
-                        children: List.generate(cubit.userPosts.length, (index){
+                        children: List.generate(user.posts.length, (index){
                           return Container(
                             width: SizeConfig.screenWidth!/3,
                             height: 100,
                             color: Colors.grey,
-                            child: Image.network(cubit.userPosts[index].imageUrl,
+                            child: Image.network(user.posts[index].imageUrl,
                               fit: BoxFit.cover,
                             ),
                           );
