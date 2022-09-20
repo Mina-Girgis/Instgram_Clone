@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../services/utils/size_config.dart';
+import '../../../shared/components/constants.dart';
 import '../bloc/home_cubit.dart';
 import '../components/components.dart';
 class SearchScreen extends StatelessWidget {
@@ -21,8 +22,23 @@ class SearchScreen extends StatelessWidget {
               return true;
             },
             child: Scaffold(
-              // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                title: TextFormField(
+                  style: TextStyle(
+                    color: WHITE,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(0),
+                      filled: true,
+                      fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red) 
+                    )
 
+                  ),
+                ),
+              ),
             ),
           );
         },
