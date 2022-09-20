@@ -427,3 +427,57 @@ Future<dynamic> commentSection({required context , required cubit,required PostM
         );
       });
 }
+
+
+
+Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
+  return BottomNavigationBar(
+    elevation: 0.0,
+    showSelectedLabels: false,
+    showUnselectedLabels: false,
+    selectedIconTheme: IconThemeData(
+        size: 30.0
+    ),
+    unselectedIconTheme: IconThemeData(
+        size: 30.0
+    ),
+    currentIndex: cubit.bottomNavigationBarIndex,
+    unselectedItemColor: WHITE,
+    selectedItemColor: WHITE,
+    type: BottomNavigationBarType.fixed,
+    backgroundColor: Colors.black,
+    onTap: (index) {
+      if(cubit.bottomNavigationBarIndex !=index){
+        AppNavigator.customNavigator(context: context, screen: cubit.screens[index], finish: false);
+        cubit.changeBottomNavigationBarIndex(idx: index);
+        print(cubit.bottomNavigationBarIndex);
+
+      }
+    },
+    items: [
+      BottomNavigationBarItem(
+
+          icon: Icon(
+            Icons.home_filled,
+          ),
+          label: "",
+          backgroundColor: Colors.transparent),
+      BottomNavigationBarItem(
+        icon: Icon(FontAwesomeIcons.magnifyingGlass,size: 25.0,),
+        label: "item",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.slideshow,),
+        label: "item",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.local_mall,),
+        label: "item",
+      ),
+      BottomNavigationBarItem(
+        icon: circleAvatarDesign(radius: 16),
+        label: "item",
+      ),
+    ],
+  );
+}

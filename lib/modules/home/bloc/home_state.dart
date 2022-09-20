@@ -122,6 +122,9 @@ class GetCommentsForSprcificPostFail extends HomeState {}
 
 class GetAllPostsForSpecificUserFail extends HomeState {}
 
+class RemoveBottomNavBarIndexListTop extends HomeState {}
+
+
 
 
 

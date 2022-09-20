@@ -20,7 +20,8 @@ class SideBarScreen extends StatelessWidget {
               TextButton(
                   onPressed: (){
                     CacheHelper.putData(key: 'username', value: '-1').then((value){
-                      HomeCubit.get(context).changeBottomNavigationBarIndex(0);
+                      HomeCubit.get(context).changeBottomNavigationBarIndex(idx: 0);
+                      HomeCubit.get(context).bottomNavBarIndexList.clear();
                       AppNavigator.customNavigator(context: context, screen: LoginScreen(), finish: true);
                     });
 

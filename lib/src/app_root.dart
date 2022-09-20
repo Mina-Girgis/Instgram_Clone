@@ -40,8 +40,7 @@ class AppRoot extends StatelessWidget {
           listener: (context, state) {},
           builder: (context, state) {
             // return LoginScreen();
-            var screen = (CacheHelper.getData(key: 'username') == '-1' ||CacheHelper.getData(key: 'username') == null )?LoginScreen():StartScreen();
-
+            var screen = (CacheHelper.getData(key: 'username') == '-1' ||CacheHelper.getData(key: 'username') == null )?LoginScreen():HomeScreen();
             if(screen is LoginScreen)
               return screen;
             else

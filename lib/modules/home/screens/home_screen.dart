@@ -24,134 +24,142 @@ class HomeScreen extends StatelessWidget {
       child: BlocConsumer<HomeCubit, HomeState>(
         listener: (context, state) {},
         builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 60,
-              backgroundColor: Colors.transparent,
-              elevation: 0.0,
-              title: Row(
-                children: [
-                  Image.asset(
-                    'assets/instaWhite.png',
-                    width: SizeConfig.defaultSize! * 15,
-                  ),
-                  ButtonTheme(
-                    child: IconButton(
-                      splashRadius: 15,
-                      iconSize: 30.0,
-                      alignment: Alignment.centerLeft,
-                      onPressed: () {},
-                      icon: Icon(
-                        IconData(
-                          0xf13d,
-                          fontFamily: 'MaterialIcons',
+          return WillPopScope(
+            onWillPop: ()async{
+              cubit.removeBottomNavBarIndexListTop(context: context);
+              return true;
+            },
+            child: Scaffold(
+              bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                toolbarHeight: 60,
+                backgroundColor: Colors.transparent,
+                elevation: 0.0,
+                title: Row(
+                  children: [
+                    Image.asset(
+                      'assets/instaWhite.png',
+                      width: SizeConfig.defaultSize! * 15,
+                    ),
+                    ButtonTheme(
+                      child: IconButton(
+                        splashRadius: 15,
+                        iconSize: 30.0,
+                        alignment: Alignment.centerLeft,
+                        onPressed: () {},
+                        icon: Icon(
+                          IconData(
+                            0xf13d,
+                            fontFamily: 'MaterialIcons',
+                          ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    iconSize: 30.0,
+                    splashRadius: 15,
+                    onPressed: () {
+                      cubit.getImagesPath();
+                      AppNavigator.customNavigator(
+                          context: context,
+                          screen: PickImageScreen(),
+                          finish: false);
+                    },
+                    icon: Icon(
+                      Icons.add_box_outlined,
+                    ),
                   ),
+                  IconButton(
+                    iconSize: 30.0,
+                    splashRadius: 15,
+                    onPressed: () async {
+
+                    },
+                    icon: Icon(
+                      Icons.favorite_border,
+                    ),
+                  ),
+                  Transform.rotate(
+                      angle: 50,
+                      child: IconButton(
+                          iconSize: 30.0,
+                          splashRadius: 15,
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.send_outlined,
+                          ))),
                 ],
               ),
-              actions: [
-                IconButton(
-                  iconSize: 30.0,
-                  splashRadius: 15,
-                  onPressed: () {
-                    cubit.getImagesPath();
-                    AppNavigator.customNavigator(
-                        context: context,
-                        screen: PickImageScreen(),
-                        finish: false);
-                  },
-                  icon: Icon(
-                    Icons.add_box_outlined,
-                  ),
-                ),
-                IconButton(
-                  iconSize: 30.0,
-                  splashRadius: 15,
-                  onPressed: () async {
-
-                  },
-                  icon: Icon(
-                    Icons.favorite_border,
-                  ),
-                ),
-                Transform.rotate(
-                    angle: 50,
-                    child: IconButton(
-                        iconSize: 30.0,
-                        splashRadius: 15,
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.send_outlined,
-                        ))),
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: () async {
-                await cubit.getAllPosts();
-                await cubit.getAllUsers();
-              },
-              child: Stack(
-                children: [
-                  SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: Container(
-                      width: SizeConfig.screenWidth,
-                      child: Column(
-                        children: [
-                          Container(
-                            // color: Colors.grey,
-                            height: 130.0,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8.0),
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 10,
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  await cubit.getAllPosts();
+                  await cubit.getAllUsers();
+                },
+                child: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: Container(
+                        width: SizeConfig.screenWidth,
+                        child: Column(
+                          children: [
+                            Container(
+                              // color: Colors.grey,
+                              height: 130.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 8.0, right: 8.0),
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: 10,
+                                  separatorBuilder: (context, index) {
+                                    return SizedBox(
+                                      width: 15.0,
+                                    );
+                                  },
+                                  itemBuilder: (context, index) {
+                                    return storyDesignItem();
+                                  },
+                                ),
+                              ),
+                            ),
+                            if (cubit.allPosts.isNotEmpty)
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                itemCount: cubit.allPosts.length,
                                 separatorBuilder: (context, index) {
                                   return SizedBox(
-                                    width: 15.0,
+                                    height: 10.0,
                                   );
                                 },
                                 itemBuilder: (context, index) {
-                                  return storyDesignItem();
+                                  String username = cubit.allPosts[index].username;
+                                  return postDesgin(
+                                      user: cubit.users[username],
+                                      context: context,
+                                      model: cubit.allPosts[index],
+                                      cubit: cubit);
                                 },
+                              )
+                            else
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: CircularProgressIndicator(),
                               ),
+                            SizedBox(
+                              height: 10,
                             ),
-                          ),
-                          if (cubit.allPosts.isNotEmpty)
-                            ListView.separated(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              itemCount: cubit.allPosts.length,
-                              separatorBuilder: (context, index) {
-                                return SizedBox(
-                                  height: 10.0,
-                                );
-                              },
-                              itemBuilder: (context, index) {
-                                String username = cubit.allPosts[index].username;
-                                return postDesgin(
-                                    user: cubit.users[username],
-                                    context: context,
-                                    model: cubit.allPosts[index],
-                                    cubit: cubit);
-                              },
-                            )
-                          else
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

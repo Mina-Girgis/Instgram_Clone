@@ -33,243 +33,252 @@ class _ProfileScreenState extends State<ProfileScreen> {
   },
   builder: (context, state) {
     return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            title: Row(
-              children: [
-                Icon(
-                  FontAwesomeIcons.lock,
-                  size: 20.0,
-                ),
-                SizedBox(
-                  width: 8.0,
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    minWidth: 0.0,
-                    maxHeight: SizeConfig.screenWidth!/2.5,
+        child: WillPopScope(
+          onWillPop: ()async{
+            print("pop page");
+            cubit.removeBottomNavBarIndexListTop(context: context);
+            return true;
+          },
+          child: Scaffold(
+            bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.transparent,
+              elevation: 0.0,
+              title: Row(
+                children: [
+                  Icon(
+                    FontAwesomeIcons.lock,
+                    size: 20.0,
                   ),
-                  child: Text(
-                    user.username,
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                      minWidth: 0.0,
+                      maxHeight: SizeConfig.screenWidth!/2.5,
                     ),
-                  ),
-                ),
-                ButtonTheme(
-                  child: IconButton(
-                    splashRadius: 15,
-                    iconSize: 30.0,
-                    alignment: Alignment.centerLeft,
-                    onPressed: () {},
-                    icon: Icon(
-                      IconData(
-                        0xf13d,
-                        fontFamily: 'MaterialIcons',
+                    child: Text(
+                      user.username,
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
+                  ButtonTheme(
+                    child: IconButton(
+                      splashRadius: 15,
+                      iconSize: 30.0,
+                      alignment: Alignment.centerLeft,
+                      onPressed: () {},
+                      icon: Icon(
+                        IconData(
+                          0xf13d,
+                          fontFamily: 'MaterialIcons',
+                        ),
+                      ),
+                    ),
+                  ),
 
+                ],
+              ),
+              actions: [
+                IconButton(
+                  iconSize: 30.0,
+                  splashRadius: 15,
+                  onPressed: () {
+
+                  },
+                  icon: Icon(
+                    Icons.add_box_outlined,
+                  ),
+                ),
+                IconButton(
+                  iconSize: 30.0,
+                  splashRadius: 15,
+                  onPressed: () {
+                    AppNavigator.customNavigator(context: context, screen: SideBarScreen(), finish: false);
+                  },
+                  icon: Icon(
+                    Icons.menu,
+                    size: 35.0,
+                  ),
+                ),
+                SizedBox(width: 5,),
               ],
             ),
-            actions: [
-              IconButton(
-                iconSize: 30.0,
-                splashRadius: 15,
-                onPressed: () {
+            body: RefreshIndicator(
+              onRefresh: ()async{
+                setState(() {
 
-                },
-                icon: Icon(
-                  Icons.add_box_outlined,
-                ),
-              ),
-              IconButton(
-                iconSize: 30.0,
-                splashRadius: 15,
-                onPressed: () {
-                  AppNavigator.customNavigator(context: context, screen: SideBarScreen(), finish: false);
-                },
-                icon: Icon(
-                  Icons.menu,
-                  size: 35.0,
-                ),
-              ),
-              SizedBox(width: 5,),
-            ],
-          ),
-          body: RefreshIndicator(
-            onRefresh: ()async{
-              setState(() {
-
-              });
-              await cubit.getAllUsers();
-            },
-            child: Stack(
-              children: [
-                LayoutBuilder(
-                  builder: (context, constraint) {
-                    return SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0,right: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      profilePicWithOvelCircle(
-                                        radius: 50.0,
-                                        size: SizeConfig.defaultSize! * 11,
-                                        ovelCircle: true,
-                                        padding: 0,
-                                      ),
-                                      profileNumbers(text: 'Posts', number: user.posts.length),
-                                      profileNumbers(text: 'Followers', number: 0),
-                                      profileNumbers(text: 'Following', number: 0),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(user.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                });
+                await cubit.getAllUsers();
+              },
+              child: Stack(
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraint) {
+                      return SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        profilePicWithOvelCircle(
+                                          radius: 50.0,
+                                          size: SizeConfig.defaultSize! * 11,
+                                          ovelCircle: true,
+                                          padding: 0,
+                                        ),
+                                        profileNumbers(text: 'Posts', number: user.posts.length),
+                                        profileNumbers(text: 'Followers', number: 0),
+                                        profileNumbers(text: 'Following', number: 0),
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(user.bio),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: defaultButton(
-                                          child: Text(
-                                            "Edit profile",
-                                            style: TextStyle(
-                                              color: WHITE,
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(user.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(user.bio),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: defaultButton(
+                                            child: Text(
+                                              "Edit profile",
+                                              style: TextStyle(
+                                                color: WHITE,
+                                              ),
                                             ),
+                                            color: Color.fromRGBO(30, 30, 30, 1.0),
+                                            function: () async{
+                                              cubit.changeNameController(cubit.userTmp.name);
+                                              cubit.changeUsernameController(cubit.userTmp.username);
+                                              cubit.changeBioController(cubit.userTmp.bio);
+                                              AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
+                                            },
+                                            height: 4,
                                           ),
-                                          color: Color.fromRGBO(30, 30, 30, 1.0),
-                                          function: () async{
-                                            cubit.changeNameController(cubit.userTmp.name);
-                                            cubit.changeUsernameController(cubit.userTmp.username);
-                                            cubit.changeBioController(cubit.userTmp.bio);
-                                            AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Container(
+                                          width: 40.0,
+                                          height: SizeConfig.defaultSize! * 4,
+                                          decoration: BoxDecoration(
+                                            color: Color.fromRGBO(30, 30, 30, 1.0),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: IconButton(
+                                              splashRadius: 25.0,
+                                              onPressed: () {},
+                                              icon: Icon(
+                                                FontAwesomeIcons.user,
+                                                color: WHITE,
+                                                size: 20.0,
+                                              )),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      // color: Colors.grey,
+                                      height: 130.0,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 0.0, right:0.0),
+                                        child: ListView.separated(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: 10,
+                                          separatorBuilder: (context, index) {
+                                            return SizedBox(
+                                              width: 15.0,
+                                            );
                                           },
-                                          height: 4,
+                                          itemBuilder: (context, index) {
+                                            return storyDesignItem(ovel: false);
+                                          },
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Container(
-                                        width: 40.0,
-                                        height: SizeConfig.defaultSize! * 4,
-                                        decoration: BoxDecoration(
-                                          color: Color.fromRGBO(30, 30, 30, 1.0),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: IconButton(
-                                            splashRadius: 25.0,
-                                            onPressed: () {},
-                                            icon: Icon(
-                                              FontAwesomeIcons.user,
-                                              color: WHITE,
-                                              size: 20.0,
-                                            )),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    // color: Colors.grey,
-                                    height: 130.0,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 0.0, right:0.0),
-                                      child: ListView.separated(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: 10,
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(
-                                            width: 15.0,
-                                          );
-                                        },
-                                        itemBuilder: (context, index) {
-                                          return storyDesignItem(ovel: false);
-                                        },
                                       ),
                                     ),
-                                  ),
 
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            DefaultTabController(
-                              length: 2,
-                              child: SizedBox(
-                                height: 50,
-                                child: AppBar(
-                                  backgroundColor: Colors.transparent,
+                              DefaultTabController(
+                                length: 2,
+                                child: SizedBox(
+                                  height: 50,
+                                  child: AppBar(
+                                    backgroundColor: Colors.transparent,
 
-                                  bottom: TabBar(
-                                    indicatorColor: WHITE,
-                                    onTap: (index) {
-                                      print(index);
-                                    },
-                                    physics: ScrollPhysics(),
-                                    isScrollable: false,
-                                    tabs: [
-                                      Tab(
-                                        icon: Icon(Icons.directions_bike),
-                                      ),
-                                      Tab(
-                                        icon: Icon(
-                                          Icons.directions_car,
+                                    bottom: TabBar(
+                                      indicatorColor: WHITE,
+                                      onTap: (index) {
+                                        print(index);
+                                      },
+                                      physics: ScrollPhysics(),
+                                      isScrollable: false,
+                                      tabs: [
+                                        Tab(
+                                          icon: Icon(Icons.directions_bike),
                                         ),
-                                      ),
-                                    ],
+                                        Tab(
+                                          icon: Icon(
+                                            Icons.directions_car,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 5,),
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 3.0,
-                              crossAxisSpacing: 3.0,
-                              children: List.generate(user.posts.length, (index){
-                                return Container(
-                                  width: SizeConfig.screenWidth!/3,
-                                  height: 100,
-                                  color: Colors.grey,
-                                  child: Image.network(user.posts[index].imageUrl,
-                                    fit: BoxFit.cover,
-                                  ),
-                                );
-                              }),
-                            ),
-                          ]),
-                    );
-                  },
-                ),
-              ],
+                              SizedBox(height: 5,),
+                              GridView.count(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 3.0,
+                                crossAxisSpacing: 3.0,
+                                children: List.generate(user.posts.length, (index){
+                                  return Container(
+                                    width: SizeConfig.screenWidth!/3,
+                                    height: 100,
+                                    color: Colors.grey,
+                                    child: Image.network(user.posts[index].imageUrl,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ]),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ));

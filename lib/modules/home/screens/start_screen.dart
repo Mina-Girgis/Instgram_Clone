@@ -7,6 +7,7 @@ import 'package:pro/modules/home/screens/profile/profile_screen.dart';
 import 'package:pro/modules/home/screens/reel_screen.dart';
 import 'package:pro/modules/home/screens/search_screen.dart';
 import 'package:pro/modules/home/screens/shop_screen.dart';
+import 'package:pro/services/utils/app_navigation.dart';
 
 import '../../../models/user_model.dart';
 import '../../../shared/components/constants.dart';
@@ -18,63 +19,23 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
-    UserModel? user = cubit.users['mina_girgis_alfy'];
-    List<Widget>screens=[
-      HomeScreen(),
-      SearchScreen(),
-      ReelScreen(),
-      ShopScreen(),
-      ProfileScreen(),
-    ];
+    // UserModel? user = cubit.users['mina_girgis_alfy'];
+
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Scaffold(
-          bottomNavigationBar: BottomNavigationBar(
-            elevation: 0.0,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            selectedIconTheme: IconThemeData(
-                size: 30.0
-            ),
-            unselectedIconTheme: IconThemeData(
-                size: 30.0
-            ),
-            currentIndex: cubit.bottomNavigationBarIndex,
-            unselectedItemColor: WHITE,
-            selectedItemColor: WHITE,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.black,
-            onTap: (index) {
-              cubit.changeBottomNavigationBarIndex(index);
-            },
-            items: [
-              BottomNavigationBarItem(
-
-                  icon: Icon(
-                    Icons.home_filled,
-                  ),
-                  label: "",
-                  backgroundColor: Colors.transparent),
-              BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.magnifyingGlass,size: 25.0,),
-                label: "item",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.slideshow,),
-                label: "item",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.local_mall,),
-                label: "item",
-              ),
-              BottomNavigationBarItem(
-                icon: circleAvatarDesign(radius: 16),
-                label: "item",
-              ),
-            ],
+        return WillPopScope(
+          onWillPop: ()async{
+            cubit.removeBottomNavBarIndexListTop(context: context);
+            print("----------------------------");
+            print(cubit.bottomNavigationBarIndex);
+            print("----------------------------");
+            return false;
+          },
+          child: Scaffold(
+            // bottomNavigationBar: defaulBottomNavBar(context:context ,cubit: cubit),
+            // body: cubit.screens[cubit.bottomNavigationBarIndex],
           ),
-          body: screens[cubit.bottomNavigationBarIndex],
         );
       },
     );

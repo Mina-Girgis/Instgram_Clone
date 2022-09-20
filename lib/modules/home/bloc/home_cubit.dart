@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_storage_path/flutter_storage_path.dart';
 import 'package:meta/meta.dart';
@@ -14,7 +15,11 @@ import '../../../models/post_model.dart';
 import '../../../shared/components/components.dart';
 import '../../../shared/components/constants.dart';
 import '../../../shared/network/local/cache_helper/cache_helper.dart';
-
+import '../screens/home_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/reel_screen.dart';
+import '../screens/search_screen.dart';
+import '../screens/shop_screen.dart';
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
@@ -29,10 +34,22 @@ class HomeCubit extends Cubit<HomeState> {
   UserModel userTmp = UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
   List<FileModel> files   = [];
-
   List<PostModel> allPosts   = [];
   List<String> userPostsIds = [];
   List<PostModel> userPosts =[];
+
+
+  List<int> bottomNavBarIndexList =[0]; // to controll navigation (stack)
+
+
+
+  List<Widget>screens=[
+    HomeScreen(),
+    SearchScreen(),
+    ReelScreen(),
+    ShopScreen(),
+    ProfileScreen(),
+  ];
 
 
   Map<String, UserModel> users = {};
@@ -63,13 +80,7 @@ class HomeCubit extends Cubit<HomeState> {
     bioController.text = s;
     emit(ChangeBioController());
   }
-  void changeBottomNavigationBarIndex(int idx) {
-    bottomNavigationBarIndex = idx;
-    if(idx ==4){
-      userPosts.sort((PostModel a , PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
-    }
-    emit(ChangeBottomNavigationBarIndex());
-  }
+
   void changeDropdownButtonHintText(int idx) {
     albumNameIndex = idx;
     imageIndex=0;
@@ -91,6 +102,38 @@ class HomeCubit extends Cubit<HomeState> {
         emit(ChangeLikeStateInAllPosts());
       }
     });
+  }
+
+
+  void removeBottomNavBarIndexListTop({required context}){
+    if(bottomNavBarIndexList.isNotEmpty){
+      bottomNavBarIndexList.removeLast();
+      bottomNavBarIndexList.forEach((element) {
+        print(element);
+      });
+      if(bottomNavBarIndexList.isNotEmpty){
+        changeBottomNavigationBarIndex(idx :bottomNavBarIndexList.last ,add: false);
+        print(bottomNavBarIndexList.last);
+      }
+      else{
+        SystemNavigator.pop();
+      }
+    }
+    else{
+      SystemNavigator.pop();
+    }
+    emit(RemoveBottomNavBarIndexListTop());
+  }
+
+  void changeBottomNavigationBarIndex({required int idx, bool add = true}) {
+    bottomNavigationBarIndex = idx;
+    if(add){
+      bottomNavBarIndexList.add(idx);
+    }
+    if(idx ==4){
+      userPosts.sort((PostModel a , PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
+    }
+    emit(ChangeBottomNavigationBarIndex());
   }
 
   // Edit profile
