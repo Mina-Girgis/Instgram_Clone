@@ -33,8 +33,8 @@ class StartScreen extends StatelessWidget {
             return false;
           },
           child: Scaffold(
-            // bottomNavigationBar: defaulBottomNavBar(context:context ,cubit: cubit),
-            // body: cubit.screens[cubit.bottomNavigationBarIndex],
+            bottomNavigationBar: defaulBottomNavBar(context:context ,cubit: cubit),
+            body: cubit.screens[cubit.bottomNavigationBarIndex],
           ),
         );
       },

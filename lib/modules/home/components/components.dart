@@ -448,7 +448,7 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
     backgroundColor: Colors.black,
     onTap: (index) {
       if(cubit.bottomNavigationBarIndex !=index){
-        AppNavigator.customNavigator(context: context, screen: cubit.screens[index], finish: false);
+        // AppNavigator.customNavigator(context: context, screen: cubit.screens[index], finish: false);
         cubit.changeBottomNavigationBarIndex(idx: index);
         print(cubit.bottomNavigationBarIndex);
 

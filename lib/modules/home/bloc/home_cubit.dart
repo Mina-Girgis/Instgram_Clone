@@ -113,7 +113,7 @@ class HomeCubit extends Cubit<HomeState> {
       });
       if(bottomNavBarIndexList.isNotEmpty){
         changeBottomNavigationBarIndex(idx :bottomNavBarIndexList.last ,add: false);
-        print(bottomNavBarIndexList.last);
+        // print(bottomNavBarIndexList.last);
       }
       else{
         SystemNavigator.pop();
@@ -124,7 +124,6 @@ class HomeCubit extends Cubit<HomeState> {
     }
     emit(RemoveBottomNavBarIndexListTop());
   }
-
   void changeBottomNavigationBarIndex({required int idx, bool add = true}) {
     bottomNavigationBarIndex = idx;
     if(add){

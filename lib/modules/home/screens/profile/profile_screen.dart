@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return true;
           },
           child: Scaffold(
-            bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+            // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
             appBar: AppBar(
               automaticallyImplyLeading: false,
               backgroundColor: Colors.transparent,
@@ -57,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     constraints: BoxConstraints(
                       minWidth: 0.0,
-                      maxHeight: SizeConfig.screenWidth!/2.5,
+                      maxWidth: SizeConfig.screenWidth!/2.5,
                     ),
                     child: Text(
                       user.username,

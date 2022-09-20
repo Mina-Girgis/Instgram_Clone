@@ -21,7 +21,7 @@ class ShopScreen extends StatelessWidget {
               return true;
             },
             child: Scaffold(
-              bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+              // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
 
             ),
           );
