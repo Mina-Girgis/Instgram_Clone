@@ -8,15 +8,21 @@ import 'package:pro/modules/home/screens/profile/side_bar/side_bar_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/components/components.dart';
 import 'package:pro/shared/components/constants.dart';
+import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../../services/utils/size_config.dart';
 import '../../components/components.dart';
 import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
@@ -95,164 +101,176 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(width: 5,),
             ],
           ),
-          body: LayoutBuilder(
-            builder: (context, constraint) {
-              return SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0,right: 10.0),
-                        child: Column(
+          body: RefreshIndicator(
+            onRefresh: ()async{
+              setState(() {
+
+              });
+              await cubit.getAllUsers();
+            },
+            child: Stack(
+              children: [
+                LayoutBuilder(
+                  builder: (context, constraint) {
+                    return SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                profilePicWithOvelCircle(
-                                  radius: 50.0,
-                                  size: SizeConfig.defaultSize! * 11,
-                                  ovelCircle: true,
-                                  padding: 0,
-                                ),
-                                profileNumbers(text: 'Posts', number: user.posts.length),
-                                profileNumbers(text: 'Followers', number: 0),
-                                profileNumbers(text: 'Following', number: 0),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(user.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(user.bio),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: defaultButton(
-                                    child: Text(
-                                      "Edit profile",
-                                      style: TextStyle(
-                                        color: WHITE,
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      profilePicWithOvelCircle(
+                                        radius: 50.0,
+                                        size: SizeConfig.defaultSize! * 11,
+                                        ovelCircle: true,
+                                        padding: 0,
+                                      ),
+                                      profileNumbers(text: 'Posts', number: user.posts.length),
+                                      profileNumbers(text: 'Followers', number: 0),
+                                      profileNumbers(text: 'Following', number: 0),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(user.name,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(user.bio),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: defaultButton(
+                                          child: Text(
+                                            "Edit profile",
+                                            style: TextStyle(
+                                              color: WHITE,
+                                            ),
+                                          ),
+                                          color: Color.fromRGBO(30, 30, 30, 1.0),
+                                          function: () async{
+                                            cubit.changeNameController(cubit.userTmp.name);
+                                            cubit.changeUsernameController(cubit.userTmp.username);
+                                            cubit.changeBioController(cubit.userTmp.bio);
+                                            AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
+                                          },
+                                          height: 4,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        width: 40.0,
+                                        height: SizeConfig.defaultSize! * 4,
+                                        decoration: BoxDecoration(
+                                          color: Color.fromRGBO(30, 30, 30, 1.0),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: IconButton(
+                                            splashRadius: 25.0,
+                                            onPressed: () {},
+                                            icon: Icon(
+                                              FontAwesomeIcons.user,
+                                              color: WHITE,
+                                              size: 20.0,
+                                            )),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Container(
+                                    // color: Colors.grey,
+                                    height: 130.0,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 0.0, right:0.0),
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: 10,
+                                        separatorBuilder: (context, index) {
+                                          return SizedBox(
+                                            width: 15.0,
+                                          );
+                                        },
+                                        itemBuilder: (context, index) {
+                                          return storyDesignItem(ovel: false);
+                                        },
                                       ),
                                     ),
-                                    color: Color.fromRGBO(30, 30, 30, 1.0),
-                                    function: () async{
-                                      cubit.changeNameController(GlobalCubit.get(context).currentUser.name);
-                                      cubit.changeUsernameController(GlobalCubit.get(context).currentUser.username);
-                                      cubit.changeBioController(GlobalCubit.get(context).currentUser.bio);
-                                      AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
-                                    },
-                                    height: 4,
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Container(
-                                  width: 40.0,
-                                  height: SizeConfig.defaultSize! * 4,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromRGBO(30, 30, 30, 1.0),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: IconButton(
-                                      splashRadius: 25.0,
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        FontAwesomeIcons.user,
-                                        color: WHITE,
-                                        size: 20.0,
-                                      )),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              // color: Colors.grey,
-                              height: 130.0,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 0.0, right:0.0),
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: 10,
-                                  separatorBuilder: (context, index) {
-                                    return SizedBox(
-                                      width: 15.0,
-                                    );
-                                  },
-                                  itemBuilder: (context, index) {
-                                    return storyDesignItem(ovel: false);
-                                  },
-                                ),
+
+                                ],
                               ),
                             ),
 
-                          ],
-                        ),
-                      ),
+                            DefaultTabController(
+                              length: 2,
+                              child: SizedBox(
+                                height: 50,
+                                child: AppBar(
+                                  backgroundColor: Colors.transparent,
 
-                      DefaultTabController(
-                        length: 2,
-                        child: SizedBox(
-                          height: 50,
-                          child: AppBar(
-                            backgroundColor: Colors.transparent,
-
-                            bottom: TabBar(
-                              indicatorColor: WHITE,
-                              onTap: (index) {
-                                print(index);
-                              },
-                              physics: ScrollPhysics(),
-                              isScrollable: false,
-                              tabs: [
-                                Tab(
-                                  icon: Icon(Icons.directions_bike),
-                                ),
-                                Tab(
-                                  icon: Icon(
-                                    Icons.directions_car,
+                                  bottom: TabBar(
+                                    indicatorColor: WHITE,
+                                    onTap: (index) {
+                                      print(index);
+                                    },
+                                    physics: ScrollPhysics(),
+                                    isScrollable: false,
+                                    tabs: [
+                                      Tab(
+                                        icon: Icon(Icons.directions_bike),
+                                      ),
+                                      Tab(
+                                        icon: Icon(
+                                          Icons.directions_car,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5,),
-                      GridView.count(
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 3.0,
-                        crossAxisSpacing: 3.0,
-                        children: List.generate(user.posts.length, (index){
-                          return Container(
-                            width: SizeConfig.screenWidth!/3,
-                            height: 100,
-                            color: Colors.grey,
-                            child: Image.network(user.posts[index].imageUrl,
-                              fit: BoxFit.cover,
+                            SizedBox(height: 5,),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 3.0,
+                              crossAxisSpacing: 3.0,
+                              children: List.generate(user.posts.length, (index){
+                                return Container(
+                                  width: SizeConfig.screenWidth!/3,
+                                  height: 100,
+                                  color: Colors.grey,
+                                  child: Image.network(user.posts[index].imageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              }),
                             ),
-                          );
-                        }),
-                      ),
-                    ]),
-              );
-            },
+                          ]),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ));
   },

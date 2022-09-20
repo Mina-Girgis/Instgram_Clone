@@ -90,6 +90,7 @@ class HomeScreen extends StatelessWidget {
             body: RefreshIndicator(
               onRefresh: () async {
                 await cubit.getAllPosts();
+                await cubit.getAllUsers();
               },
               child: Stack(
                 children: [

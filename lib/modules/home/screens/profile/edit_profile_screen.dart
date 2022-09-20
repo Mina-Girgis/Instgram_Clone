@@ -10,12 +10,14 @@ import 'package:pro/shared/components/constants.dart';
 import '../../../../services/utils/app_navigation.dart';
 import '../../components/components.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   EditProfileScreen({Key? key}) : super(key: key);
 
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
 
-
-
+class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
@@ -33,12 +35,14 @@ class EditProfileScreen extends StatelessWidget {
               cubit: cubit,
                 title: "Edit profile",
                 context: context,
-                onSave: () {
-                    cubit.updateUserData(
-                        oldUsername: GlobalCubit.get(context).currentUser.username,
-                        user: GlobalCubit.get(context).currentUser,
-                        context: context,
-                    );
+                onSave: () async{
+                  await cubit.updateUserData(
+                    oldUsername: cubit.userTmp.username,
+                    user: cubit.userTmp,
+                    context: context,
+                  );
+
+
                 }),
             body: SingleChildScrollView(
               child: Container(

@@ -43,7 +43,8 @@ class _PickImageScreenState extends State<PickImageScreen> {
             ),
             title: Text("New post"),
             actions: [
-              IconButton(
+              if(cubit.files.isNotEmpty)
+                  IconButton(
                 onPressed: () {
                   AppNavigator.customNavigator(
                       context: context, screen: AddPostScreen(), finish: false);

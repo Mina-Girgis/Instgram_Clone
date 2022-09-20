@@ -106,6 +106,9 @@ class HomeCubit extends Cubit<HomeState> {
       String username = usernameController.text;
       String name = nameController.text;
       String bio = bioController.text;
+      print("---------------");
+      print(name);
+      print("---------------");
       if (username == user.username && name == user.name && bio == user.bio) {
         toastMessage(
             text: 'No data changed.', backgroundColor: GREY, textColor: WHITE);
@@ -122,7 +125,8 @@ class HomeCubit extends Cubit<HomeState> {
         // await deleteUser(oldUsername);
         // await addUser(username, mp, context);
         FirebaseFirestore.instance.collection('users').doc(username).set(mp);
-        userTmp = UserModel.fromJson(mp);
+        await getAllUsers();
+        // userTmp = UserModel.fromJson(mp);
         toastMessage(text: 'Data changed successfully.', backgroundColor: GREY, textColor: WHITE);
         CacheHelper.putData(key: 'username', value: username);
         print(CacheHelper.getData(key: 'username'));
@@ -327,7 +331,7 @@ class HomeCubit extends Cubit<HomeState> {
       print("----------------------");
     });
     print("------------------------");
-    print(files[0].files[0]);
+    // print(files[0].files[0]);
     emit(GetImagesPathSuccess());
   }
   Future<void> uploadNewPostImage({required context,required username, required String image}) async {
@@ -395,7 +399,7 @@ class HomeCubit extends Cubit<HomeState> {
   // get all users info and store them in a map
   // each user with their info ,posts
   Future<void> getAllUsers() async {
-    users.clear();
+    users={};
     await FirebaseFirestore.instance
         .collection('users')
         .get()
