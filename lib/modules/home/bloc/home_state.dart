@@ -166,6 +166,18 @@ class RemoveFromMyFollowRequestsSuccess extends HomeState {}
 
 class RemoveFromMyFollowRequestsFail extends HomeState {}
 
+class UploadProfilePicLoading extends HomeState {}
+
+class UploadProfilePicSuccess extends HomeState {}
+
+class ChangeUserProfileImageTemp extends HomeState {}
+
+class UploadProfilePicFail extends HomeState {}
+
+class UpdateUserDataLoading extends HomeState {}
+
+
+
 
 
 

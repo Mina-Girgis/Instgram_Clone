@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insta_like_button/insta_like_button.dart';
@@ -12,7 +14,7 @@ import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
 
-Widget storyDesignItem({bool ovel = true}) {
+Widget storyDesignItem({bool ovel = true,required cubit}) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -21,6 +23,7 @@ Widget storyDesignItem({bool ovel = true}) {
           height: 2.0,
         ),
         profilePicWithOvelCircle(
+          cubit: cubit,
             padding: 5, radius: 46, size: 83, ovelCircle: ovel),
         SizedBox(
           height: 5.0,
@@ -40,18 +43,27 @@ Widget storyDesignItem({bool ovel = true}) {
   );
 }
 
-Widget circleAvatarDesign({required double radius}) {
+Widget circleAvatarDesign({required HomeCubit cubit,required double radius , String imageUrl=""}) {
   return CircleAvatar(
-    backgroundImage: AssetImage('assets/person.jpg'),
+    backgroundImage: picImage(imageUrl,cubit),
     radius: radius,
   );
 }
 
+ImageProvider picImage(String image , HomeCubit cubit){
+  if(cubit.userTmp.imageUrl == image)
+    return NetworkImage(image);
+  else if(image=="")
+    return NetworkImage('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fA%3D%3D&w=1000&q=80');
+  else
+    return FileImage(File(image));
+}
 Widget profilePicWithOvelCircle({
   required double radius,
   required double size,
   required bool ovelCircle,
   required double padding,
+  required cubit ,
 }) {
   return Container(
     width: size,
@@ -72,7 +84,7 @@ Widget profilePicWithOvelCircle({
       child: Padding(
         padding: EdgeInsets.all(padding),
         child: Center(
-          child: circleAvatarDesign(radius: radius),
+          child: circleAvatarDesign(radius: radius,cubit: cubit),
         ),
       ),
     ),
@@ -80,7 +92,9 @@ Widget profilePicWithOvelCircle({
 }
 
 Widget postDesgin(
-    {required UserModel? user,
+    {
+    required UserModel? user,
+    required index,
     required context,
     required HomeCubit cubit,
     required PostModel model}) {
@@ -95,6 +109,7 @@ Widget postDesgin(
           child: Row(
             children: [
               profilePicWithOvelCircle(
+                cubit: cubit,
                 size: 45,
                 radius: 60,
                 ovelCircle: true,
@@ -144,7 +159,11 @@ Widget postDesgin(
           // color: Colors.blue,
           width: SizeConfig.screenWidth,
           child: InstaLikeButton(
-            onChanged: () {},
+            onChanged: () {
+              String username = CacheHelper.getData(key: 'username').toString();
+              cubit.likePost(postId: model.postId, username: username);
+              cubit.changeLikeStateInAllPosts(postId: model.postId);
+            },
             image: NetworkImage(model.imageUrl),
             height: 300,
           ),
@@ -238,7 +257,7 @@ Widget postDesgin(
               ),
               Row(
                 children: [
-                  circleAvatarDesign(radius: 17.0),
+                  circleAvatarDesign(radius: 17.0,cubit: cubit),
                   SizedBox(
                     width: 10.0,
                   ),
@@ -247,6 +266,7 @@ Widget postDesgin(
                     splashColor: Colors.transparent,
                     onTap: () {
                       cubit.commentController.clear();
+                      String username = CacheHelper.getData(key: 'username').toString();
                       commentSection(
                           cubit: cubit,
                           context: context,
@@ -256,8 +276,9 @@ Widget postDesgin(
                                 time: GlobalCubit.get(context).getCurrentTime(),
                                 postId: model.postId,
                                 text: cubit.commentController.text,
-                                username: CacheHelper.getData(key: 'username').toString(),
+                                username: username,
                             ).then((value){
+                              cubit.allPosts[index].comments.add(CommentModel(time: GlobalCubit.get(context).getCurrentTime(), username: username, text: cubit.commentController.text));
                               Navigator.pop(context);
                             });
                           },
@@ -357,11 +378,12 @@ AppBar appBar({required String title, required context, required Function()? onS
         padding: const EdgeInsets.only(right: 0.0),
         child: IconButton(
           onPressed: onSave,
-          icon: const Icon(
+          icon:  Icon(
             FontAwesomeIcons.check,
             size: 27.0,
             color: BUTTON_COLOR,
           ),
+
         ),
       ),
     ],
@@ -451,7 +473,6 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
         // AppNavigator.customNavigator(context: context, screen: cubit.screens[index], finish: false);
         cubit.changeBottomNavigationBarIndex(idx: index);
         print(cubit.bottomNavigationBarIndex);
-
       }
     },
     items: [
@@ -475,7 +496,7 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
         label: "item",
       ),
       BottomNavigationBarItem(
-        icon: circleAvatarDesign(radius: 16),
+        icon: circleAvatarDesign(radius: 16,cubit: cubit),
         label: "item",
       ),
     ],

@@ -11,7 +11,8 @@ import '../../../../shared/components/constants.dart';
 import 'add_post_screen.dart';
 
 class PickImageScreen extends StatefulWidget {
-  const PickImageScreen({Key? key}) : super(key: key);
+  int postOrProfilePic;
+  PickImageScreen({Key? key,required this.postOrProfilePic}) : super(key: key);
 
   @override
   State<PickImageScreen> createState() => _PickImageScreenState();
@@ -37,6 +38,8 @@ class _PickImageScreenState extends State<PickImageScreen> {
             automaticallyImplyLeading: false,
             leading: IconButton(
               onPressed: () {
+                cubit.imageIndex=-1;
+                cubit.albumNameIndex=-1;
                 Navigator.pop(context);
               },
               icon: Icon(FontAwesomeIcons.x),
@@ -46,8 +49,12 @@ class _PickImageScreenState extends State<PickImageScreen> {
               if(cubit.files.isNotEmpty)
                   IconButton(
                 onPressed: () {
-                  AppNavigator.customNavigator(
-                      context: context, screen: AddPostScreen(), finish: false);
+                  if(widget.postOrProfilePic==0){
+                    AppNavigator.customNavigator(context: context, screen: AddPostScreen(), finish: false);
+                  }else{
+                    cubit.changeUserProfileImageTemp(cubit.files[cubit.albumNameIndex].files[cubit.imageIndex]);
+                    Navigator.pop(context);
+                  }
                 },
                 icon: Icon(FontAwesomeIcons.arrowRight),
               ),

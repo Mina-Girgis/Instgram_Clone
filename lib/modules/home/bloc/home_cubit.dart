@@ -33,11 +33,9 @@ class HomeCubit extends Cubit<HomeState> {
   List labels = ["Name", "Username", "Bio"];
   List initialValues = [];
   String updatingValueField = "";
-  String PostImageUrlFromFireBaseStorage = "";
-  UserModel userTmp =
-      UserModel.empty(); // to switch between different profile screens
+  UserModel userTmp = UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
-  List<FileModel> files = [];
+  List<FileModel> files = []; // all pics in your phone
   List<PostModel> allPosts = [];
   List<String> userPostsIds = [];
   List<PostModel> userPosts = [];
@@ -67,6 +65,14 @@ class HomeCubit extends Cubit<HomeState> {
   int albumNameIndex = -1;
   int imageIndex = -1;
   int profileRowIndex = 0;
+  String userProfileImageTemp = "";
+
+
+  void changeUserProfileImageTemp(String imageurl){
+    userProfileImageTemp = imageurl;
+    emit(ChangeUserProfileImageTemp());
+  }
+
 
   void changeProfileRowIndex(UserModel user) {
     String currentUserName = CacheHelper.getData(key: 'username').toString();
@@ -125,22 +131,6 @@ class HomeCubit extends Cubit<HomeState> {
   var addPostController = TextEditingController();
   var commentController = TextEditingController();
   var searchController = TextEditingController();
-
-  void whenLogOut() {
-    changeBottomNavigationBarIndex(idx: 0);
-    userTmp = UserModel.empty();
-    postTmp = PostModel.empty();
-    files = [];
-    allPosts = [];
-    userPostsIds = [];
-    userPosts = [];
-    searchList = [];
-    bottomNavBarIndexList = [0];
-    users = {};
-    albumNameIndex = -1;
-    imageIndex = -1;
-    emit(LogOutSuccess());
-  }
 
   void changeSearchController(String s) {
     searchController.text = s;
@@ -242,22 +232,25 @@ class HomeCubit extends Cubit<HomeState> {
     emit(SetUserTmpAsCurrentUserAgain());
   }
 
+
+
+
   Future<void> updateUserData({
     required String oldUsername,
     required UserModel user,
     required context,
+    required imageUrl,
   }) async {
     try {
       String username = usernameController.text;
       String name = nameController.text;
       String bio = bioController.text;
-      print("---------------");
-      print(name);
-      print("---------------");
-      if (username == user.username && name == user.name && bio == user.bio) {
+      if (username == user.username && name == user.name && bio == user.bio && imageUrl=="") {
         toastMessage(
             text: 'No data changed.', backgroundColor: GREY, textColor: WHITE);
       } else {
+
+        emit(UpdateUserDataLoading());
         Map<String, dynamic> mp = {
           'username': username,
           'phone': user.phoneNumber,
@@ -265,13 +258,11 @@ class HomeCubit extends Cubit<HomeState> {
           'email': user.email,
           'bio': bio,
           'name': name,
-          'imageUrl': user.imageUrl,
+          'imageUrl': imageUrl==""?user.imageUrl : imageUrl,
         };
-        // await deleteUser(oldUsername);
-        // await addUser(username, mp, context);
-        FirebaseFirestore.instance.collection('users').doc(username).set(mp);
+        await FirebaseFirestore.instance.collection('users').doc(username).set(mp);
         await getAllUsers();
-        // userTmp = UserModel.fromJson(mp);
+        userTmp = UserModel.fromJson(mp);
         toastMessage(
             text: 'Data changed successfully.',
             backgroundColor: GREY,
@@ -285,6 +276,44 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UpdateUserDataFail());
     }
   }
+
+
+  Future<void> uploadProfilePic({required context, required username, required String image ,required UserModel user}) async {
+    if(albumNameIndex!=-1){
+      emit(UploadProfilePicLoading());
+      File file = File(image);
+      await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('profilePic/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) async {
+          print("******************************");
+          await updateUserData(oldUsername: username, user: user, context: context, imageUrl: value);
+          print("******************************");
+          changeUserProfileImageTemp(value);
+          emit(UploadProfilePicSuccess());
+        }).catchError((error) {
+          print(error.toString());
+        });
+      }).catchError((error) {
+        print(error.toString());
+        emit(UploadProfilePicFail());
+      });
+    }
+    else{
+      await updateUserData(oldUsername: username, user: user, context: context, imageUrl: "");
+      emit(UploadProfilePicSuccess());
+    }
+
+  }
+
+
+
+
+
+
+
 
   Future<void> deleteUser(String username) async {
     // DELETE ALL COLLECTIONS
@@ -504,6 +533,10 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
+
+
+
+
   Future<void> addNewPost({
     required String image,
     required String description,
@@ -602,7 +635,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // when you send follow request
-  Future<void> addToFollowRequests({required String currentUserName, required String user}) async {
+  Future<void> addToFollowRequests(
+      {required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user)
@@ -615,7 +649,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddToFollowRequestFail());
     });
   }
-  Future<void> removeFromFollowRequests({required String currentUserName, required String user}) async {
+
+  Future<void> removeFromFollowRequests(
+      {required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user)
@@ -628,8 +664,10 @@ class HomeCubit extends Cubit<HomeState> {
       emit(RemoveFromFollowRequestsFail());
     });
   }
+
   // when you confirm your follow requests
-  Future<void> addToFollowers({required String currentUserName, required String user}) async {
+  Future<void> addToFollowers(
+      {required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUserName)
@@ -643,7 +681,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddToFollowersFail());
     });
   }
-  Future<void> addToFollowing({required String currentUserName, required String user}) async {
+
+  Future<void> addToFollowing(
+      {required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user)
@@ -657,8 +697,10 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddToFollowingFail());
     });
   }
+
   // when delete requests from your follow request
-  Future<void> removeFromMyFollowRequests({required String currentUserName, required String user}) async {
+  Future<void> removeFromMyFollowRequests(
+      {required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUserName)
@@ -692,6 +734,7 @@ class HomeCubit extends Cubit<HomeState> {
     });
     return mp;
   }
+
   Future<List<String>> getLikesForSpecificPost({required String postId}) async {
     List<String> list = [];
     await FirebaseFirestore.instance
@@ -711,7 +754,9 @@ class HomeCubit extends Cubit<HomeState> {
     });
     return list;
   }
-  Future<void> _addLike({required String postId, required String username}) async {
+
+  Future<void> _addLike(
+      {required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -723,7 +768,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddLikeFail());
     });
   }
-  Future<void> _removeLike({required String postId, required String username}) async {
+
+  Future<void> _removeLike(
+      {required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
@@ -738,7 +785,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(RemoveLikeFail());
     });
   }
-  Future<void> _addToPostsLiked({required String postId, required String username}) async {
+
+  Future<void> _addToPostsLiked(
+      {required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -752,7 +801,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddToPostsLikedFail());
     });
   }
-  Future<void> _removeFromPostsLiked({required String postId, required String username}) async {
+
+  Future<void> _removeFromPostsLiked(
+      {required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -773,15 +824,19 @@ class HomeCubit extends Cubit<HomeState> {
     await _addToPostsLiked(postId: postId, username: username);
     emit(LikePostSuccess());
   }
+
   void unlikePost({required String postId, required String username}) async {
     await _removeLike(postId: postId, username: username);
     await _removeFromPostsLiked(postId: postId, username: username);
     emit(UnlikePostSuccess());
   }
 
-
   // comments
-  Future<void> addComment({required String time, required String postId, required String text, required String username}) async {
+  Future<void> addComment(
+      {required String time,
+      required String postId,
+      required String text,
+      required String username}) async {
     CommentModel comment = CommentModel(
       username: username,
       text: text,
@@ -800,7 +855,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddCommentFail());
     });
   }
-  Future<List<CommentModel>> getCommentsForSprcificPost({required String postId}) async {
+
+  Future<List<CommentModel>> getCommentsForSprcificPost(
+      {required String postId}) async {
     List<CommentModel> comments = [];
     await FirebaseFirestore.instance
         .collection('posts')
@@ -849,5 +906,22 @@ class HomeCubit extends Cubit<HomeState> {
       print(error.toString());
       emit(GetAllUsersFail());
     });
+  }
+
+  void whenLogOut() {
+    changeBottomNavigationBarIndex(idx: 0);
+    userTmp = UserModel.empty();
+    postTmp = PostModel.empty();
+    files = [];
+    allPosts = [];
+    userPostsIds = [];
+    userPosts = [];
+    searchList = [];
+    bottomNavBarIndexList = [0];
+    users = {};
+    albumNameIndex = -1;
+    imageIndex = -1;
+    searchController.clear();
+    emit(LogOutSuccess());
   }
 }

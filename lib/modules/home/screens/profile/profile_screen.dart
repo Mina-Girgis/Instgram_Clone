@@ -43,16 +43,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color:
               Color.fromRGBO(30, 30, 30, 1.0),
               function: () async {
-                cubit.changeNameController(
-                    cubit.userTmp.name);
-                cubit.changeUsernameController(
-                    cubit.userTmp.username);
-                cubit.changeBioController(
-                    cubit.userTmp.bio);
-                AppNavigator.customNavigator(
-                    context: context,
-                    screen: EditProfileScreen(),
-                    finish: false);
+                cubit.albumNameIndex=-1;
+                cubit.changeUserProfileImageTemp(cubit.userTmp.imageUrl);
+                cubit.changeNameController(cubit.userTmp.name);
+                cubit.changeUsernameController(cubit.userTmp.username);
+                cubit.changeBioController(cubit.userTmp.bio);
+                AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
               },
               height: 4,
             ),
@@ -354,6 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         profilePicWithOvelCircle(
+                                          cubit: cubit,
                                           radius: 50.0,
                                           size: SizeConfig.defaultSize! * 11,
                                           ovelCircle: false,
@@ -406,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             );
                                           },
                                           itemBuilder: (context, index) {
-                                            return storyDesignItem(ovel: false);
+                                            return storyDesignItem(ovel: false,cubit: cubit);
                                           },
                                         ),
                                       ),
@@ -430,12 +427,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isScrollable: false,
                                       tabs: [
                                         Tab(
-                                          icon: Icon(Icons.directions_bike),
+                                          icon: Icon( Icons.grid_on_outlined,size: 25.0,),
                                         ),
                                         Tab(
-                                          icon: Icon(
-                                            Icons.directions_car,
-                                          ),
+                                          icon: Icon(IconData(0xee34, fontFamily: 'MaterialIcons'),size: 25.0,),
                                         ),
                                       ],
                                     ),
@@ -499,10 +494,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ],
                               ),
-
-
-
-
                             ]),
                       );
                     },

@@ -66,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                       cubit.getImagesPath();
                       AppNavigator.customNavigator(
                           context: context,
-                          screen: PickImageScreen(),
+                          screen: PickImageScreen(postOrProfilePic: 0,),
                           finish: false);
                     },
                     icon: Icon(
@@ -123,7 +123,7 @@ class HomeScreen extends StatelessWidget {
                                     );
                                   },
                                   itemBuilder: (context, index) {
-                                    return storyDesignItem();
+                                    return storyDesignItem(cubit: cubit);
                                   },
                                 ),
                               ),
@@ -141,6 +141,7 @@ class HomeScreen extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   String username = cubit.allPosts[index].username;
                                   return postDesgin(
+                                      index: index,
                                       user: cubit.users[username],
                                       context: context,
                                       model: cubit.allPosts[index],

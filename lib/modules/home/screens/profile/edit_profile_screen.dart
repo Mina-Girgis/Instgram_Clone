@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
+import 'package:pro/modules/home/screens/add%20post/pick_photo_screen.dart';
 import 'package:pro/modules/home/screens/profile/update_profile_data_screen.dart';
 import 'package:pro/services/utils/size_config.dart';
 import 'package:pro/shared/components/constants.dart';
@@ -36,22 +37,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 title: "Edit profile",
                 context: context,
                 onSave: () async{
-                  await cubit.updateUserData(
-                    oldUsername: cubit.userTmp.username,
-                    user: cubit.userTmp,
-                    context: context,
+                  await cubit.uploadProfilePic(
+                      context: context,
+                      username: cubit.userTmp.username,
+                      image: cubit.userProfileImageTemp,
+                      user:cubit.userTmp,
                   );
-
-
                 }),
             body: SingleChildScrollView(
               child: Container(
                 width: SizeConfig.screenWidth,
                 child: Column(
                   children: [
-                    circleAvatarDesign(radius: 53.0),
+                    circleAvatarDesign(
+                        cubit: cubit,
+                        radius: 53.0,
+                        imageUrl: cubit.userProfileImageTemp,
+                    ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        cubit.getImagesPath();
+                        AppNavigator.customNavigator(context: context, screen: PickImageScreen(postOrProfilePic: 1,), finish: false);
+                      },
                       child: Text(
                         "Change profile photo",
                         style: TextStyle(
