@@ -9,6 +9,9 @@ class UserModel{
   late String bio;
   late String imageUrl;
   List<PostModel>posts=[];
+  Map<String,bool>followers ={};
+  Map<String,bool>following ={};
+  Map<String,bool>followRequest ={};
 
   UserModel({
     required this.phoneNumber,
@@ -51,8 +54,19 @@ class UserModel{
     imageUrl=json['imageUrl']??"https://i.pinimg.com/564x/66/ff/cb/66ffcb56482c64bdf6b6010687938835.jpg";
   }
 
-  void changePostsList(List<PostModel>list){
-    posts=list;
+  void addToPostsList(PostModel model){
+    posts.add(model);
+    posts.sort((a,b)=>int.parse(b.time).compareTo(int.parse(a.time)));
+  }
+
+  void addToFollowers({required String username}){
+    followers[username]=true;
+  }
+  void addToFollowing({required String username}){
+    following[username]=true;
+  }
+  void addToFollowRequest({required String username}){
+    followRequest[username]=true;
   }
 
 

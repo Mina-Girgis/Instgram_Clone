@@ -24,7 +24,7 @@ class AppRoot extends StatelessWidget {
         BlocProvider(create: (BuildContext context) => GlobalCubit()..getAllUsers()),
         BlocProvider(create: (BuildContext context) => SignupCubit()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
-        BlocProvider(create: (BuildContext context) => HomeCubit()..getAllPosts()..getAllUsers()),
+        BlocProvider(create: (BuildContext context) => HomeCubit()..getAllUsers()..getAllPosts()),
 
       ],
       child: MaterialApp(

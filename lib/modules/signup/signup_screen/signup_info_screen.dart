@@ -7,6 +7,7 @@ import 'package:pro/services/utils/size_config.dart';
 import 'package:pro/shared/components/components.dart';
 
 import '../../../shared/components/constants.dart';
+import '../../home/bloc/home_cubit.dart';
 
 class SignUpInfoScreen extends StatelessWidget {
   SignUpInfoScreen({Key? key}) : super(key: key);
@@ -18,7 +19,14 @@ class SignUpInfoScreen extends StatelessWidget {
     var cubit = SignupCubit.get(context);
 
     return BlocConsumer<SignupCubit, SignupState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if(state is AddNewUserSuccess)
+          {
+            HomeCubit.get(context).getAllUsers();
+            HomeCubit.get(context).allPosts.clear();
+            HomeCubit.get(context).getAllPosts();
+          }
+      },
       builder: (context, state) {
         return SafeArea(
           child: Scaffold(

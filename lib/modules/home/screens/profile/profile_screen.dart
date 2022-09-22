@@ -16,7 +16,8 @@ import '../../components/components.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key? key}) : super(key: key);
+  bool fromSearch;
+  ProfileScreen({Key? key,required this.fromSearch}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -26,17 +27,172 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
+
+    List<Widget>list=[
+      Row(
+        children: [
+          Expanded(
+            child: defaultButton(
+              child: Text(
+                "Edit profile",
+                style: TextStyle(
+                  color: WHITE,
+                ),
+              ),
+              color:
+              Color.fromRGBO(30, 30, 30, 1.0),
+              function: () async {
+                cubit.changeNameController(
+                    cubit.userTmp.name);
+                cubit.changeUsernameController(
+                    cubit.userTmp.username);
+                cubit.changeBioController(
+                    cubit.userTmp.bio);
+                AppNavigator.customNavigator(
+                    context: context,
+                    screen: EditProfileScreen(),
+                    finish: false);
+              },
+              height: 4,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            width: 40.0,
+            height: SizeConfig.defaultSize! * 4,
+            decoration: BoxDecoration(
+              color:
+              Color.fromRGBO(30, 30, 30, 1.0),
+              borderRadius:
+              BorderRadius.circular(10),
+            ),
+            child: IconButton(
+                splashRadius: 25.0,
+                onPressed: () {},
+                icon: Icon(
+                  FontAwesomeIcons.user,
+                  color: WHITE,
+                  size: 20.0,
+                )),
+          ),
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Text("Follow"),
+              style:
+              ElevatedButton.styleFrom(
+                shape:
+                RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.circular(
+                      6.0),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {},
+              child: Text("Requested"),
+              style:
+              ElevatedButton.styleFrom(
+                primary: HINT_TEXT_COLOR,
+                shape:
+                RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.circular(
+                      6.0),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      Row(children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {},
+            child: Text("Following"),
+            style:
+            ElevatedButton.styleFrom(
+              primary: Colors.white24,
+              shape:
+              RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.circular(
+                    6.0),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 10,),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {},
+            child: Text("Message"),
+            style:
+            ElevatedButton.styleFrom(
+              primary: Colors.white24,
+              shape:
+              RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.circular(
+                    6.0),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 10,),
+        Container(
+          width: 40.0,
+          height: SizeConfig.defaultSize! * 4,
+          decoration: BoxDecoration(
+            color:
+            Color.fromRGBO(30, 30, 30, 1.0),
+            borderRadius:
+            BorderRadius.circular(10),
+          ),
+          child: IconButton(
+              splashRadius: 25.0,
+              onPressed: () {},
+              icon: Icon(
+                FontAwesomeIcons.user,
+                color: WHITE,
+                size: 20.0,
+              )),
+        ),
+      ],
+      ),
+    ];
+
     UserModel user = cubit.userTmp;
     return BlocConsumer<HomeCubit, HomeState>(
-  listener: (context, state) {
-    // TODO: implement listener
-  },
-  builder: (context, state) {
-    return SafeArea(
-        child: WillPopScope(
-          onWillPop: ()async{
-            print("pop page");
-            cubit.removeBottomNavBarIndexListTop(context: context);
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        return SafeArea(
+            child: WillPopScope(
+          onWillPop: () async {
+            if(widget.fromSearch){
+              // from search
+              cubit.setUserTmpAsCurrentUserAgain();
+            }else{
+              // from profile
+              print("pop page");
+              cubit.removeBottomNavBarIndexListTop(context: context);
+            }
+
             return true;
           },
           child: Scaffold(
@@ -57,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     constraints: BoxConstraints(
                       minWidth: 0.0,
-                      maxWidth: SizeConfig.screenWidth!/2.5,
+                      maxWidth: SizeConfig.screenWidth! / 2.5,
                     ),
                     child: Text(
                       user.username,
@@ -81,16 +237,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-
                 ],
               ),
               actions: [
                 IconButton(
                   iconSize: 30.0,
                   splashRadius: 15,
-                  onPressed: () {
-
-                  },
+                  onPressed: () {},
                   icon: Icon(
                     Icons.add_box_outlined,
                   ),
@@ -99,22 +252,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   iconSize: 30.0,
                   splashRadius: 15,
                   onPressed: () {
-                    AppNavigator.customNavigator(context: context, screen: SideBarScreen(), finish: false);
+                    AppNavigator.customNavigator(
+                        context: context,
+                        screen: SideBarScreen(),
+                        finish: false);
                   },
                   icon: Icon(
                     Icons.menu,
                     size: 35.0,
                   ),
                 ),
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
               ],
             ),
             body: RefreshIndicator(
-              onRefresh: ()async{
-                setState(() {
+              onRefresh: () async {
+                if(widget.fromSearch){
 
-                });
-                await cubit.getAllUsers();
+                }else{
+                  setState(() {});
+                  await cubit.getAllUsers();
+                }
+
               },
               child: Stack(
                 children: [
@@ -126,12 +287,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(left: 10.0,right: 10.0),
+                                padding: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         profilePicWithOvelCircle(
                                           radius: 50.0,
@@ -139,15 +302,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ovelCircle: true,
                                           padding: 0,
                                         ),
-                                        profileNumbers(text: 'Posts', number: user.posts.length),
-                                        profileNumbers(text: 'Followers', number: 0),
-                                        profileNumbers(text: 'Following', number: 0),
+                                        profileNumbers(
+                                            text: 'Posts',
+                                            number: user.posts.length),
+                                        profileNumbers(
+                                            text: 'Followers', number: user.followers.length),
+                                        profileNumbers(
+                                            text: 'Following', number: user.following.length),
                                       ],
                                     ),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text(user.name,
+                                    Text(
+                                      user.name,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -159,47 +327,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: defaultButton(
-                                            child: Text(
-                                              "Edit profile",
-                                              style: TextStyle(
-                                                color: WHITE,
-                                              ),
-                                            ),
-                                            color: Color.fromRGBO(30, 30, 30, 1.0),
-                                            function: () async{
-                                              cubit.changeNameController(cubit.userTmp.name);
-                                              cubit.changeUsernameController(cubit.userTmp.username);
-                                              cubit.changeBioController(cubit.userTmp.bio);
-                                              AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
-                                            },
-                                            height: 4,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Container(
-                                          width: 40.0,
-                                          height: SizeConfig.defaultSize! * 4,
-                                          decoration: BoxDecoration(
-                                            color: Color.fromRGBO(30, 30, 30, 1.0),
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          child: IconButton(
-                                              splashRadius: 25.0,
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                FontAwesomeIcons.user,
-                                                color: WHITE,
-                                                size: 20.0,
-                                              )),
-                                        ),
-                                      ],
-                                    ),
+
+                                    list[0],
+
+
+
+
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -207,7 +340,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       // color: Colors.grey,
                                       height: 130.0,
                                       child: Padding(
-                                        padding: const EdgeInsets.only(left: 0.0, right:0.0),
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, right: 0.0),
                                         child: ListView.separated(
                                           scrollDirection: Axis.horizontal,
                                           itemCount: 10,
@@ -222,18 +356,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ),
                                     ),
-
                                   ],
                                 ),
                               ),
-
                               DefaultTabController(
                                 length: 2,
                                 child: SizedBox(
                                   height: 50,
                                   child: AppBar(
                                     backgroundColor: Colors.transparent,
-
                                     bottom: TabBar(
                                       indicatorColor: WHITE,
                                       onTap: (index) {
@@ -255,19 +386,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 5,),
+                              SizedBox(
+                                height: 5,
+                              ),
                               GridView.count(
                                 shrinkWrap: true,
                                 physics: ScrollPhysics(),
                                 crossAxisCount: 3,
                                 mainAxisSpacing: 3.0,
                                 crossAxisSpacing: 3.0,
-                                children: List.generate(user.posts.length, (index){
+                                children:
+                                    List.generate(user.posts.length, (index) {
                                   return Container(
-                                    width: SizeConfig.screenWidth!/3,
+                                    width: SizeConfig.screenWidth! / 3,
                                     height: 100,
                                     color: Colors.grey,
-                                    child: Image.network(user.posts[index].imageUrl,
+                                    child: Image.network(
+                                      user.posts[index].imageUrl,
                                       fit: BoxFit.cover,
                                     ),
                                   );
@@ -282,8 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ));
-  },
-);
+      },
+    );
   }
 }
-

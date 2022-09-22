@@ -124,6 +124,31 @@ class GetAllPostsForSpecificUserFail extends HomeState {}
 
 class RemoveBottomNavBarIndexListTop extends HomeState {}
 
+class ChangeSearchController extends HomeState {}
+
+class ChangeSearchList extends HomeState {}
+
+class LogOutSuccess extends HomeState {}
+
+class SetUserTmpAsCurrentUserAgain extends HomeState {}
+
+class GetAllFollowersSuccess extends HomeState {}
+
+class GetAllFollowersFail extends HomeState {}
+
+class GetAllFollowingSuccess extends HomeState {}
+
+class GetAllFollowingFail extends HomeState {}
+
+class GetAllFollowRequestSuccess extends HomeState {}
+
+class GetAllFollowRequestFail extends HomeState {}
+
+
+
+
+
+
 
 
 

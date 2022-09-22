@@ -20,6 +20,7 @@ import '../screens/profile/profile_screen.dart';
 import '../screens/reel_screen.dart';
 import '../screens/search_screen.dart';
 import '../screens/shop_screen.dart';
+
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
@@ -31,51 +32,81 @@ class HomeCubit extends Cubit<HomeState> {
   List initialValues = [];
   String updatingValueField = "";
   String PostImageUrlFromFireBaseStorage = "";
-  UserModel userTmp = UserModel.empty(); // to switch between different profile screens
+  UserModel userTmp =
+      UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
-  List<FileModel> files   = [];
-  List<PostModel> allPosts   = [];
+  List<FileModel> files = [];
+  List<PostModel> allPosts = [];
   List<String> userPostsIds = [];
-  List<PostModel> userPosts =[];
+  List<PostModel> userPosts = [];
+  List<UserModel> searchList = [];
 
+  List<int> bottomNavBarIndexList = [0]; // to controll navigation (stack)
 
-  List<int> bottomNavBarIndexList =[0]; // to controll navigation (stack)
+  void changeSearchList(List<UserModel> list) {
+    searchList.clear();
+    searchList = list;
+    emit(ChangeSearchList());
+  }
 
-
-
-  List<Widget>screens=[
+  List<Widget> screens = [
     HomeScreen(),
     SearchScreen(),
     ReelScreen(),
     ShopScreen(),
-    ProfileScreen(),
+    ProfileScreen(fromSearch: false,),
   ];
-
 
   Map<String, UserModel> users = {};
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
 
-  var nameController     = TextEditingController();
+  var nameController = TextEditingController();
   var usernameController = TextEditingController();
-  var bioController      = TextEditingController();
-  var updateController   = TextEditingController();
-  var addPostController  = TextEditingController();
-  var commentController  = TextEditingController();
+  var bioController = TextEditingController();
+  var updateController = TextEditingController();
+  var addPostController = TextEditingController();
+  var commentController = TextEditingController();
+  var searchController = TextEditingController();
+
+  void whenLogOut() {
+    changeBottomNavigationBarIndex(idx: 0);
+    userTmp = UserModel.empty();
+    postTmp = PostModel.empty();
+    files = [];
+    allPosts = [];
+    userPostsIds = [];
+    userPosts = [];
+    searchList = [];
+    bottomNavBarIndexList = [0];
+    users = {};
+    albumNameIndex = -1;
+    imageIndex = -1;
+    emit(LogOutSuccess());
+  }
+
+  void changeSearchController(String s) {
+    searchController.text = s;
+    emit(ChangeSearchController());
+  }
+
   // change controllers
   void changeUpdateController(String s) {
     updateController.text = s;
     emit(ChangeUpdateController());
   }
+
   void changeNameController(String s) {
     nameController.text = s;
     emit(ChangeNameController());
   }
+
   void changeUsernameController(String s) {
     usernameController.text = s;
     emit(ChangeUsernameController());
   }
+
   void changeBioController(String s) {
     bioController.text = s;
     emit(ChangeBioController());
@@ -83,20 +114,22 @@ class HomeCubit extends Cubit<HomeState> {
 
   void changeDropdownButtonHintText(int idx) {
     albumNameIndex = idx;
-    imageIndex=0;
+    imageIndex = 0;
     emit(ChangeDropdownButtonHintText());
   }
+
   void changeImageIndex(int idx) {
     imageIndex = idx;
     emit(ChangeImageIndex());
   }
-  void changeLikeStateInAllPosts({required String postId}){
+
+  void changeLikeStateInAllPosts({required String postId}) {
     allPosts.forEach((element) {
-      if(element.postId==postId){
-        if(element.isLiked){
+      if (element.postId == postId) {
+        if (element.isLiked) {
           element.likes.remove(CacheHelper.getData(key: 'username').toString());
-        }else{
-         element.likes.add(CacheHelper.getData(key: 'username').toString());
+        } else {
+          element.likes.add(CacheHelper.getData(key: 'username').toString());
         }
         element.changeIsliked(!element.isLiked);
         emit(ChangeLikeStateInAllPosts());
@@ -104,33 +137,33 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-
-  void removeBottomNavBarIndexListTop({required context}){
-    if(bottomNavBarIndexList.isNotEmpty){
+  void removeBottomNavBarIndexListTop({required context}) {
+    if (bottomNavBarIndexList.isNotEmpty) {
       bottomNavBarIndexList.removeLast();
       bottomNavBarIndexList.forEach((element) {
         print(element);
       });
-      if(bottomNavBarIndexList.isNotEmpty){
-        changeBottomNavigationBarIndex(idx :bottomNavBarIndexList.last ,add: false);
+      if (bottomNavBarIndexList.isNotEmpty) {
+        changeBottomNavigationBarIndex(
+            idx: bottomNavBarIndexList.last, add: false);
         // print(bottomNavBarIndexList.last);
-      }
-      else{
+      } else {
         SystemNavigator.pop();
       }
-    }
-    else{
+    } else {
       SystemNavigator.pop();
     }
     emit(RemoveBottomNavBarIndexListTop());
   }
+
   void changeBottomNavigationBarIndex({required int idx, bool add = true}) {
     bottomNavigationBarIndex = idx;
-    if(add){
+    if (add) {
       bottomNavBarIndexList.add(idx);
     }
-    if(idx ==4){
-      userPosts.sort((PostModel a , PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
+    if (idx == 4) {
+      userPosts.sort((PostModel a, PostModel b) =>
+          int.parse(b.time).compareTo(int.parse(a.time)));
     }
     emit(ChangeBottomNavigationBarIndex());
   }
@@ -139,11 +172,24 @@ class HomeCubit extends Cubit<HomeState> {
   void changePostTempData(PostModel model) {
     postTmp = PostModel.copy(model);
   }
+
   void changeUserTmpData(UserModel model) {
     userTmp = model;
     emit(ChangeUserTmpData());
   }
-  Future<void> updateUserData({required String oldUsername, required UserModel user, required context,}) async {
+
+  void setUserTmpAsCurrentUserAgain(){
+    String?username = CacheHelper.getData(key: 'username').toString();
+    UserModel? user = users[username];
+    userTmp = user!;
+    emit(SetUserTmpAsCurrentUserAgain());
+  }
+
+  Future<void> updateUserData({
+    required String oldUsername,
+    required UserModel user,
+    required context,
+  }) async {
     try {
       String username = usernameController.text;
       String name = nameController.text;
@@ -169,7 +215,10 @@ class HomeCubit extends Cubit<HomeState> {
         FirebaseFirestore.instance.collection('users').doc(username).set(mp);
         await getAllUsers();
         // userTmp = UserModel.fromJson(mp);
-        toastMessage(text: 'Data changed successfully.', backgroundColor: GREY, textColor: WHITE);
+        toastMessage(
+            text: 'Data changed successfully.',
+            backgroundColor: GREY,
+            textColor: WHITE);
         CacheHelper.putData(key: 'username', value: username);
         print(CacheHelper.getData(key: 'username'));
         emit(UpdateUserDataSuccess());
@@ -179,6 +228,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UpdateUserDataFail());
     }
   }
+
   Future<void> deleteUser(String username) async {
     // DELETE ALL COLLECTIONS
     List<String> subCollections = ['myPosts'];
@@ -210,7 +260,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(DeleteUserFail());
     });
   }
-  Future<void> addUser(String username, Map<String, dynamic> mp, context) async {
+
+  Future<void> addUser(
+      String username, Map<String, dynamic> mp, context) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -238,9 +290,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   // get all posts
   // check is done .. its working well
-  Future<List<String>> getAllPostsIdsForSpecicUser({required String username}) async {
+  Future<List<String>> getAllPostsIdsForSpecicUser(
+      {required String username}) async {
     userPostsIds.clear();
-    List<String>list=[];
+    List<String> list = [];
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -279,81 +332,68 @@ class HomeCubit extends Cubit<HomeState> {
     return model;
   }
 
-  Future<void> getAllPostsForSpecificUser({required String username})async {
-      List<String>ids=[];
-     await getAllPostsIdsForSpecicUser(username:username)
-        .then((value){
-           ids=value;
-    }).catchError((error){
+  Future<void> getAllPostsForSpecificUser({required String username}) async {
+    List<String> ids = [];
+    await getAllPostsIdsForSpecicUser(username: username).then((value) {
+      ids = value;
+    }).catchError((error) {
       print(error.toString());
       emit(GetAllPostsForSpecificUserFail());
     });
-      // users[username]!.posts.clear();
-      ids.forEach((element) async{
-        await getPostById(postId: element)
-            .then((value){
-          PostModel model = PostModel.copy(value);
-          // print(element);
-          model.changePostId(element);
-          users[username]!.posts.add(model);
-          // userPosts.sort((a,b)=>b.time.compareTo(a.time));
-          emit(GetAllPostsForSpecificUserSuccess());
-        }
-        );
+    // users[username]!.posts.clear();
+    ids.forEach((element) async {
+      await getPostById(postId: element).then((value) {
+        PostModel model = PostModel.copy(value);
+        // print(element);
+        model.changePostId(element);
+        users[username]!.addToPostsList(model);
+        // userPosts.sort((a,b)=>b.time.compareTo(a.time));
+        emit(GetAllPostsForSpecificUserSuccess());
       });
-      // return userPosts;
+    });
+    // return userPosts;
   }
-
   Future<void> getAllPosts() async {
     String? username = CacheHelper.getData(key: 'username');
-    await getPostsILiked(username:username.toString())
-        .then((value)async{
+    await getPostsILiked(username: username.toString()).then((value) async {
+      Map<String, bool> isLikedMap = value;
 
-          Map<String,bool>isLikedMap=value;
+      await FirebaseFirestore.instance.collection('posts').get().then((value) {
+        allPosts.clear();
+        userPosts.clear();
+        value.docs.forEach((element) async {
+          PostModel model = PostModel.fromJson(element.data());
+          model.changePostId(element.id);
 
-          await FirebaseFirestore.instance
-              .collection('posts').get().then((value) {
-               allPosts.clear();
-               userPosts.clear();
-               value.docs.forEach((element) async {
-               PostModel model = PostModel.fromJson(element.data());
-               model.changePostId(element.id);
-
-              await getLikesForSpecificPost(postId: element.id).then((value) async {
-                model.changeLikesList(list: value);
-                await getCommentsForSprcificPost(postId: element.id).then((value){
-                  model.changeCommentList(list: value);
-                  if(isLikedMap[element.id]==true){
-                    model.changeIsliked(true);
-                  }
-                  allPosts.add(model);
-                  if(model.username == username){
-                    userPosts.add(model);
-                  }
-                  allPosts.sort((PostModel a,PostModel b)=>int.parse(b.time).compareTo(int.parse(a.time)));
-                });
-              })
-                .catchError((error){
-                print(error.toString());
-                emit(GetAllPostsFail());
-              });
-            }
-
-          );
-
-            emit(GetAllPostsSuccess());
+          await getLikesForSpecificPost(postId: element.id).then((value) async {
+            model.changeLikesList(list: value);
+            await getCommentsForSprcificPost(postId: element.id).then((value) {
+              model.changeCommentList(list: value);
+              if (isLikedMap[element.id] == true) {
+                model.changeIsliked(true);
+              }
+              allPosts.add(model);
+              if (model.username == username) {
+                userPosts.add(model);
+              }
+              allPosts.sort((PostModel a, PostModel b) =>
+                  int.parse(b.time).compareTo(int.parse(a.time)));
+            });
           }).catchError((error) {
             print(error.toString());
             emit(GetAllPostsFail());
           });
-        })
-        .catchError((error){
-            emit(GetAllPostsFail());
-         });
+        });
 
-
+        emit(GetAllPostsSuccess());
+      }).catchError((error) {
+        print(error.toString());
+        emit(GetAllPostsFail());
+      });
+    }).catchError((error) {
+      emit(GetAllPostsFail());
+    });
   }
-
 
   // add post
   Future<void> getImagesPath() async {
@@ -376,7 +416,9 @@ class HomeCubit extends Cubit<HomeState> {
     // print(files[0].files[0]);
     emit(GetImagesPathSuccess());
   }
-  Future<void> uploadNewPostImage({required context,required username, required String image}) async {
+
+  Future<void> uploadNewPostImage(
+      {required context, required username, required String image}) async {
     // String profileImage = files[albumNameIndex].files[imageIndex]; // from imagePicker
     emit(AddNewPostLoading());
     File file = File(image);
@@ -403,7 +445,13 @@ class HomeCubit extends Cubit<HomeState> {
       emit(UploadNewPostImageFail());
     });
   }
-  Future<void> addNewPost({required String image, required String description, required String username, required String time,}) async {
+
+  Future<void> addNewPost({
+    required String image,
+    required String description,
+    required String username,
+    required String time,
+  }) async {
     PostModel model = PostModel(
       username: username,
       imageUrl: image,
@@ -428,6 +476,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddNewPostFail());
     });
   }
+
   Future<void> _addToMyPosts({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -438,89 +487,116 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
-  // get all users info and store them in a map
-  // each user with their info ,posts
-  Future<void> getAllUsers() async {
-    users={};
-    await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((value) {
-      value.docs.forEach((element) async{
-
-        UserModel user = UserModel.fromJson(element.data());
-        users[element.id] = user;
-        users[element.id]!.posts.clear();
-        await getAllPostsForSpecificUser(username: element.id);
-        if(element.id==CacheHelper.getData(key: 'username').toString()){
-          UserModel? user= users[element.id];
-          changeUserTmpData(user!);
-        }
-      });
-      emit(GetAllUsersSuccess());
-    }).catchError((error) {
-      print(error.toString());
-      emit(GetAllUsersFail());
-    });
-  }
 
 
-  // likes
-  Future<Map<String,bool>> getPostsILiked({required String username})async{
-      Map<String,bool>mp={};
+  Future<void> getAllFollowers({required String username})async{
       await FirebaseFirestore.instance
           .collection('users')
           .doc(username)
-          .collection('postsLiked')
+          .collection('followers')
           .get()
           .then((value){
             value.docs.forEach((element) {
-              mp[element.id]=true;
+              users[username]?.addToFollowers(username: element.id);
             });
-          emit(GetPostsILikedSuccess());
+           emit(GetAllFollowersSuccess());
       })
           .catchError((error){
-          emit(GetPostsILikedFail());
-      });
-      return mp;
-  }
-  Future<List<String>>getLikesForSpecificPost({required String postId})async{
-    List<String>list=[];
-    await FirebaseFirestore.instance
-          .collection('posts')
-          .doc(postId)
-          .collection('likes')
-          .get()
-          .then((value) {
-            value.docs.forEach((element) {
-              list.add(element.id);
-            });
-            emit(GetLikesForSpecificPostSuccess());
-            // print(list.length);
-      })
-          .catchError((error){
+            print("getAllFollowersMethod");
             print(error.toString());
-            emit(GetLikesForSpecificPostFail());
+            emit(GetAllFollowersFail());
+      });
+  }
+  Future<void> getAllFollowing({required String username})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('following')
+        .get()
+        .then((value){
+      value.docs.forEach((element) {
+        users[username]?.addToFollowing(username: element.id);
+      });
+      emit(GetAllFollowingSuccess());
+    })
+        .catchError((error){
+      print("GetAllFollowingMethod");
+      print(error.toString());
+      emit(GetAllFollowingFail());
+    });
+  }
+  Future<void> getAllFollowRequest({required String username})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('followRequest')
+        .get()
+        .then((value){
+      value.docs.forEach((element) {
+        users[username]?.addToFollowRequest(username: element.id);
+      });
+      emit(GetAllFollowRequestSuccess());
+    })
+        .catchError((error){
+      print("getAllFollowRequestMethod");
+      print(error.toString());
+      emit(GetAllFollowRequestFail());
+    });
+  }
+
+
+
+
+
+  // likes
+  Future<Map<String, bool>> getPostsILiked({required String username}) async {
+    Map<String, bool> mp = {};
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('postsLiked')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        mp[element.id] = true;
+      });
+      emit(GetPostsILikedSuccess());
+    }).catchError((error) {
+      emit(GetPostsILikedFail());
+    });
+    return mp;
+  }
+  Future<List<String>> getLikesForSpecificPost({required String postId}) async {
+    List<String> list = [];
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        list.add(element.id);
+      });
+      emit(GetLikesForSpecificPostSuccess());
+      // print(list.length);
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetLikesForSpecificPostFail());
     });
     return list;
   }
-  Future<void> _addLike({required String postId, required String username})async{
-  await FirebaseFirestore.instance
-      .collection('posts')
-      .doc(postId)
-      .collection('likes')
-      .doc(username)
-      .set({}).then((value) {
-        emit(AddLikeSuccess());
-  }).catchError((error){
-        emit(AddLikeFail());
-  });
-
-
-
-
-
-}
+  Future<void> _addLike({required String postId, required String username}) async {
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(username)
+        .set({}).then((value) {
+      emit(AddLikeSuccess());
+    }).catchError((error) {
+      emit(AddLikeFail());
+    });
+  }
   Future<void> _removeLike({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('posts')
@@ -529,61 +605,60 @@ class HomeCubit extends Cubit<HomeState> {
         .doc(username)
         .delete()
         .then((value) {
-          emit(RemoveLikeSuccess());
-    })
-        .catchError((error){
-          print("removeLikeMethod");
-          print(error.toString());
-          emit(RemoveLikeFail());
+      emit(RemoveLikeSuccess());
+    }).catchError((error) {
+      print("removeLikeMethod");
+      print(error.toString());
+      emit(RemoveLikeFail());
     });
   }
-  Future<void> _addToPostsLiked({required String postId, required String username})async{
+  Future<void> _addToPostsLiked({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
         .collection('postsLiked')
         .doc(postId)
-        .set({})
-        .then((value){
-          emit(AddToPostsLikedSuccess());
-    })
-        .catchError((error){
-          print("postsLikedMethod");
-          print(error.toString());
-          emit(AddToPostsLikedFail());
+        .set({}).then((value) {
+      emit(AddToPostsLikedSuccess());
+    }).catchError((error) {
+      print("postsLikedMethod");
+      print(error.toString());
+      emit(AddToPostsLikedFail());
     });
   }
-  Future<void> _removeFromPostsLiked({required String postId, required String username})async{
+  Future<void> _removeFromPostsLiked({required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
         .collection('postsLiked')
         .doc(postId)
         .delete()
-        .then((value){
-          emit(RemoveFromPostsLikedSuccess());
-    })
-        .catchError((error){
-         print("removeFromPostsLikedMethod");
-         print(error.toString());
-         emit(RemoveFromPostsLikedFail());
+        .then((value) {
+      emit(RemoveFromPostsLikedSuccess());
+    }).catchError((error) {
+      print("removeFromPostsLikedMethod");
+      print(error.toString());
+      emit(RemoveFromPostsLikedFail());
     });
   }
-
-  void likePost({required String postId, required String username})async{
-    await _addLike(postId: postId,username: username);
-    await _addToPostsLiked(postId: postId,username: username);
+  void likePost({required String postId, required String username}) async {
+    await _addLike(postId: postId, username: username);
+    await _addToPostsLiked(postId: postId, username: username);
     emit(LikePostSuccess());
   }
-  void unlikePost({required String postId, required String username})async{
-    await _removeLike(postId: postId,username: username);
-    await _removeFromPostsLiked(postId: postId,username: username);
+  void unlikePost({required String postId, required String username}) async {
+    await _removeLike(postId: postId, username: username);
+    await _removeFromPostsLiked(postId: postId, username: username);
     emit(UnlikePostSuccess());
   }
 
 
   // comments
-  Future<void> addComment({required String time , required String postId , required String text , required String username})async {
+  Future<void> addComment(
+      {required String time,
+      required String postId,
+      required String text,
+      required String username}) async {
     CommentModel comment = CommentModel(
       username: username,
       text: text,
@@ -594,37 +669,65 @@ class HomeCubit extends Cubit<HomeState> {
         .doc(postId)
         .collection('comments')
         .add(comment.toMap(comment))
-        .then((value){
-          emit(AddCommentSuccess());
-    })
-        .catchError((error){
-          print("addCommentMethod");
-          print(error.toString());
-         emit(AddCommentFail());
+        .then((value) {
+      emit(AddCommentSuccess());
+    }).catchError((error) {
+      print("addCommentMethod");
+      print(error.toString());
+      emit(AddCommentFail());
     });
-  }
-  Future<List<CommentModel>> getCommentsForSprcificPost({required String postId})async{
-      List<CommentModel>comments=[];
-      await FirebaseFirestore.instance
-          .collection('posts')
-          .doc(postId)
-          .collection('comments')
-          .get()
-          .then((value){
-                value.docs.forEach((element) {
-                  CommentModel comment = CommentModel.fromJson(element.data());
-                  comments.add(comment);
-                });
-                emit(GetCommentsForSprcificPostSuccess());
-          })
-          .catchError((error){
-            print("emit(GetCommentsForSprcificPostMethod");
-            print(error.toString());
-            emit(GetCommentsForSprcificPostFail());
-    });
-      return comments;
   }
 
+  Future<List<CommentModel>> getCommentsForSprcificPost({required String postId}) async {
+    List<CommentModel> comments = [];
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        CommentModel comment = CommentModel.fromJson(element.data());
+        comments.add(comment);
+      });
+      emit(GetCommentsForSprcificPostSuccess());
+    }).catchError((error) {
+      print("emit(GetCommentsForSprcificPostMethod");
+      print(error.toString());
+      emit(GetCommentsForSprcificPostFail());
+    });
+    return comments;
+  }
+
+
+
+  // get all users info and store them in a map
+  // each user with their info ,posts
+  Future<void> getAllUsers() async {
+    users = {};
+    await FirebaseFirestore.instance.collection('users').get().then((value) {
+      value.docs.forEach((element) async {
+        UserModel user = UserModel.fromJson(element.data());
+        users[element.id] = user;
+        users[element.id]!.posts.clear();
+        users[element.id]!.followers.clear();
+        users[element.id]!.following.clear();
+        users[element.id]!.followRequest.clear();
+        await getAllPostsForSpecificUser(username: element.id);
+        await getAllFollowers(username: element.id);
+        await getAllFollowing(username: element.id);
+        await getAllFollowRequest(username: element.id);
+        if (element.id == CacheHelper.getData(key: 'username').toString()) {
+          UserModel? user = users[element.id];
+          changeUserTmpData(user!);
+        }
+      });
+      emit(GetAllUsersSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetAllUsersFail());
+    });
+  }
 
 
 }

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:pro/modules/signup/signup_screen/signup_info_screen.dart';
+import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
 
 import '../../../models/user_model.dart';
 import '../../../services/utils/app_navigation.dart';
@@ -180,6 +181,7 @@ class SignupCubit extends Cubit<SignupState> {
         backgroundColor: GREY,
         textColor: WHITE,
       );
+      CacheHelper.putData(key: 'username', value: userNameController.text.toLowerCase());
       AppNavigator.customNavigator(context: context, screen: HomeScreen(), finish: true);
       emit(AddNewUserSuccess());
     }).catchError((error) {

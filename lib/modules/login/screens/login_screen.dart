@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/modules/login/bloc/login_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
@@ -20,7 +21,14 @@ class LoginScreen extends StatelessWidget {
     var cubit = LoginCubit.get(context);
     SizeConfig.init(context);
     return BlocConsumer<LoginCubit, LoginState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if(state is validEmailAndPasswordSuccess){
+           HomeCubit.get(context).getAllUsers();
+           HomeCubit.get(context).allPosts.clear();
+           HomeCubit.get(context).getAllPosts();
+           print(HomeCubit.get(context).allPosts.length);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.black,

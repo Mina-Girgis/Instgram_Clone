@@ -27,7 +27,7 @@ class LoginCubit extends Cubit<LoginState> {
       {required String email, required String password, required context}) async{
     emit(ValidEmailAndPasswordLoading());
     List<UserModel> users = GlobalCubit.get(context).globalUsers;
-    bool valid=false;
+    bool valid = false;
 
     await Future.delayed(const Duration(seconds: 3), (){
       users.forEach((element) {
