@@ -11,7 +11,7 @@ class UserModel{
   List<PostModel>posts=[];
   Map<String,bool>followers ={};
   Map<String,bool>following ={};
-  Map<String,bool>followRequest ={};
+  Map<String,bool>followRequests ={};
 
   UserModel({
     required this.phoneNumber,
@@ -66,7 +66,7 @@ class UserModel{
     following[username]=true;
   }
   void addToFollowRequest({required String username}){
-    followRequest[username]=true;
+    followRequests[username]=true;
   }
 
 

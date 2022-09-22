@@ -144,6 +144,17 @@ class GetAllFollowRequestSuccess extends HomeState {}
 
 class GetAllFollowRequestFail extends HomeState {}
 
+class ChangeProfileRowIndex extends HomeState {}
+
+class AddToFollowRequestSuccess extends HomeState {}
+
+class AddToFollowRequestFail extends HomeState {}
+
+class RemoveFromFollowRequestsSuccess extends HomeState {}
+
+class RemoveFromFollowRequestsFail extends HomeState {}
+
+
 
 
 

@@ -77,7 +77,8 @@ class HomeScreen extends StatelessWidget {
                     iconSize: 30.0,
                     splashRadius: 15,
                     onPressed: () async {
-
+                      cubit.changeBottomNavigationBarIndex(idx: 5);
+                      print(cubit.bottomNavigationBarIndex);
                     },
                     icon: Icon(
                       Icons.favorite_border,

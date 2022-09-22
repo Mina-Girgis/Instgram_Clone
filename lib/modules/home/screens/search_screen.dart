@@ -22,6 +22,7 @@ class SearchScreen extends StatelessWidget {
         builder: (context, state) {
           return WillPopScope(
             onWillPop: ()async{
+
               cubit.removeBottomNavBarIndexListTop(context: context);
               return true;
             },
@@ -85,6 +86,7 @@ class SearchScreen extends StatelessWidget {
                               String usrename = cubit.searchList[index].username.toString();
                               UserModel? user = cubit.users[usrename];
                               cubit.changeUserTmpData(user!);
+                              cubit.changeProfileRowIndex(user);
                               AppNavigator.customNavigator(context: context, screen: ProfileScreen(fromSearch: true,), finish: false);
                             },
                             child: searchPersonDesign(user:cubit.searchList[index]));

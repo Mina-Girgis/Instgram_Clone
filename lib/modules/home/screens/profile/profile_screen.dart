@@ -27,8 +27,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
-
-    List<Widget>list=[
+    UserModel user = cubit.userTmp;
+    List<Widget>profileRow=[
       Row(
         children: [
           Expanded(
@@ -83,7 +83,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                String currentUsername = CacheHelper.getData(key: 'username').toString();
+                cubit.addToFollowRequests(currentUserName: currentUsername, user: user.username).then((value){
+                  setState(() {
+                    print("Added request success");
+                    cubit.getAllUsers(cahngeUserTmp: false);
+                    cubit.profileRowIndex=2;
+                  });
+                });
+
+              },
               child: Text("Follow"),
               style:
               ElevatedButton.styleFrom(
@@ -102,7 +112,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  String currentUsername = CacheHelper.getData(key: 'username').toString();
+                  cubit.removeFromFollowRequests(currentUserName: currentUsername, user: user.username)
+                      .then((value){
+                        cubit.getAllUsers(cahngeUserTmp: false);
+                        cubit.profileRowIndex=1;
+                  })
+                      .catchError((error){
+                  });
+
+                });
+              },
               child: Text("Requested"),
               style:
               ElevatedButton.styleFrom(
@@ -175,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     ];
 
-    UserModel user = cubit.userTmp;
+
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
         // TODO: implement listener
@@ -270,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: RefreshIndicator(
               onRefresh: () async {
                 if(widget.fromSearch){
-
+                  await cubit.getAllUsers(cahngeUserTmp: false);
                 }else{
                   setState(() {});
                   await cubit.getAllUsers();
@@ -328,9 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       height: 10,
                                     ),
 
-                                    list[0],
-
-
+                                    profileRow[cubit.profileRowIndex],
 
 
                                     SizedBox(
