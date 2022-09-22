@@ -26,7 +26,9 @@ class NotificationScreen extends StatelessWidget {
             child: Scaffold(
               appBar: AppBar(
                 leading: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    cubit.removeBottomNavBarIndexListTop(context: context);
+                  },
                   icon: Icon(FontAwesomeIcons.arrowLeft),
                 ),
                 backgroundColor: Colors.transparent,
@@ -34,39 +36,44 @@ class NotificationScreen extends StatelessWidget {
               ),
               body: Column(
                 children: [
-                  Container(
-                    height: SizeConfig.screenHeight!*0.1,
-                    width: SizeConfig.screenWidth,
-                    // color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                           CircleAvatar(
-                             backgroundImage: AssetImage('assets/person.jpg'),
-                             radius: SizeConfig.screenHeight!*0.034,
-                           ),
-                           SizedBox(width: 10.0,),
-                           Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               Text("Follow requests",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                               ),
-                               SizedBox(height: 5.0,),
-                               Text("Approve or ignore requests",
-                                style: TextStyle(
-                                  color: GREY,
-                                ),
-                               ),
-                             ],
-                           ),
-                        ],
+                  InkWell(
+                    onTap: (){
+                      cubit.changeBottomNavigationBarIndex(idx: 6);
+                    },
+                    child: Container(
+                      height: SizeConfig.screenHeight!*0.1,
+                      width: SizeConfig.screenWidth,
+                      // color: Colors.red,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                             CircleAvatar(
+                               backgroundImage: AssetImage('assets/person.jpg'),
+                               radius: SizeConfig.screenHeight!*0.034,
+                             ),
+                             SizedBox(width: 10.0,),
+                             Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               mainAxisAlignment: MainAxisAlignment.center,
+                               children: [
+                                 Text("Follow requests",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                 ),
+                                 SizedBox(height: 5.0,),
+                                 Text("Approve or ignore requests",
+                                  style: TextStyle(
+                                    color: GREY,
+                                  ),
+                                 ),
+                               ],
+                             ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

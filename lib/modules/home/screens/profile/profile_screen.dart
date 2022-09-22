@@ -29,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var cubit = HomeCubit.get(context);
     UserModel user = cubit.userTmp;
     List<Widget>profileRow=[
+      // edit profile
       Row(
         children: [
           Expanded(
@@ -79,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+      //follow
       Row(
         children: [
           Expanded(
@@ -108,6 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+      // Requested
       Row(
         children: [
           Expanded(
@@ -140,6 +143,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+
+      //Following
       Row(children: [
         Expanded(
           child: ElevatedButton(
@@ -194,6 +199,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )),
         ),
       ],
+      ),
+
+      //follow back
+        Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                String currentUsername = CacheHelper.getData(key: 'username').toString();
+                cubit.addToFollowRequests(currentUserName: currentUsername, user: user.username).then((value){
+                  setState(() {
+                    print("Added request success");
+                    cubit.getAllUsers(cahngeUserTmp: false);
+                    cubit.profileRowIndex=2;
+                  });
+                });
+
+              },
+              child: Text("Follow back"),
+              style:
+              ElevatedButton.styleFrom(
+                shape:
+                RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.circular(
+                      6.0),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     ];
 
@@ -297,7 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   setState(() {});
                   await cubit.getAllUsers();
                 }
-
               },
               child: Stack(
                 children: [
@@ -321,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         profilePicWithOvelCircle(
                                           radius: 50.0,
                                           size: SizeConfig.defaultSize! * 11,
-                                          ovelCircle: true,
+                                          ovelCircle: false,
                                           padding: 0,
                                         ),
                                         profileNumbers(
@@ -345,17 +380,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text(user.bio),
+                                    if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                      Text(user.bio),
                                     SizedBox(
                                       height: 10,
                                     ),
 
                                     profileRow[cubit.profileRowIndex],
-
-
                                     SizedBox(
                                       height: 10,
                                     ),
+                                    if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
                                     Container(
                                       // color: Colors.grey,
                                       height: 130.0,
@@ -379,7 +414,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                               ),
-                              DefaultTabController(
+                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                DefaultTabController(
                                 length: 2,
                                 child: SizedBox(
                                   height: 50,
@@ -406,10 +442,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                SizedBox(
                                 height: 5,
                               ),
-                              GridView.count(
+                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                GridView.count(
                                 shrinkWrap: true,
                                 physics: ScrollPhysics(),
                                 crossAxisCount: 3,
@@ -428,6 +466,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 }),
                               ),
+
+                              if(cubit.profileRowIndex!=0 && cubit.profileRowIndex!=3)
+                                Column(
+                                children: [
+                                  Divider(thickness: 0,color: GREY,),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0,right: 10),
+                                    child: Row(
+                                      children: [
+
+                                        CircleAvatar(
+                                          backgroundImage: AssetImage('assets/lock.jpg'),
+                                          backgroundColor: Colors.transparent,
+                                          radius: 32.0,
+                                        ),
+                                        SizedBox(width: 20.0,),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text("This Account Is Private"),
+                                            SizedBox(height: 3.0,),
+                                            Text("Follow this account to see their photos",
+                                              style: TextStyle(
+                                                color: GREY,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+
+
                             ]),
                       );
                     },

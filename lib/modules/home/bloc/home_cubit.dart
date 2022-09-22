@@ -34,7 +34,8 @@ class HomeCubit extends Cubit<HomeState> {
   List initialValues = [];
   String updatingValueField = "";
   String PostImageUrlFromFireBaseStorage = "";
-  UserModel userTmp = UserModel.empty(); // to switch between different profile screens
+  UserModel userTmp =
+      UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
   List<FileModel> files = [];
   List<PostModel> allPosts = [];
@@ -54,7 +55,9 @@ class HomeCubit extends Cubit<HomeState> {
     SearchScreen(),
     ReelScreen(),
     ShopScreen(),
-    ProfileScreen(fromSearch: false,),
+    ProfileScreen(
+      fromSearch: false,
+    ),
     NotificationScreen(),
     FollowRequestScreen(),
   ];
@@ -63,49 +66,57 @@ class HomeCubit extends Cubit<HomeState> {
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
-  int profileRowIndex=0;
+  int profileRowIndex = 0;
 
-
-  void changeProfileRowIndex(UserModel user){
-    String currentUserName=CacheHelper.getData(key: 'username').toString();
+  void changeProfileRowIndex(UserModel user) {
+    String currentUserName = CacheHelper.getData(key: 'username').toString();
     UserModel? currentUser = users[currentUserName];
-    if(user.username==currentUser!.username){
+    // same profile
+    if (user.username == currentUser!.username) {
       profileRowIndex = 0;
     }
 
     // no follow between two users
-    else if(user.followers[currentUser.username]==null&& user.followRequests[currentUser.username]==null&& user.following[currentUser.username]==null) {
-      profileRowIndex=1;
+    //follow
+    else if (user.followers[currentUser.username] == null &&
+        user.followRequests[currentUser.username] == null &&
+        user.following[currentUser.username] == null) {
+      profileRowIndex = 1;
     }
 
     // current user sent followRequest to another person
     // working well
-    else if(user.followRequests[currentUser.username]==true)
-    {
-      profileRowIndex=2;
+    // requested
+    else if (user.followRequests[currentUser.username] == true) {
+      profileRowIndex = 2;
     }
 
-    else if(currentUser.followers[user.username]==true&&currentUser.following[user.username]==true)
-    {
-      profileRowIndex=3;
-    }
-    else if(currentUser.followers[user.username]==true)
-    {
-      profileRowIndex=3;
-    }
-    else if(user.following[currentUser.username]==true)
-    {
-      profileRowIndex=3;
+    // two users follow each other
+    else if (currentUser.followers[user.username] == true &&
+        currentUser.following[user.username] == true) {
+      profileRowIndex = 3;
     }
 
-    else{
-      profileRowIndex=0;
+    //currentUser doesn't follow the  user but the user follows currentUser
+    // follow back
+    else if (currentUser.followers[user.username] == true &&
+        currentUser.following[user.username] == null) {
+      profileRowIndex = 4;
+    }
+
+    // user is one of the currentUser Following
+    else if (user.following[currentUser.username] == true) {
+      profileRowIndex = 3;
+    }
+    // current user follows another user but the other user doesn't follow them
+    else if (user.followers[currentUser.username] == true) {
+      profileRowIndex = 3;
+    } else {
+      print("Errorrrrrrrrrrrrrrrrr");
+      profileRowIndex = 1;
     }
     emit(ChangeProfileRowIndex());
   }
-
-
-
 
   var nameController = TextEditingController();
   var usernameController = TextEditingController();
@@ -223,11 +234,11 @@ class HomeCubit extends Cubit<HomeState> {
     emit(ChangeUserTmpData());
   }
 
-  void setUserTmpAsCurrentUserAgain(){
-    String?username = CacheHelper.getData(key: 'username').toString();
+  void setUserTmpAsCurrentUserAgain() {
+    String? username = CacheHelper.getData(key: 'username').toString();
     UserModel? user = users[username];
     userTmp = user!;
-    profileRowIndex=0;
+    profileRowIndex = 0;
     emit(SetUserTmpAsCurrentUserAgain());
   }
 
@@ -336,7 +347,8 @@ class HomeCubit extends Cubit<HomeState> {
 
   // get all posts
   // check is done .. its working well
-  Future<List<String>> getAllPostsIdsForSpecicUser({required String username}) async {
+  Future<List<String>> getAllPostsIdsForSpecicUser(
+      {required String username}) async {
     userPostsIds.clear();
     List<String> list = [];
     await FirebaseFirestore.instance
@@ -398,6 +410,7 @@ class HomeCubit extends Cubit<HomeState> {
     });
     // return userPosts;
   }
+
   Future<void> getAllPosts() async {
     String? username = CacheHelper.getData(key: 'username');
     await getPostsILiked(username: username.toString()).then((value) async {
@@ -522,7 +535,8 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  Future<void> _addToMyPosts({required String postId, required String username}) async {
+  Future<void> _addToMyPosts(
+      {required String postId, required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
@@ -532,94 +546,133 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
-
   // Follow Functions
-  Future<void> getAllFollowers({required String username})async{
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(username)
-          .collection('followers')
-          .get()
-          .then((value){
-            value.docs.forEach((element) {
-              users[username]?.addToFollowers(username: element.id);
-            });
-           emit(GetAllFollowersSuccess());
-      })
-          .catchError((error){
-            print("getAllFollowersMethod");
-            print(error.toString());
-            emit(GetAllFollowersFail());
+  Future<void> getAllFollowers({required String username}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('followers')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        users[username]?.addToFollowers(username: element.id);
       });
+      emit(GetAllFollowersSuccess());
+    }).catchError((error) {
+      print("getAllFollowersMethod");
+      print(error.toString());
+      emit(GetAllFollowersFail());
+    });
   }
-  Future<void> getAllFollowing({required String username})async{
+
+  Future<void> getAllFollowing({required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
         .collection('following')
         .get()
-        .then((value){
+        .then((value) {
       value.docs.forEach((element) {
         users[username]?.addToFollowing(username: element.id);
       });
       emit(GetAllFollowingSuccess());
-    })
-        .catchError((error){
+    }).catchError((error) {
       print("GetAllFollowingMethod");
       print(error.toString());
       emit(GetAllFollowingFail());
     });
   }
-  Future<void> getAllFollowRequests({required String username})async{
+
+  Future<void> getAllFollowRequests({required String username}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(username)
         .collection('followRequests')
         .get()
-        .then((value){
+        .then((value) {
       value.docs.forEach((element) {
         users[username]?.addToFollowRequest(username: element.id);
       });
       emit(GetAllFollowRequestSuccess());
-    })
-        .catchError((error){
+    }).catchError((error) {
       print("getAllFollowRequestMethod");
       print(error.toString());
       emit(GetAllFollowRequestFail());
     });
   }
 
-  Future<void>addToFollowRequests({required String currentUserName , required String user})async{
+  // when you send follow request
+  Future<void> addToFollowRequests({required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user)
         .collection('followRequests')
         .doc(currentUserName)
-        .set({})
-        .then((value){
-          emit(AddToFollowRequestSuccess());
-    })
-        .catchError((error){
-          print(error.toString());
-          emit(AddToFollowRequestFail());
+        .set({}).then((value) {
+      emit(AddToFollowRequestSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(AddToFollowRequestFail());
     });
-
   }
-  Future<void>removeFromFollowRequests({required String currentUserName , required String user})async{
+  Future<void> removeFromFollowRequests({required String currentUserName, required String user}) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user)
         .collection('followRequests')
         .doc(currentUserName)
         .delete()
-        .then((value){
-          emit(RemoveFromFollowRequestsSuccess());
-    })
-        .catchError((error){
+        .then((value) {
+      emit(RemoveFromFollowRequestsSuccess());
+    }).catchError((error) {
       emit(RemoveFromFollowRequestsFail());
     });
   }
-
+  // when you confirm your follow requests
+  Future<void> addToFollowers({required String currentUserName, required String user}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserName)
+        .collection('followers')
+        .doc(user)
+        .set({}).then((value) {
+      users[currentUserName]!.followers[user] = true;
+      emit(AddToFollowersSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(AddToFollowersFail());
+    });
+  }
+  Future<void> addToFollowing({required String currentUserName, required String user}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user)
+        .collection('following')
+        .doc(currentUserName)
+        .set({}).then((value) {
+      users[user]!.following[currentUserName] = true;
+      emit(AddToFollowingSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(AddToFollowingFail());
+    });
+  }
+  // when delete requests from your follow request
+  Future<void> removeFromMyFollowRequests({required String currentUserName, required String user}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserName)
+        .collection('followRequests')
+        .doc(user)
+        .delete()
+        .then((value) {
+      users[currentUserName]!.followRequests.remove(user);
+      emit(RemoveFromMyFollowRequestsSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(RemoveFromMyFollowRequestsFail());
+    });
+  }
 
   // likes
   Future<Map<String, bool>> getPostsILiked({required String username}) async {
@@ -714,6 +767,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(RemoveFromPostsLikedFail());
     });
   }
+
   void likePost({required String postId, required String username}) async {
     await _addLike(postId: postId, username: username);
     await _addToPostsLiked(postId: postId, username: username);
@@ -727,11 +781,7 @@ class HomeCubit extends Cubit<HomeState> {
 
 
   // comments
-  Future<void> addComment(
-      {required String time,
-      required String postId,
-      required String text,
-      required String username}) async {
+  Future<void> addComment({required String time, required String postId, required String text, required String username}) async {
     CommentModel comment = CommentModel(
       username: username,
       text: text,
@@ -750,7 +800,6 @@ class HomeCubit extends Cubit<HomeState> {
       emit(AddCommentFail());
     });
   }
-
   Future<List<CommentModel>> getCommentsForSprcificPost({required String postId}) async {
     List<CommentModel> comments = [];
     await FirebaseFirestore.instance
@@ -772,11 +821,9 @@ class HomeCubit extends Cubit<HomeState> {
     return comments;
   }
 
-
-
   // get all users info and store them in a map
   // each user with their info ,posts
-  Future<void> getAllUsers({bool cahngeUserTmp=true}) async {
+  Future<void> getAllUsers({bool cahngeUserTmp = true}) async {
     users = {};
     await FirebaseFirestore.instance.collection('users').get().then((value) {
       value.docs.forEach((element) async {
@@ -790,13 +837,12 @@ class HomeCubit extends Cubit<HomeState> {
         await getAllFollowers(username: element.id);
         await getAllFollowing(username: element.id);
         await getAllFollowRequests(username: element.id);
-        if(cahngeUserTmp){
+        if (cahngeUserTmp) {
           if (element.id == CacheHelper.getData(key: 'username').toString()) {
             UserModel? user = users[element.id];
             changeUserTmpData(user!);
           }
         }
-
       });
       emit(GetAllUsersSuccess());
     }).catchError((error) {
@@ -804,6 +850,4 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetAllUsersFail());
     });
   }
-
-
 }

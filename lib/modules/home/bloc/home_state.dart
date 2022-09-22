@@ -154,6 +154,19 @@ class RemoveFromFollowRequestsSuccess extends HomeState {}
 
 class RemoveFromFollowRequestsFail extends HomeState {}
 
+class AddToFollowersSuccess extends HomeState {}
+
+class AddToFollowersFail extends HomeState {}
+
+class AddToFollowingSuccess extends HomeState {}
+
+class AddToFollowingFail extends HomeState {}
+
+class RemoveFromMyFollowRequestsSuccess extends HomeState {}
+
+class RemoveFromMyFollowRequestsFail extends HomeState {}
+
+
 
 
 

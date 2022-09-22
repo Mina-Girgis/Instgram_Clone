@@ -441,7 +441,7 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
     unselectedIconTheme: IconThemeData(
         size: 30.0
     ),
-    currentIndex: (cubit.bottomNavigationBarIndex>4)? 4:cubit.bottomNavigationBarIndex,
+    currentIndex: (cubit.bottomNavigationBarIndex>4)? 0:cubit.bottomNavigationBarIndex,
     unselectedItemColor: WHITE,
     selectedItemColor: WHITE,
     type: BottomNavigationBarType.fixed,
