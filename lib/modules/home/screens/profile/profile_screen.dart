@@ -403,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             );
                                           },
                                           itemBuilder: (context, index) {
-                                            return storyDesignItem(ovel: false,cubit: cubit);
+                                            return storyDesignItem(ovel: false,cubit: cubit,context: context);
                                           },
                                         ),
                                       ),

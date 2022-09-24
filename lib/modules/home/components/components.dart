@@ -13,8 +13,9 @@ import '../../../models/user_model.dart';
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
+import '../screens/story/story_screen.dart';
 
-Widget storyDesignItem({bool ovel = true,required cubit}) {
+Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = true}) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -22,9 +23,7 @@ Widget storyDesignItem({bool ovel = true,required cubit}) {
         SizedBox(
           height: 2.0,
         ),
-        profilePicWithOvelCircle(
-          cubit: cubit,
-            padding: 5, radius: 46, size: 83, ovelCircle: ovel),
+        StoryItem(context:context ,user: cubit.userTmp),
         SizedBox(
           height: 5.0,
         ),

@@ -54,6 +54,7 @@ dependencies:
   insta_like_button: ^0.1.1
   flutter_storage_path: ^1.0.3
   stack: ^0.2.1
+  flutter_stories: ^0.3.1
 
 
 dev_dependencies:

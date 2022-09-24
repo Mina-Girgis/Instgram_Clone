@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/modules/home/screens/add%20post/pick_photo_screen.dart';
+import 'package:pro/modules/home/screens/story/story_screen.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
@@ -89,7 +90,9 @@ class HomeScreen extends StatelessWidget {
                       child: IconButton(
                           iconSize: 30.0,
                           splashRadius: 15,
-                          onPressed: () {},
+                          onPressed: () {
+                              AppNavigator.customNavigator(context: context, screen: StoryScreen(), finish: false);
+                          },
                           icon: Icon(
                             Icons.send_outlined,
                           ))),
@@ -123,7 +126,7 @@ class HomeScreen extends StatelessWidget {
                                     );
                                   },
                                   itemBuilder: (context, index) {
-                                    return storyDesignItem(cubit: cubit);
+                                    return storyDesignItem(cubit: cubit,context: context);
                                   },
                                 ),
                               ),
