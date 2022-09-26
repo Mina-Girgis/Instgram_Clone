@@ -8,6 +8,7 @@ class PostModel{
   String postId = ""; // comes from database
   List<String>likes=[];
   List<CommentModel>comments=[];
+  List<dynamic>photos=[];
   PostModel({required this.username,required this.imageUrl,required this.description,required this.time});
 
   PostModel.empty(){
@@ -28,6 +29,7 @@ class PostModel{
     imageUrl=json['imageUrl'];
     time=json['time'];
     description=json['description'];
+    photos = json['photos'];
   }
   Map<String,dynamic> toMap(PostModel model){
     return {
@@ -35,6 +37,7 @@ class PostModel{
       'imageUrl':model.imageUrl,
       'time':model.time,
       'description':model.description,
+      'photos':model.photos,
     };
   }
   void changePostId(String id){
@@ -50,6 +53,9 @@ class PostModel{
     isLiked = b;
   }
 
+  void changePhotosList(List<String>list){
+    photos=list;
+  }
 }
 
 

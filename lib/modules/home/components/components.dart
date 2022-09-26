@@ -1,6 +1,7 @@
 import 'dart:io';
-
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insta_like_button/insta_like_button.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
@@ -16,6 +17,7 @@ import '../screens/profile/update_profile_data_screen.dart';
 import '../screens/story/story_screen.dart';
 
 Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = true}) {
+
   return Container(
     // color: Colors.red,
     child: Column(
@@ -97,6 +99,7 @@ Widget postDesgin(
     required context,
     required HomeCubit cubit,
     required PostModel model}) {
+  CarouselController buttonCarouselController = CarouselController();
   return Container(
     width: SizeConfig.screenWidth,
     // color: Colors.grey,
@@ -157,15 +160,26 @@ Widget postDesgin(
         Container(
           // color: Colors.blue,
           width: SizeConfig.screenWidth,
-          child: InstaLikeButton(
-            onChanged: () {
-              String username = CacheHelper.getData(key: 'username').toString();
-              cubit.likePost(postId: model.postId, username: username);
-              cubit.changeLikeStateInAllPosts(postId: model.postId);
-            },
-            image: NetworkImage(model.imageUrl),
-            height: 300,
+          child: ImageSlideshow(
+            height: 320,
+            children: model.photos.map((e) {
+                return InstaLikeButton(
+                  onChanged: () {
+                    if(!model.isLiked){
+                      String username = CacheHelper.getData(key: 'username').toString();
+                      cubit.likePost(postId: model.postId, username: username);
+                      cubit.changeLikeStateInAllPosts(postId: model.postId);
+                    }
+                  },
+                  image: NetworkImage(e),
+                  height: 320,
+                );
+              }).toList(),
+            // isLoop: true,
+            indicatorColor: (model.photos.length==1)?Colors.transparent:Colors.blue,
+            indicatorBackgroundColor: (model.photos.length==1)?Colors.transparent:Colors.grey,
           ),
+
         ),
         Row(
           children: [

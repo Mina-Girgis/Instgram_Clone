@@ -93,8 +93,8 @@ class HomeScreen extends StatelessWidget {
                           iconSize: 30.0,
                           splashRadius: 15,
                           onPressed: () {
-                              AppNavigator.customNavigator(context: context, screen: StoryScreen(), finish: false);
-                          },
+
+                            },
                           icon: Icon(
                             Icons.send_outlined,
                           ))),

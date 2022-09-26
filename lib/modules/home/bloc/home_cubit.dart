@@ -341,12 +341,6 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
 
-
-
-
-
-
-
   Future<void> deleteUser(String username) async {
     // DELETE ALL COLLECTIONS
     List<String> subCollections = ['myPosts'];
@@ -419,8 +413,7 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       value.docs.forEach((element) {
-        // print(element.id);
-        // userPostsIds.add(element.id);
+
         list.add(element.id);
         emit(GetMyPostsIdsSuccess());
       });
@@ -444,6 +437,7 @@ class HomeCubit extends Cubit<HomeState> {
       changePostTempData(model);
       emit(GetPostByIdSuccess());
     }).catchError((error) {
+      print("errrrrrrrrrrrrror");
       print(error.toString());
       emit(GetPostByIdFail());
     });
@@ -462,14 +456,11 @@ class HomeCubit extends Cubit<HomeState> {
     ids.forEach((element) async {
       await getPostById(postId: element).then((value) {
         PostModel model = PostModel.copy(value);
-        // print(element);
         model.changePostId(element);
         users[username]!.addToPostsList(model);
-        // userPosts.sort((a,b)=>b.time.compareTo(a.time));
         emit(GetAllPostsForSpecificUserSuccess());
       });
     });
-    // return userPosts;
   }
 
   Future<void> getAllPosts() async {
@@ -536,33 +527,43 @@ class HomeCubit extends Cubit<HomeState> {
     emit(GetImagesPathSuccess());
   }
 
+
+
   Future<void> uploadNewPostImage(
       {required context, required username, required String image}) async {
-    // String profileImage = files[albumNameIndex].files[imageIndex]; // from imagePicker
-    emit(AddNewPostLoading());
-    File file = File(image);
-    await firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('posts/${Uri.file(file.path).pathSegments.last}')
-        .putFile(file)
-        .then((value) {
-      value.ref.getDownloadURL().then((value) async {
-        print(value);
-        await addNewPost(
-          time: GlobalCubit.get(context).getCurrentTime(),
-          description: addPostController.text,
-          username: username,
-          image: value,
-        );
 
-        emit(UploadNewPostImageSuccess());
-      }).catchError((error) {
-        print(error.toString());
-      });
-    }).catchError((error) {
-      print(error.toString());
-      emit(UploadNewPostImageFail());
-    });
+    emit(AddNewPostLoading());
+
+    List<String>photosLinks=[];
+
+    picsAddresses.forEach((element) async{
+      File file = File(element);
+      await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('posts/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file)
+          .then((value){
+        value.ref.getDownloadURL()
+            .then((value)async{
+             photosLinks.add(value);
+             if(photosLinks.length == picsAddresses.length){
+               await addNewPost(
+                   time: GlobalCubit.get(context).getCurrentTime(),
+                   description: addPostController.text,
+                   username: username,
+                   image: value,
+                   photosList:photosLinks,
+                );
+               emit(UploadNewPostImageSuccess());
+             }
+            })
+          .catchError((error){print(error.toString());emit(UploadNewPostImageFail());});
+          })
+          .catchError((error){print(error.toString());emit(UploadNewPostImageFail());});
+    }
+    );
+
+
   }
 
 
@@ -574,6 +575,7 @@ class HomeCubit extends Cubit<HomeState> {
     required String description,
     required String username,
     required String time,
+    required List<String>photosList,
   }) async {
     PostModel model = PostModel(
       username: username,
@@ -581,6 +583,7 @@ class HomeCubit extends Cubit<HomeState> {
       description: description,
       time: time,
     );
+    model.changePhotosList(photosList);
     await FirebaseFirestore.instance
         .collection('posts')
         .add(model.toMap(model))
@@ -956,4 +959,8 @@ class HomeCubit extends Cubit<HomeState> {
     searchController.clear();
     emit(LogOutSuccess());
   }
+
+
 }
+
+
