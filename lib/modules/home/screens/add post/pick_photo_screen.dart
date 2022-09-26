@@ -103,6 +103,9 @@ class _PickImageScreenState extends State<PickImageScreen> {
                                   child: Text(
                                     cubit.files[cubit.albumNameIndex].folderName,
                                     overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ),
                                 IconButton(
@@ -223,6 +226,7 @@ class _PickImageScreenState extends State<PickImageScreen> {
                                     },
                                     icon: Icon(
                                       Icons.grid_on_outlined,
+                                      size: 19,
                                       color: (cubit.multiPhotos == true)
                                           ? Colors.blue
                                           : WHITE,

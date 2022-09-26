@@ -184,6 +184,18 @@ class RemoveFromPicsAddressesList extends HomeState {}
 
 class ChangeAddStoryIndex extends HomeState {}
 
+class AddNewStorySuccess extends HomeState {}
+
+class AddNewStoryFail extends HomeState {}
+
+class AddNewStoryLoading extends HomeState {}
+
+class UploadNewStoryImageFail extends HomeState {}
+
+
+
+
+
 
 
 

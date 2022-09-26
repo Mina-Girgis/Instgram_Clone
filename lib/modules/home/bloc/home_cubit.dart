@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_storage_path/flutter_storage_path.dart';
 import 'package:meta/meta.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
+import 'package:pro/models/story_model.dart';
 import 'package:pro/models/user_model.dart';
 import 'package:pro/modules/home/screens/notifications/notification_screen.dart';
 import '../../../models/file_model.dart';
@@ -33,7 +34,8 @@ class HomeCubit extends Cubit<HomeState> {
   List labels = ["Name", "Username", "Bio"];
   List initialValues = [];
   String updatingValueField = "";
-  UserModel userTmp = UserModel.empty(); // to switch between different profile screens
+  UserModel userTmp =
+      UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
   List<FileModel> files = []; // all pics in your phone
   List<PostModel> allPosts = [];
@@ -42,38 +44,41 @@ class HomeCubit extends Cubit<HomeState> {
   List<UserModel> searchList = [];
   List<int> bottomNavBarIndexList = [0]; // to controll navigation (stack)
 
+  bool multiPhotos = false;
+  int addStoryIndex = 0;
+  List<String> picsAddresses = [];
 
-  bool multiPhotos=false;
-  int addStoryIndex=0;
-  List<String>picsAddresses=[];
-
-  void changeAddStoryIndex(value){
-    addStoryIndex=value;
+  void changeAddStoryIndex(value) {
+    addStoryIndex = value;
     emit(ChangeAddStoryIndex());
   }
-  void addToPicsAddressesList(String address){
-    if(picsAddresses.length<10){
+
+  void addToPicsAddressesList(String address) {
+    if (picsAddresses.length < 10) {
       picsAddresses.add(address);
-    }else{
-      toastMessage(text: "you can't select more than 10 photos", backgroundColor: GREY, textColor: WHITE);
+    } else {
+      toastMessage(
+          text: "you can't select more than 10 photos",
+          backgroundColor: GREY,
+          textColor: WHITE);
     }
     emit(AddToPicsAddressesList());
   }
-  void removeFromPicsAddressesList(String address){
+
+  void removeFromPicsAddressesList(String address) {
     picsAddresses.remove(address);
     emit(RemoveFromPicsAddressesList());
   }
 
-  void changeMultiPhotos(){
-    multiPhotos=!multiPhotos;
-    if(multiPhotos==false)
-      {
-        if(picsAddresses.isNotEmpty){
-          String lastPic = picsAddresses.last;
-          picsAddresses.clear();
-          picsAddresses.add(lastPic);
-        }
+  void changeMultiPhotos() {
+    multiPhotos = !multiPhotos;
+    if (multiPhotos == false) {
+      if (picsAddresses.isNotEmpty) {
+        String lastPic = picsAddresses.last;
+        picsAddresses.clear();
+        picsAddresses.add(lastPic);
       }
+    }
 
     emit(ChangeMultiPhotos());
   }
@@ -103,12 +108,10 @@ class HomeCubit extends Cubit<HomeState> {
   int profileRowIndex = 0;
   String userProfileImageTemp = "";
 
-
-  void changeUserProfileImageTemp(String imageurl){
+  void changeUserProfileImageTemp(String imageurl) {
     userProfileImageTemp = imageurl;
     emit(ChangeUserProfileImageTemp());
   }
-
 
   void changeProfileRowIndex(UserModel user) {
     String currentUserName = CacheHelper.getData(key: 'username').toString();
@@ -268,9 +271,6 @@ class HomeCubit extends Cubit<HomeState> {
     emit(SetUserTmpAsCurrentUserAgain());
   }
 
-
-
-
   Future<void> updateUserData({
     required String oldUsername,
     required UserModel user,
@@ -281,11 +281,13 @@ class HomeCubit extends Cubit<HomeState> {
       String username = usernameController.text;
       String name = nameController.text;
       String bio = bioController.text;
-      if (username == user.username && name == user.name && bio == user.bio && imageUrl=="") {
+      if (username == user.username &&
+          name == user.name &&
+          bio == user.bio &&
+          imageUrl == "") {
         toastMessage(
             text: 'No data changed.', backgroundColor: GREY, textColor: WHITE);
       } else {
-
         emit(UpdateUserDataLoading());
         Map<String, dynamic> mp = {
           'username': username,
@@ -294,9 +296,12 @@ class HomeCubit extends Cubit<HomeState> {
           'email': user.email,
           'bio': bio,
           'name': name,
-          'imageUrl': imageUrl==""?user.imageUrl : imageUrl,
+          'imageUrl': imageUrl == "" ? user.imageUrl : imageUrl,
         };
-        await FirebaseFirestore.instance.collection('users').doc(username).set(mp);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(username)
+            .set(mp);
         await getAllUsers();
         userTmp = UserModel.fromJson(mp);
         toastMessage(
@@ -313,9 +318,12 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-
-  Future<void> uploadProfilePic({required context, required username, required String image ,required UserModel user}) async {
-    if(albumNameIndex!=-1){
+  Future<void> uploadProfilePic(
+      {required context,
+      required username,
+      required String image,
+      required UserModel user}) async {
+    if (albumNameIndex != -1) {
       emit(UploadProfilePicLoading());
       File file = File(image);
       await firebase_storage.FirebaseStorage.instance
@@ -325,7 +333,11 @@ class HomeCubit extends Cubit<HomeState> {
           .then((value) {
         value.ref.getDownloadURL().then((value) async {
           print("******************************");
-          await updateUserData(oldUsername: username, user: user, context: context, imageUrl: value);
+          await updateUserData(
+              oldUsername: username,
+              user: user,
+              context: context,
+              imageUrl: value);
           print("******************************");
           changeUserProfileImageTemp(value);
           emit(UploadProfilePicSuccess());
@@ -336,14 +348,12 @@ class HomeCubit extends Cubit<HomeState> {
         print(error.toString());
         emit(UploadProfilePicFail());
       });
-    }
-    else{
-      await updateUserData(oldUsername: username, user: user, context: context, imageUrl: "");
+    } else {
+      await updateUserData(
+          oldUsername: username, user: user, context: context, imageUrl: "");
       emit(UploadProfilePicSuccess());
     }
-
   }
-
 
   Future<void> deleteUser(String username) async {
     // DELETE ALL COLLECTIONS
@@ -417,7 +427,6 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       value.docs.forEach((element) {
-
         list.add(element.id);
         emit(GetMyPostsIdsSuccess());
       });
@@ -531,42 +540,94 @@ class HomeCubit extends Cubit<HomeState> {
     emit(GetImagesPathSuccess());
   }
 
-
-
   Future<void> uploadNewPostImage(
       {required context, required username, required String image}) async {
-
     emit(AddNewPostLoading());
 
-    List<String>photosLinks=[];
+    List<String> photosLinks = [];
 
-    picsAddresses.forEach((element) async{
+    picsAddresses.forEach((element) async {
       File file = File(element);
-      await firebase_storage.FirebaseStorage.instance.ref().child('posts/${Uri.file(file.path).pathSegments.last}').putFile(file)
-          .then((value){
-            value.ref.getDownloadURL()
-            .then((value)async{
-             photosLinks.add(value);
-             if(photosLinks.length == picsAddresses.length){
-               await addNewPost(
-                   time: GlobalCubit.get(context).getCurrentTime(),
-                   description: addPostController.text,
-                   username: username,
-                   image: value,
-                   photosList:photosLinks,
-                );
-               emit(UploadNewPostImageSuccess());
-             }
-            })
-          .catchError((error){print(error.toString());emit(UploadNewPostImageFail());});
-          })
-          .catchError((error){print(error.toString());emit(UploadNewPostImageFail());});
-    }
-    );
-
-
+      await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('posts/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) async {
+          photosLinks.add(value);
+          if (photosLinks.length == picsAddresses.length) {
+            await addNewPost(
+              time: GlobalCubit.get(context).getCurrentTime(),
+              description: addPostController.text,
+              username: username,
+              image: value,
+              photosList: photosLinks,
+            );
+            emit(UploadNewPostImageSuccess());
+          }
+        }).catchError((error) {
+          print(error.toString());
+          emit(UploadNewPostImageFail());
+        });
+      }).catchError((error) {
+        print(error.toString());
+        emit(UploadNewPostImageFail());
+      });
+    });
   }
 
+  Future<void> uploadNewStory(
+      {required context, required username}) async {
+    emit(AddNewStoryLoading());
+
+    picsAddresses.forEach((element) async {
+      File file = File(element);
+      await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('posts/${Uri.file(file.path).pathSegments.last}')
+          .putFile(file)
+          .then((value) {
+           value.ref.getDownloadURL().then((value) async {
+            await addNewStory(
+              time: GlobalCubit.get(context).getCurrentTime(),
+              username: username,
+              imageUrl: value,
+            );
+        }).catchError((error) {
+          print(error.toString());
+          toastMessage(text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
+          emit(UploadNewStoryImageFail());
+        });
+      }).catchError((error) {
+        print(error.toString());
+        toastMessage(text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
+        emit(UploadNewStoryImageFail());
+      });
+
+      emit(AddNewStorySuccess());
+    }
+    );
+  }
+
+  Future<void> addNewStory({
+    required String imageUrl,
+    required String username,
+    required String time,
+  }) async {
+      StoryModel story = StoryModel(time: time, imageUrl: imageUrl, username: username);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(username)
+          .collection('stories')
+          .add(story.toMap(story))
+          .then((value) {
+          // emit(AddNewStorySuccess());
+      }).catchError((error){
+        print(error.toString());
+        emit(AddNewStoryFail());
+      });
+
+  }
 
 
 
@@ -576,7 +637,7 @@ class HomeCubit extends Cubit<HomeState> {
     required String description,
     required String username,
     required String time,
-    required List<String>photosList,
+    required List<String> photosList,
   }) async {
     PostModel model = PostModel(
       username: username,
@@ -960,8 +1021,5 @@ class HomeCubit extends Cubit<HomeState> {
     searchController.clear();
     emit(LogOutSuccess());
   }
-
-
 }
-
 

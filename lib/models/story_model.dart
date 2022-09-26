@@ -1,10 +1,10 @@
 class StoryModel{
-  late String storyId;
+  String storyId="";
   late String imageUrl;
   late String time;
   late String username;
 
-  StoryModel({required this.storyId,required this.time,required this.imageUrl,required this.username});
+  StoryModel({required this.time,required this.imageUrl,required this.username});
 
   StoryModel.fromJson(Map<String,dynamic>json){
     imageUrl=json['imageUrl'];
@@ -12,5 +12,16 @@ class StoryModel{
     username=json['username'];
   }
 
+  Map<String,dynamic> toMap(StoryModel model){
+    return {
+      'imageUrl':model.imageUrl,
+      'time':model.time,
+      'username':model.username,
+    };
+  }
+
+  void changeStoryId(String id){
+    storyId=id;
+  }
 
 }

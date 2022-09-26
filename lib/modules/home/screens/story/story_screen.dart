@@ -6,8 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stories/flutter_stories.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pro/services/utils/size_config.dart';
+import 'package:pro/shared/components/components.dart';
 
 import '../../../../models/user_model.dart';
+import '../../../../shared/components/constants.dart';
 import '../../bloc/home_cubit.dart';
 
 class AddStoryScreen extends StatelessWidget {
@@ -18,7 +20,11 @@ class AddStoryScreen extends StatelessWidget {
     var cubit = HomeCubit.get(context);
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
-        // TODO: implement listener
+        if(state is AddNewStorySuccess){
+          toastMessage(text: "Story uploaded successfully", backgroundColor: GREY, textColor: WHITE);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        }
       },
       builder: (context, state) {
         return SafeArea(
@@ -61,6 +67,14 @@ class AddStoryScreen extends StatelessWidget {
                             radius: 22,
                             child:Icon( Icons.arrow_back_ios_new_outlined,color: Colors.white, ),
                           ),
+                        ),
+                      ),
+                      if(state is AddNewStoryLoading)
+                        Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: SizeConfig.defaultSize!*2.2,right: SizeConfig.defaultSize!*1),
+                          child: CircularProgressIndicator(),
                         ),
                       ),
                     ],
@@ -122,34 +136,40 @@ class AddStoryScreen extends StatelessWidget {
                         width: 10,
                       ),
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white10,
-                          ),
-                          // height: SizeConfig.screenHeight! * 0.07,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 15,
-                                  backgroundImage: NetworkImage(
-                                    cubit.userTmp.imageUrl,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () async{
+                            await cubit.uploadNewStory(username: cubit.userTmp.username, context: context,);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white10,
+                            ),
+                            // height: SizeConfig.screenHeight! * 0.07,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 15,
+                                    backgroundImage: NetworkImage(
+                                      cubit.userTmp.imageUrl,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Your story",
-                                  style: TextStyle(
-                                    fontSize: 13.0,
+                                  SizedBox(
+                                    width: 5,
                                   ),
-                                ),
-                              ],
+                                  Text(
+                                    "Your story",
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
