@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:flutter_stories/flutter_stories.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:insta_like_button/insta_like_button.dart';
 import 'package:pro/global_bloc/global_cubit.dart';
@@ -513,5 +515,105 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
         label: "item",
       ),
     ],
+  );
+}
+
+Widget StoryItem({required context , required UserModel user ,required double width , required double height}){
+  return CupertinoPageScaffold(
+    child: Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100.0),
+          border: Border.all(
+            color: Colors.red,
+            width: 2.0,
+            style: BorderStyle.solid,
+          ),
+        ),
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(2.0),
+        child: GestureDetector(
+          onTap: () {
+
+            if(1!=1){
+
+            }else{
+              showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoPageScaffold(
+
+                    child: Stack(
+                      children: [
+                        Story(
+                          onFlashForward: Navigator.of(context).pop,
+                          onFlashBack: Navigator.of(context).pop,
+                          momentCount: 5,
+                          momentDurationGetter: (idx) => Duration(seconds: 5),
+                          momentBuilder: (context, idx) => Image.network(
+                            user.imageUrl,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  Spacer(),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  Spacer(),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+
+
+
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: NetworkImage(user.imageUrl),fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(100.0),
+              // color: CupertinoColors.activeBlue,
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 }

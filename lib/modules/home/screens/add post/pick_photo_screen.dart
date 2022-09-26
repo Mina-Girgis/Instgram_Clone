@@ -8,12 +8,13 @@ import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/services/utils/size_config.dart';
 
 import '../../../../shared/components/constants.dart';
+import '../story/story_screen.dart';
 import 'add_post_screen.dart';
 
 class PickImageScreen extends StatefulWidget {
-  int postOrProfilePic; // 0 or 1s
+  int postOrProfilePicOrStory; // 0 or 1 or 2
   String title;
-  PickImageScreen({Key? key, required this.postOrProfilePic ,required this.title}) : super(key: key);
+  PickImageScreen({Key? key, required this.postOrProfilePicOrStory ,required this.title}) : super(key: key);
 
   @override
   State<PickImageScreen> createState() => _PickImageScreenState();
@@ -60,14 +61,13 @@ class _PickImageScreenState extends State<PickImageScreen> {
                 if (cubit.picsAddresses.isNotEmpty)
                   IconButton(
                     onPressed: () {
-                      if (widget.postOrProfilePic == 0) {
-                        AppNavigator.customNavigator(
-                            context: context,
-                            screen: AddPostScreen(),
-                            finish: false);
-                      } else {
+                      if (widget.postOrProfilePicOrStory == 0) {
+                        AppNavigator.customNavigator(context: context, screen: AddPostScreen(), finish: false);
+                      } else if(widget.postOrProfilePicOrStory==1) {
                         cubit.changeUserProfileImageTemp(cubit.files[cubit.albumNameIndex].files[cubit.imageIndex]);
                         Navigator.pop(context);
+                      }else if(widget.postOrProfilePicOrStory==2){
+                        AppNavigator.customNavigator(context: context, screen: AddStoryScreen(), finish: false);
                       }
                     },
                     icon: Icon(FontAwesomeIcons.arrowRight),
@@ -216,7 +216,7 @@ class _PickImageScreenState extends State<PickImageScreen> {
                                       ),
                                     )),
                                 Spacer(),
-                                if(widget.postOrProfilePic==0)
+                                if(widget.postOrProfilePicOrStory!=1)
                                   IconButton(
                                     onPressed: () {
                                       cubit.changeMultiPhotos();
@@ -263,7 +263,7 @@ class _PickImageScreenState extends State<PickImageScreen> {
                                   child: InkWell(
 
                                     onLongPress: (){
-                                      if(widget.postOrProfilePic==0){
+                                      if(widget.postOrProfilePicOrStory!=1){
                                         cubit.changeImageIndex(index);
                                         print(index);
                                         String imageAddress = cubit.files[cubit.albumNameIndex].files[index];
@@ -274,9 +274,7 @@ class _PickImageScreenState extends State<PickImageScreen> {
                                           cubit.addToPicsAddressesList(imageAddress);
                                         }
                                       }
-
                                     },
-
                                     onTap: () {
                                       cubit.changeImageIndex(index);
                                       print(index);

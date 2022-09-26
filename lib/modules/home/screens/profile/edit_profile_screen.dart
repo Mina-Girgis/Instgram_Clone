@@ -57,7 +57,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     TextButton(
                       onPressed: () {
                         cubit.getImagesPath();
-                        AppNavigator.customNavigator(context: context, screen: PickImageScreen(postOrProfilePic: 1,title: 'New profile photo',), finish: false);
+                        AppNavigator.customNavigator(context: context, screen: PickImageScreen(postOrProfilePicOrStory: 1,title: 'New profile photo',), finish: false);
                       },
                       child: Text(
                         "Change profile photo",

@@ -182,6 +182,8 @@ class AddToPicsAddressesList extends HomeState {}
 
 class RemoveFromPicsAddressesList extends HomeState {}
 
+class ChangeAddStoryIndex extends HomeState {}
+
 
 
 

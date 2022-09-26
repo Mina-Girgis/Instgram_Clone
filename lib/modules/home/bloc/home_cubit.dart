@@ -44,9 +44,13 @@ class HomeCubit extends Cubit<HomeState> {
 
 
   bool multiPhotos=false;
+  int addStoryIndex=0;
   List<String>picsAddresses=[];
 
-
+  void changeAddStoryIndex(value){
+    addStoryIndex=value;
+    emit(ChangeAddStoryIndex());
+  }
   void addToPicsAddressesList(String address){
     if(picsAddresses.length<10){
       picsAddresses.add(address);
@@ -538,12 +542,9 @@ class HomeCubit extends Cubit<HomeState> {
 
     picsAddresses.forEach((element) async{
       File file = File(element);
-      await firebase_storage.FirebaseStorage.instance
-          .ref()
-          .child('posts/${Uri.file(file.path).pathSegments.last}')
-          .putFile(file)
+      await firebase_storage.FirebaseStorage.instance.ref().child('posts/${Uri.file(file.path).pathSegments.last}').putFile(file)
           .then((value){
-        value.ref.getDownloadURL()
+            value.ref.getDownloadURL()
             .then((value)async{
              photosLinks.add(value);
              if(photosLinks.length == picsAddresses.length){
