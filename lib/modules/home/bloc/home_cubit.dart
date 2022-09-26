@@ -42,6 +42,38 @@ class HomeCubit extends Cubit<HomeState> {
   List<UserModel> searchList = [];
   List<int> bottomNavBarIndexList = [0]; // to controll navigation (stack)
 
+
+  bool multiPhotos=false;
+  List<String>picsAddresses=[];
+
+
+  void addToPicsAddressesList(String address){
+    if(picsAddresses.length<10){
+      picsAddresses.add(address);
+    }else{
+      toastMessage(text: "you can't select more than 10 photos", backgroundColor: GREY, textColor: WHITE);
+    }
+    emit(AddToPicsAddressesList());
+  }
+  void removeFromPicsAddressesList(String address){
+    picsAddresses.remove(address);
+    emit(RemoveFromPicsAddressesList());
+  }
+
+  void changeMultiPhotos(){
+    multiPhotos=!multiPhotos;
+    if(multiPhotos==false)
+      {
+        if(picsAddresses.isNotEmpty){
+          String lastPic = picsAddresses.last;
+          picsAddresses.clear();
+          picsAddresses.add(lastPic);
+        }
+      }
+
+    emit(ChangeMultiPhotos());
+  }
+
   void changeSearchList(List<UserModel> list) {
     searchList.clear();
     searchList = list;

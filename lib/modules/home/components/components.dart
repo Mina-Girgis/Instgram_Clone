@@ -23,7 +23,7 @@ Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = tr
         SizedBox(
           height: 2.0,
         ),
-        StoryItem(context:context ,user: cubit.userTmp),
+        StoryItem(context:context ,user: cubit.userTmp,width: 80,height: 80),
         SizedBox(
           height: 5.0,
         ),

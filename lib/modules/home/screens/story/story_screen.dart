@@ -20,14 +20,14 @@ class StoryScreen extends StatelessWidget {
   },
   builder: (context, state) {
     return Scaffold(
-      body: StoryItem(context: context,user: cubit.userTmp),
+      body: StoryItem(context: context,user: cubit.userTmp,width: 90,height: 90),
     );
   },
 );
   }
 }
 
-Widget StoryItem({required context , required UserModel user ,}){
+Widget StoryItem({required context , required UserModel user ,required double width , required double height}){
   return CupertinoPageScaffold(
     child: Center(
       child: Container(
@@ -39,71 +39,79 @@ Widget StoryItem({required context , required UserModel user ,}){
             style: BorderStyle.solid,
           ),
         ),
-        width: 90.0,
-        height: 90.0,
+        width: width,
+        height: height,
         padding: const EdgeInsets.all(2.0),
         child: GestureDetector(
           onTap: () {
-            showCupertinoDialog(
-              context: context,
-              builder: (context) {
-                return CupertinoPageScaffold(
 
-                  child: Stack(
-                    children: [
-                      Story(
-                        onFlashForward: Navigator.of(context).pop,
-                        onFlashBack: Navigator.of(context).pop,
-                        momentCount: 5,
-                        momentDurationGetter: (idx) => Duration(seconds: 5),
-                        momentBuilder: (context, idx) => Image.asset(
-                          'assets/person.jpg',
-                          fit: BoxFit.contain,
+            if(1!=1){
+
+            }else{
+              showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoPageScaffold(
+
+                    child: Stack(
+                      children: [
+                        Story(
+                          onFlashForward: Navigator.of(context).pop,
+                          onFlashBack: Navigator.of(context).pop,
+                          momentCount: 5,
+                          momentDurationGetter: (idx) => Duration(seconds: 5),
+                          momentBuilder: (context, idx) => Image.network(
+                            user.imageUrl,
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Card(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                Spacer(),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                              ],
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  Spacer(),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Card(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                Spacer(),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                              ],
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  Spacer(),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+
+
+
           },
           child: Container(
             decoration: BoxDecoration(

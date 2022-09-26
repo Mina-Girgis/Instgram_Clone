@@ -1,4 +1,5 @@
 import 'package:pro/models/post_model.dart';
+import 'package:pro/models/story_model.dart';
 
 class UserModel{
   late String username;
@@ -9,6 +10,7 @@ class UserModel{
   late String bio;
   late String imageUrl;
   List<PostModel>posts=[];
+  List<StoryModel>stories=[];
   Map<String,bool>followers ={};
   Map<String,bool>following ={};
   Map<String,bool>followRequests ={};
@@ -67,6 +69,11 @@ class UserModel{
   }
   void addToFollowRequest({required String username}){
     followRequests[username]=true;
+  }
+
+  void addToStories(StoryModel story){
+    stories.add(story);
+    stories.sort((a,b)=>int.parse(a.time).compareTo(int.parse(b.time)));
   }
 
 

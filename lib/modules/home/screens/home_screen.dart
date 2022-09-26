@@ -64,10 +64,12 @@ class HomeScreen extends StatelessWidget {
                     iconSize: 30.0,
                     splashRadius: 15,
                     onPressed: () {
+                      cubit.multiPhotos=false;
+                      cubit.picsAddresses.clear();
                       cubit.getImagesPath();
                       AppNavigator.customNavigator(
                           context: context,
-                          screen: PickImageScreen(postOrProfilePic: 0,),
+                          screen: PickImageScreen(postOrProfilePic: 0,title: 'New Post',),
                           finish: false);
                     },
                     icon: Icon(

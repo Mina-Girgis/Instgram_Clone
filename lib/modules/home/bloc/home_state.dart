@@ -176,6 +176,13 @@ class UploadProfilePicFail extends HomeState {}
 
 class UpdateUserDataLoading extends HomeState {}
 
+class ChangeMultiPhotos extends HomeState {}
+
+class AddToPicsAddressesList extends HomeState {}
+
+class RemoveFromPicsAddressesList extends HomeState {}
+
+
 
 
 
