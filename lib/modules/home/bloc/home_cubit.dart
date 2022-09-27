@@ -1071,7 +1071,18 @@ class HomeCubit extends Cubit<HomeState> {
           emit(GetAllStoriesSeenFail());
     });
   }
-  
+
+  bool seenOrNot(List<StoryModel>list){
+    bool seen=false;
+    list.forEach((element) {
+      if(storiesSeen[element.storyId]!=null){
+        seen=true;
+      }
+    });
+    emit(SeenOrNotSucess());
+    return seen;
+  }
+
   // get all users info and store them in a map
   // each user with their info ,posts
   Future<void> getAllUsers({bool cahngeUserTmp = true}) async {

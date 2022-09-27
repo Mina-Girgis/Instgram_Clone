@@ -210,6 +210,8 @@ class GetAllStoriesSeenSuccess extends HomeState {}
 
 class GetAllStoriesSeenFail extends HomeState {}
 
+class SeenOrNotSucess extends HomeState {}
+
 
 
 

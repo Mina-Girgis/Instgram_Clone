@@ -110,7 +110,7 @@ Widget StoryItem(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100.0),
           border: Border.all(
-            color: (ovel)?Colors.red:Colors.transparent,
+            color: (!cubit.seenOrNot(storyList))?Colors.red:Colors.grey,
             width: 2.0,
             style: BorderStyle.solid,
           ),
