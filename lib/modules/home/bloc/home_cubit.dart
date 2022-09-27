@@ -1072,14 +1072,14 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  bool seenOrNot(List<StoryModel>list){
-    bool seen=false;
+  bool allSeen(List<StoryModel>list){
+    bool seen=true;
     list.forEach((element) {
-      if(storiesSeen[element.storyId]!=null){
-        seen=true;
+      if(storiesSeen[element.storyId]==null){
+        seen=false;
       }
     });
-    emit(SeenOrNotSucess());
+    // emit(SeenOrNotSucess());
     return seen;
   }
 
