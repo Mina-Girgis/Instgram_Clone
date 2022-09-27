@@ -10,16 +10,21 @@ import 'package:pro/global_bloc/global_cubit.dart';
 import 'package:pro/modules/home/bloc/home_cubit.dart';
 import 'package:pro/services/utils/app_navigation.dart';
 import 'package:pro/shared/network/local/cache_helper/cache_helper.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import '../../../models/post_model.dart';
+import '../../../models/story_model.dart';
 import '../../../models/user_model.dart';
 import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
 import '../screens/story/story_screen.dart';
 
-Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = true}) {
-
+Widget storyDesignItem(
+    {required context,
+    required HomeCubit cubit,
+    required List<StoryModel> storyList,
+    bool ovel = true}) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -27,7 +32,16 @@ Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = tr
         SizedBox(
           height: 2.0,
         ),
-        StoryItem(context:context ,user: cubit.userTmp,width: 80,height: 80),
+        //***//
+        StoryItem(
+            context: context,
+            username: storyList[0].username,
+            width: 80,
+            height: 80,
+            storyList: storyList,
+            cubit: cubit,
+        ),
+        //***//
         SizedBox(
           height: 5.0,
         ),
@@ -35,7 +49,7 @@ Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = tr
           width: 80,
           child: Center(
             child: Text(
-              "mina_girgis",
+              storyList[0].username,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -46,27 +60,195 @@ Widget storyDesignItem({required context,required HomeCubit cubit,bool ovel = tr
   );
 }
 
-Widget circleAvatarDesign({required HomeCubit cubit,required double radius , String imageUrl=""}) {
+Widget StoryItem(
+    {required List<StoryModel> storyList,
+    required context,
+    required String username,
+    required double width,
+    required double height,
+    required HomeCubit cubit,
+    }) {
+  return CupertinoPageScaffold(
+    child: Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100.0),
+          border: Border.all(
+            color: Colors.red,
+            width: 2.0,
+            style: BorderStyle.solid,
+          ),
+        ),
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(2.0),
+        child: GestureDetector(
+          onTap: () {
+            if (1 != 1) {
+            } else {
+              showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoPageScaffold(
+                    child: Stack(
+                      children: [
+                        Story(
+                          onFlashForward: Navigator.of(context).pop,
+                          onFlashBack: Navigator.of(context).pop,
+                          momentCount: storyList.length,
+                          momentDurationGetter: (idx) => Duration(seconds: 5),
+                          momentBuilder: (context, idx) => Image.network(
+                            storyList[idx].imageUrl,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(-1);
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.circle,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+              image: (cubit.users[username]==null)?NetworkImage(BLACK_IMAGE):NetworkImage(cubit.users[username]!.imageUrl),
+              fit: BoxFit.cover,
+            ),
+              borderRadius: BorderRadius.circular(100.0),
+          ),
+        ),
+      ),
+    ),
+  ));
+}
+
+Widget circleAvatarDesign(
+    {required HomeCubit cubit, required double radius, String imageUrl = ""}) {
   return CircleAvatar(
-    backgroundImage: picImage(imageUrl,cubit),
+    backgroundImage: picImage(imageUrl, cubit),
     radius: radius,
   );
 }
 
-ImageProvider picImage(String image , HomeCubit cubit){
-  if(cubit.userTmp.imageUrl == image)
+ImageProvider picImage(String image, HomeCubit cubit) {
+  if (cubit.userTmp.imageUrl == image)
     return NetworkImage(image);
-  else if(image=="")
-    return NetworkImage('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fA%3D%3D&w=1000&q=80');
+  else if (image == "")
+    return NetworkImage(
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fA%3D%3D&w=1000&q=80');
   else
     return FileImage(File(image));
 }
+
 Widget profilePicWithOvelCircle({
   required double radius,
   required double size,
   required bool ovelCircle,
   required double padding,
-  required cubit ,
+  required cubit,
 }) {
   return Container(
     width: size,
@@ -87,7 +269,7 @@ Widget profilePicWithOvelCircle({
       child: Padding(
         padding: EdgeInsets.all(padding),
         child: Center(
-          child: circleAvatarDesign(radius: radius,cubit: cubit),
+          child: circleAvatarDesign(radius: radius, cubit: cubit),
         ),
       ),
     ),
@@ -95,8 +277,7 @@ Widget profilePicWithOvelCircle({
 }
 
 Widget postDesgin(
-    {
-    required UserModel? user,
+    {required UserModel? user,
     required index,
     required context,
     required HomeCubit cubit,
@@ -165,23 +346,25 @@ Widget postDesgin(
           child: ImageSlideshow(
             height: 320,
             children: model.photos.map((e) {
-                return InstaLikeButton(
-                  onChanged: () {
-                    if(!model.isLiked){
-                      String username = CacheHelper.getData(key: 'username').toString();
-                      cubit.likePost(postId: model.postId, username: username);
-                      cubit.changeLikeStateInAllPosts(postId: model.postId);
-                    }
-                  },
-                  image: NetworkImage(e),
-                  height: 320,
-                );
-              }).toList(),
+              return InstaLikeButton(
+                onChanged: () {
+                  if (!model.isLiked) {
+                    String username =
+                        CacheHelper.getData(key: 'username').toString();
+                    cubit.likePost(postId: model.postId, username: username);
+                    cubit.changeLikeStateInAllPosts(postId: model.postId);
+                  }
+                },
+                image: NetworkImage(e),
+                height: 320,
+              );
+            }).toList(),
             // isLoop: true,
-            indicatorColor: (model.photos.length==1)?Colors.transparent:Colors.blue,
-            indicatorBackgroundColor: (model.photos.length==1)?Colors.transparent:Colors.grey,
+            indicatorColor:
+                (model.photos.length == 1) ? Colors.transparent : Colors.white,
+            indicatorBackgroundColor:
+                (model.photos.length == 1) ? Colors.transparent : Colors.grey,
           ),
-
         ),
         Row(
           children: [
@@ -272,7 +455,7 @@ Widget postDesgin(
               ),
               Row(
                 children: [
-                  circleAvatarDesign(radius: 17.0,cubit: cubit),
+                  circleAvatarDesign(radius: 17.0, cubit: cubit),
                   SizedBox(
                     width: 10.0,
                   ),
@@ -281,22 +464,28 @@ Widget postDesgin(
                     splashColor: Colors.transparent,
                     onTap: () {
                       cubit.commentController.clear();
-                      String username = CacheHelper.getData(key: 'username').toString();
+                      String username =
+                          CacheHelper.getData(key: 'username').toString();
                       commentSection(
-                          cubit: cubit,
-                          context: context,
-                          model: model,
-                          function: ()async{
-                            await cubit.addComment(
+                        cubit: cubit,
+                        context: context,
+                        model: model,
+                        function: () async {
+                          await cubit
+                              .addComment(
+                            time: GlobalCubit.get(context).getCurrentTime(),
+                            postId: model.postId,
+                            text: cubit.commentController.text,
+                            username: username,
+                          )
+                              .then((value) {
+                            cubit.allPosts[index].comments.add(CommentModel(
                                 time: GlobalCubit.get(context).getCurrentTime(),
-                                postId: model.postId,
-                                text: cubit.commentController.text,
                                 username: username,
-                            ).then((value){
-                              cubit.allPosts[index].comments.add(CommentModel(time: GlobalCubit.get(context).getCurrentTime(), username: username, text: cubit.commentController.text));
-                              Navigator.pop(context);
-                            });
-                          },
+                                text: cubit.commentController.text));
+                            Navigator.pop(context);
+                          });
+                        },
                       );
                     },
                     child: Text(
@@ -377,7 +566,11 @@ Widget editProfileInputField({
   );
 }
 
-AppBar appBar({required String title, required context, required Function()? onSave, required HomeCubit cubit}) {
+AppBar appBar(
+    {required String title,
+    required context,
+    required Function()? onSave,
+    required HomeCubit cubit}) {
   return AppBar(
     backgroundColor: Colors.transparent,
     elevation: 0.0,
@@ -393,19 +586,22 @@ AppBar appBar({required String title, required context, required Function()? onS
         padding: const EdgeInsets.only(right: 0.0),
         child: IconButton(
           onPressed: onSave,
-          icon:  Icon(
+          icon: Icon(
             FontAwesomeIcons.check,
             size: 27.0,
             color: BUTTON_COLOR,
           ),
-
         ),
       ),
     ],
   );
 }
 
-Future<dynamic> commentSection({required context , required cubit,required PostModel model , required  Function() function}){
+Future<dynamic> commentSection(
+    {required context,
+    required cubit,
+    required PostModel model,
+    required Function() function}) {
   return showModalBottomSheet(
       elevation: 0.0,
       backgroundColor: Colors.black,
@@ -424,14 +620,18 @@ Future<dynamic> commentSection({required context , required cubit,required PostM
                 children: [
                   Row(
                     children: [
-                      const SizedBox(width: 10,),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       CircleAvatar(
                         backgroundImage: AssetImage(
                           'assets/person.jpg',
                         ),
                         radius: 25.0,
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Expanded(
                         child: Container(
                           child: TextFormField(
@@ -441,8 +641,7 @@ Future<dynamic> commentSection({required context , required cubit,required PostM
                                 hintText: "Add a comment...",
                                 hintStyle: TextStyle(
                                   color: Colors.white54,
-                                )
-                            ),
+                                )),
                             style: TextStyle(
                               color: WHITE,
                             ),
@@ -450,7 +649,9 @@ Future<dynamic> commentSection({required context , required cubit,required PostM
                           height: 50,
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       TextButton(
                         onPressed: function,
                         child: Text("post"),
@@ -465,26 +666,22 @@ Future<dynamic> commentSection({required context , required cubit,required PostM
       });
 }
 
-
-
-Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
+Widget defaulBottomNavBar({required context, required HomeCubit cubit}) {
   return BottomNavigationBar(
     elevation: 0.0,
     showSelectedLabels: false,
     showUnselectedLabels: false,
-    selectedIconTheme: IconThemeData(
-        size: 30.0
-    ),
-    unselectedIconTheme: IconThemeData(
-        size: 30.0
-    ),
-    currentIndex: (cubit.bottomNavigationBarIndex>4)? 0:cubit.bottomNavigationBarIndex,
+    selectedIconTheme: IconThemeData(size: 30.0),
+    unselectedIconTheme: IconThemeData(size: 30.0),
+    currentIndex: (cubit.bottomNavigationBarIndex > 4)
+        ? 0
+        : cubit.bottomNavigationBarIndex,
     unselectedItemColor: WHITE,
     selectedItemColor: WHITE,
     type: BottomNavigationBarType.fixed,
     backgroundColor: Colors.black,
     onTap: (index) {
-      if(cubit.bottomNavigationBarIndex !=index){
+      if (cubit.bottomNavigationBarIndex != index) {
         // AppNavigator.customNavigator(context: context, screen: cubit.screens[index], finish: false);
         cubit.changeBottomNavigationBarIndex(idx: index);
         print(cubit.bottomNavigationBarIndex);
@@ -492,128 +689,34 @@ Widget defaulBottomNavBar({required context , required HomeCubit cubit}){
     },
     items: [
       BottomNavigationBarItem(
-
           icon: Icon(
             Icons.home_filled,
           ),
           label: "",
           backgroundColor: Colors.transparent),
       BottomNavigationBarItem(
-        icon: Icon(FontAwesomeIcons.magnifyingGlass,size: 25.0,),
+        icon: Icon(
+          FontAwesomeIcons.magnifyingGlass,
+          size: 25.0,
+        ),
         label: "item",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.slideshow,),
+        icon: Icon(
+          Icons.slideshow,
+        ),
         label: "item",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.local_mall,),
+        icon: Icon(
+          Icons.local_mall,
+        ),
         label: "item",
       ),
       BottomNavigationBarItem(
-        icon: circleAvatarDesign(radius: 16,cubit: cubit),
+        icon: circleAvatarDesign(radius: 16, cubit: cubit),
         label: "item",
       ),
     ],
-  );
-}
-
-Widget StoryItem({required context , required UserModel user ,required double width , required double height}){
-  return CupertinoPageScaffold(
-    child: Center(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100.0),
-          border: Border.all(
-            color: Colors.red,
-            width: 2.0,
-            style: BorderStyle.solid,
-          ),
-        ),
-        width: width,
-        height: height,
-        padding: const EdgeInsets.all(2.0),
-        child: GestureDetector(
-          onTap: () {
-
-            if(1!=1){
-
-            }else{
-              showCupertinoDialog(
-                context: context,
-                builder: (context) {
-                  return CupertinoPageScaffold(
-
-                    child: Stack(
-                      children: [
-                        Story(
-                          onFlashForward: Navigator.of(context).pop,
-                          onFlashBack: Navigator.of(context).pop,
-                          momentCount: 5,
-                          momentDurationGetter: (idx) => Duration(seconds: 5),
-                          momentBuilder: (context, idx) => Image.network(
-                            user.imageUrl,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Card(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  Spacer(),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Card(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  Spacer(),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                  IconButton(onPressed: (){print(-1);}, icon: Icon(FontAwesomeIcons.circle,color: Colors.white,),),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
-
-
-
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: NetworkImage(user.imageUrl),fit: BoxFit.cover),
-              borderRadius: BorderRadius.circular(100.0),
-              // color: CupertinoColors.activeBlue,
-            ),
-          ),
-        ),
-      ),
-    ),
   );
 }

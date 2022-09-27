@@ -192,6 +192,12 @@ class AddNewStoryLoading extends HomeState {}
 
 class UploadNewStoryImageFail extends HomeState {}
 
+class GetAllStoriesForSpecificUserSuccess extends HomeState {}
+
+class GetAllStoriesForSpecificUserFail extends HomeState {}
+
+class GetActiveStories extends HomeState {}
+
 
 
 

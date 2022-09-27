@@ -387,27 +387,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                    Container(
-                                      // color: Colors.grey,
-                                      height: 130.0,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 0.0, right: 0.0),
-                                        child: ListView.separated(
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 10,
-                                          separatorBuilder: (context, index) {
-                                            return SizedBox(
-                                              width: 15.0,
-                                            );
-                                          },
-                                          itemBuilder: (context, index) {
-                                            return storyDesignItem(ovel: false,cubit: cubit,context: context);
-                                          },
-                                        ),
-                                      ),
-                                    ),
+                                    // if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                    // Container(
+                                    //   // color: Colors.grey,
+                                    //   height: 130.0,
+                                    //   child: Padding(
+                                    //     padding: const EdgeInsets.only(
+                                    //         left: 0.0, right: 0.0),
+                                    //     child: ListView.separated(
+                                    //       scrollDirection: Axis.horizontal,
+                                    //       itemCount: 10,
+                                    //       separatorBuilder: (context, index) {
+                                    //         return SizedBox(
+                                    //           width: 15.0,
+                                    //         );
+                                    //       },
+                                    //       itemBuilder: (context, index) {
+                                    //         return storyDesignItem(ovel: false,cubit: cubit,context: context,storyList: []);
+                                    //       },
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),

@@ -22,8 +22,9 @@ class AddStoryScreen extends StatelessWidget {
       listener: (context, state) {
         if(state is AddNewStorySuccess){
           toastMessage(text: "Story uploaded successfully", backgroundColor: GREY, textColor: WHITE);
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          // Navigator.of(context,rootNavigator: true).pop();
         }
       },
       builder: (context, state) {
@@ -79,8 +80,6 @@ class AddStoryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
-
 
                   SizedBox(
                     height: SizeConfig.screenHeight! * 0.02,
@@ -139,7 +138,7 @@ class AddStoryScreen extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(20),
                           onTap: () async{
-                            await cubit.uploadNewStory(username: cubit.userTmp.username, context: context,);
+                             cubit.uploadNewStory(username: cubit.userTmp.username, context: context,);
                           },
                           child: Container(
                             decoration: BoxDecoration(

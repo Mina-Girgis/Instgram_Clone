@@ -13,6 +13,7 @@ import 'package:swipe_to/swipe_to.dart';
 import '../../../models/post_model.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/components/constants.dart';
+import '../../../shared/network/local/cache_helper/cache_helper.dart';
 import '../components/components.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,7 +21,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     SizeConfig.init(context);
     var cubit = HomeCubit.get(context);
     return SafeArea(
@@ -28,19 +28,21 @@ class HomeScreen extends StatelessWidget {
         listener: (context, state) {},
         builder: (context, state) {
           return WillPopScope(
-            onWillPop: ()async{
+            onWillPop: () async {
               cubit.removeBottomNavBarIndexListTop(context: context);
               return true;
             },
             child: SwipeTo(
-              onRightSwipe: (){
-                cubit.multiPhotos=false;
+              onRightSwipe: () {
+                cubit.multiPhotos = false;
                 cubit.picsAddresses.clear();
                 cubit.getImagesPath();
-                AppNavigator.customNavigator(context: context, screen: PickImageScreen(postOrProfilePicOrStory: 2,title: 'Add Story',), finish: false);
+                AppNavigator.customNavigator(context: context,
+                    screen: PickImageScreen(
+                      postOrProfilePicOrStory: 2, title: 'Add Story',),
+                    finish: false);
               },
               child: Scaffold(
-                // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
                 appBar: AppBar(
                   automaticallyImplyLeading: false,
                   toolbarHeight: 60,
@@ -73,12 +75,13 @@ class HomeScreen extends StatelessWidget {
                       iconSize: 30.0,
                       splashRadius: 15,
                       onPressed: () {
-                        cubit.multiPhotos=false;
+                        cubit.multiPhotos = false;
                         cubit.picsAddresses.clear();
                         cubit.getImagesPath();
                         AppNavigator.customNavigator(
                             context: context,
-                            screen: PickImageScreen(postOrProfilePicOrStory: 0,title: 'New Post',),
+                            screen: PickImageScreen(
+                              postOrProfilePicOrStory: 0, title: 'New Post',),
                             finish: false);
                       },
                       icon: Icon(
@@ -103,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                             splashRadius: 15,
                             onPressed: () {
 
-                              },
+                            },
                             icon: Icon(
                               Icons.send_outlined,
                             ))),
@@ -121,24 +124,36 @@ class HomeScreen extends StatelessWidget {
                         child: Container(
                           width: SizeConfig.screenWidth,
                           child: Column(
-                            children: [
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children:[
                               Container(
                                 // color: Colors.grey,
                                 height: 130.0,
                                 child: Padding(
                                   padding:
-                                      const EdgeInsets.only(left: 8.0, right: 8.0),
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: 10,
-                                    separatorBuilder: (context, index) {
-                                      return SizedBox(
-                                        width: 15.0,
-                                      );
-                                    },
-                                    itemBuilder: (context, index) {
-                                      return storyDesignItem(cubit: cubit,context: context);
-                                    },
+                                  const EdgeInsets.only(left: 8.0, right: 8.0),
+
+                                  child: Container(
+                                    width: SizeConfig.screenWidth,
+                                    child: Row(
+                                      children: [
+
+                                        ListView.separated(
+                                          shrinkWrap: true,
+                                          physics: ScrollPhysics(),
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: cubit.activeStories.length,
+                                          separatorBuilder: (context, index) {
+                                            return SizedBox(
+                                              width: 15.0,
+                                            );
+                                          },
+                                          itemBuilder: (context, index) {
+                                            return storyDesignItem(cubit: cubit, context: context, storyList: cubit.activeStories[index]);
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -153,7 +168,8 @@ class HomeScreen extends StatelessWidget {
                                     );
                                   },
                                   itemBuilder: (context, index) {
-                                    String username = cubit.allPosts[index].username;
+                                    String username = cubit.allPosts[index]
+                                        .username;
                                     return postDesgin(
                                         index: index,
                                         user: cubit.users[username],
@@ -184,4 +200,8 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget emptyStoryItem(){
+  return Container();
 }
