@@ -103,6 +103,7 @@ class HomeCubit extends Cubit<HomeState> {
   ];
 
   Map<String, UserModel> users = {};
+  Map<String,bool>storiesSeen={};
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
@@ -979,6 +980,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
 
+  
+  // Stories
   Future<void>getAllStoriesForSpecificUser({required String username})async{
       await FirebaseFirestore.instance
           .collection('users')
@@ -999,8 +1002,6 @@ class HomeCubit extends Cubit<HomeState> {
       });
 
   }
-
-
   Future<void> getActiveStories({required String username})async{
     activeStories.clear();
     if(users[username]!.stories.isNotEmpty){
@@ -1013,6 +1014,64 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetActiveStories());
   }
 
+  // all Stories i watched
+  Future<void>addToStoriesSeen({required String username , required String storyId})async{
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(username)
+          .collection('storiesSeen')
+          .doc(storyId)
+          .set({})
+          .then((value){
+            emit(AddToStoriesSeenSuccess());
+      })
+          .catchError((error){
+            print(error.toString());
+            emit(AddToStoriesSeenFail());
+      });
+  }
+  
+  // see onw story
+  Future<void>seeSpecificStory({required String storyOwner , required String storyId})async{
+    String myUsername = CacheHelper.getData(key: 'username').toString();
+    await FirebaseFirestore.instance
+          .collection('users')
+          .doc(storyOwner)
+          .collection('stories')
+          .doc(storyId)
+          .collection('views')
+          .doc(myUsername).set({})
+          .then((value) {
+            emit(SeeSpecificStorySuccess());
+    })
+          .catchError((error){
+            print(error.toString());
+            emit(SeeSpecificStoryFail());
+    });
+  }
+  
+  Future<void>getAllStoriesSeen()async{
+    storiesSeen.clear();
+    String username = CacheHelper.getData(key: 'username').toString();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('storiesSeen')
+        .get()
+        .then((value){
+          value.docs.forEach((element) {
+            storiesSeen[element.id]=true;
+            if(storiesSeen.length == value.docs.length){
+              emit(GetAllStoriesSeenSuccess());
+            }
+          });
+    })
+        .catchError((error){
+          print(error.toString());
+          emit(GetAllStoriesSeenFail());
+    });
+  }
+  
   // get all users info and store them in a map
   // each user with their info ,posts
   Future<void> getAllUsers({bool cahngeUserTmp = true}) async {
@@ -1039,6 +1098,10 @@ class HomeCubit extends Cubit<HomeState> {
         }
         if(users.length == value.docs.length){
           await getActiveStories(username: CacheHelper.getData(key: 'username').toString());
+          await getAllStoriesSeen();
+          print("**************************");
+          print(storiesSeen.length);
+          print("**************************");
         }
       });
       emit(GetAllUsersSuccess());

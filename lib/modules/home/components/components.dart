@@ -62,6 +62,39 @@ Widget storyDesignItem(
   );
 }
 
+Widget emptyStoryGesign({required double radius}){
+  return Container(
+    // color: Colors.red,
+    child: Column(
+      children: [
+        SizedBox(
+          height: 2.0,
+        ),
+        //***//
+        CircleAvatar(
+          backgroundImage: NetworkImage(ADD_IMAGE),
+          backgroundColor: Colors.white,
+          radius: radius,
+        ),
+        //***//
+        SizedBox(
+          height: 5.0,
+        ),
+        Container(
+          width: 80,
+          child: Center(
+            child: Text(
+              'Add story',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
 Widget StoryItem(
     {required List<StoryModel> storyList,
     required context,
@@ -101,10 +134,16 @@ Widget StoryItem(
                           onFlashBack: Navigator.of(context).pop,
                           momentCount: storyList.length,
                           momentDurationGetter: (idx) => Duration(seconds: 5),
-                          momentBuilder: (context, idx) => Image.network(
-                            storyList[idx].imageUrl,
-                            fit: BoxFit.contain,
-                          ),
+                          momentBuilder: (context, idx){
+                             cubit.addToStoriesSeen(username:cubit.userTmp.username,storyId: storyList[idx].storyId);
+                             cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
+                             cubit.storiesSeen[storyList[idx].storyId]=true;
+                             print(storyList[idx].storyId);
+                            return Image.network(
+                              storyList[idx].imageUrl,
+                              fit: BoxFit.contain,
+                            );
+                          },
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,

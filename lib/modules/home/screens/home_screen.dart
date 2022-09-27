@@ -11,6 +11,7 @@ import 'package:pro/services/utils/size_config.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 import '../../../models/post_model.dart';
+import '../../../models/story_model.dart';
 import '../../../models/user_model.dart';
 import '../../../shared/components/constants.dart';
 import '../../../shared/network/local/cache_helper/cache_helper.dart';
@@ -131,13 +132,13 @@ class HomeScreen extends StatelessWidget {
                                 height: 130.0,
                                 child: Padding(
                                   padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8.0),
-
+                                  const EdgeInsets.only(left: 0.0, right: 8.0),
                                   child: Container(
                                     width: SizeConfig.screenWidth,
                                     child: Row(
                                       children: [
-                                        storyDesignItem(context: context, cubit: cubit, storyList: [cubit.emptyStoryTmp],ovel: true),
+                                        if(cubit.userTmp.stories.isEmpty)
+                                           emptyStoryGesign(radius: 40),
                                         SizedBox(width: 10,),
                                         ListView.separated(
                                           shrinkWrap: true,

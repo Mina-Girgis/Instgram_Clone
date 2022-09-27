@@ -198,6 +198,20 @@ class GetAllStoriesForSpecificUserFail extends HomeState {}
 
 class GetActiveStories extends HomeState {}
 
+class AddToStoriesSeenSuccess extends HomeState {}
+
+class AddToStoriesSeenFail extends HomeState {}
+
+class SeeSpecificStorySuccess extends HomeState {}
+
+class SeeSpecificStoryFail extends HomeState {}
+
+class GetAllStoriesSeenSuccess extends HomeState {}
+
+class GetAllStoriesSeenFail extends HomeState {}
+
+
+
 
 
 
