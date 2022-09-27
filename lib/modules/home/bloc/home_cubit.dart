@@ -36,7 +36,7 @@ class HomeCubit extends Cubit<HomeState> {
   String updatingValueField = "";
   UserModel userTmp = UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
-  StoryModel emptyStoryTmp=StoryModel(time: '0', imageUrl: "https://firebasestorage.googleapis.com/v0/b/practice-b894f.appspot.com/o/random%2Fadd.png?alt=media&token=3096db8b-f725-490b-9ca8-4f9b8a8ef9e7", username: 'Add Story');
+  StoryModel emptyStoryTmp=StoryModel(time: '0', imageUrl: ADD_IMAGE, username: 'Add Story');
   List<FileModel> files = []; // all pics in your phone
   List<PostModel> allPosts = [];
   List<String> userPostsIds = [];

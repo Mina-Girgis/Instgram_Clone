@@ -24,7 +24,8 @@ Widget storyDesignItem(
     {required context,
     required HomeCubit cubit,
     required List<StoryModel> storyList,
-    bool ovel = true}) {
+    bool ovel = true,
+    }) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -40,6 +41,7 @@ Widget storyDesignItem(
             height: 80,
             storyList: storyList,
             cubit: cubit,
+            ovel:ovel,
         ),
         //***//
         SizedBox(
@@ -67,6 +69,7 @@ Widget StoryItem(
     required double width,
     required double height,
     required HomeCubit cubit,
+    required bool ovel,
     }) {
   return CupertinoPageScaffold(
     child: Center(
@@ -74,7 +77,7 @@ Widget StoryItem(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100.0),
           border: Border.all(
-            color: Colors.red,
+            color: (ovel)?Colors.red:Colors.transparent,
             width: 2.0,
             style: BorderStyle.solid,
           ),
@@ -84,7 +87,8 @@ Widget StoryItem(
         padding: const EdgeInsets.all(2.0),
         child: GestureDetector(
           onTap: () {
-            if (1 != 1) {
+            if (!ovel) {
+              print("-1");
             } else {
               showCupertinoDialog(
                 context: context,

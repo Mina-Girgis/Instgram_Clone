@@ -137,7 +137,8 @@ class HomeScreen extends StatelessWidget {
                                     width: SizeConfig.screenWidth,
                                     child: Row(
                                       children: [
-
+                                        storyDesignItem(context: context, cubit: cubit, storyList: [cubit.emptyStoryTmp],ovel: true),
+                                        SizedBox(width: 10,),
                                         ListView.separated(
                                           shrinkWrap: true,
                                           physics: ScrollPhysics(),
