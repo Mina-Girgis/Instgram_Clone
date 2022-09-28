@@ -132,14 +132,15 @@ class HomeScreen extends StatelessWidget {
                                 height: 130.0,
                                 child: Padding(
                                   padding:
-                                  const EdgeInsets.only(left: 0.0, right: 8.0),
+                                  const EdgeInsets.only(left: 5.0, right: 8.0),
                                   child: Container(
                                     width: SizeConfig.screenWidth,
                                     child: Row(
                                       children: [
                                         if(cubit.userTmp.stories.isEmpty)
-                                           emptyStoryGesign(radius: 40),
-                                        SizedBox(width: 10,),
+                                           emptyStoryGesign(radius: 40,cubit: cubit),
+                                        if(cubit.userTmp.stories.isEmpty)
+                                           SizedBox(width: 15,),
                                         ListView.separated(
                                           shrinkWrap: true,
                                           physics: ScrollPhysics(),
@@ -151,7 +152,7 @@ class HomeScreen extends StatelessWidget {
                                             );
                                           },
                                           itemBuilder: (context, index) {
-                                            return storyDesignItem(cubit: cubit, context: context, storyList: cubit.activeStories[index]);
+                                            return storyDesignItem(cubit: cubit, context: context, storyList: cubit.activeStories[index],index:index);
                                           },
                                         ),
                                       ],
@@ -204,6 +205,3 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-Widget emptyStoryItem(){
-  return Container();
-}

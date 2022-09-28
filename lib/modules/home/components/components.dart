@@ -20,12 +20,13 @@ import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
 import '../screens/story/story_screen.dart';
 
-Widget storyDesignItem(
-    {required context,
-    required HomeCubit cubit,
-    required List<StoryModel> storyList,
-    bool ovel = true,
-    }) {
+Widget storyDesignItem({
+  required context,
+  required HomeCubit cubit,
+  required List<StoryModel> storyList,
+  required int index,
+  bool ovel = true,
+}) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -35,13 +36,14 @@ Widget storyDesignItem(
         ),
         //***//
         StoryItem(
-            context: context,
-            username: storyList[0].username,
-            width: 80,
-            height: 80,
-            storyList: storyList,
-            cubit: cubit,
-            ovel:ovel,
+          context: context,
+          username: storyList[0].username,
+          width: 80,
+          height: 80,
+          storyList: storyList,
+          cubit: cubit,
+          ovel: ovel,
+          index:index,
         ),
         //***//
         SizedBox(
@@ -62,7 +64,7 @@ Widget storyDesignItem(
   );
 }
 
-Widget emptyStoryGesign({required double radius}){
+Widget emptyStoryGesign({required double radius, required HomeCubit cubit}) {
   return Container(
     // color: Colors.red,
     child: Column(
@@ -71,11 +73,28 @@ Widget emptyStoryGesign({required double radius}){
           height: 2.0,
         ),
         //***//
-        CircleAvatar(
-          backgroundImage: NetworkImage(ADD_IMAGE),
-          backgroundColor: Colors.white,
-          radius: radius,
+        Stack(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(cubit.userTmp.imageUrl),
+              backgroundColor: Colors.white,
+              radius: radius,
+            ),
+            Padding(
+              padding:  EdgeInsets.only(left: radius*1.5,top: radius*1.4),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(FontAwesomeIcons.add,color: Colors.white,size: 17,),
+              ),
+            ),
+          ],
         ),
+
         //***//
         SizedBox(
           height: 5.0,
@@ -95,100 +114,169 @@ Widget emptyStoryGesign({required double radius}){
   );
 }
 
-Widget StoryItem(
-    {required List<StoryModel> storyList,
-    required context,
-    required String username,
-    required double width,
-    required double height,
-    required HomeCubit cubit,
-    required bool ovel,
-    }) {
+Widget StoryItem({
+  required List<StoryModel> storyList,
+  required context,
+  required String username,
+  required double width,
+  required double height,
+  required HomeCubit cubit,
+  required bool ovel,
+  required int index,
+}) {
+  String CurrentUsername=CacheHelper.getData(key: 'username').toString();
   return CupertinoPageScaffold(
-    child: Center(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100.0),
-          border: Border.all(
-            color: (cubit.allSeen(storyList))?Colors.grey:Colors.red,
-            width: 2.0,
-            style: BorderStyle.solid,
-          ),
+      child: Center(
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(100.0),
+        border: Border.all(
+          color: (cubit.allSeen(storyList)) ? Colors.grey : Colors.red,
+          width: 2.0,
+          style: BorderStyle.solid,
         ),
-        width: width,
-        height: height,
-        padding: const EdgeInsets.all(2.0),
-        child: GestureDetector(
-          onTap: () {
-            if (!ovel) {
-              print("-1");
-            } else {
-              showCupertinoDialog(
-                context: context,
-                builder: (context) {
-                  return CupertinoPageScaffold(
-                    child: Stack(
-                      children: [
-                        Story(
-                          onFlashForward: Navigator.of(context).pop,
-                          onFlashBack: Navigator.of(context).pop,
-                          momentCount: storyList.length,
-                          momentDurationGetter: (idx) => Duration(seconds: 5),
-                          momentBuilder: (context, idx){
-                             cubit.addToStoriesSeen(username:cubit.userTmp.username,storyId: storyList[idx].storyId);
-                             cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
-                             cubit.storiesSeen[storyList[idx].storyId]=true;
-                             print(storyList[idx].storyId);
-                            return Image.network(
-                              storyList[idx].imageUrl,
-                              fit: BoxFit.contain,
-                            );
-                          },
+      ),
+      width: width,
+      height: height,
+      padding: const EdgeInsets.all(2.0),
+      child: GestureDetector(
+        onTap: () {
+          if (!ovel) {
+            print("-1");
+          } else {
+            showCupertinoDialog(
+              context: context,
+              builder: (context) {
+                return CupertinoPageScaffold(
+                  child: Stack(
+                    children: [
+                      Story(
+                        onFlashForward: Navigator.of(context).pop,
+                        onFlashBack: Navigator.of(context).pop,
+                        momentCount: storyList.length,
+                        momentDurationGetter: (idx) => Duration(seconds: 5),
+                        momentBuilder: (context, idx) {
+                          cubit.addToStoriesSeen(username: cubit.userTmp.username, storyId: storyList[idx].storyId);
+                          cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
+                          cubit.storiesSeen[storyList[idx].storyId] = true;
+                          cubit.changeCurrentStoryIndex(idx);
+                          return Image.network(storyList[idx].imageUrl, fit: BoxFit.contain,);
+                        },
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Card(
+                          color: Colors.transparent,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 15.0,left: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 20.0,
+                                  backgroundImage: NetworkImage(cubit.users[username]!.imageUrl),
+                                  backgroundColor: Colors.black,
+                                ),
+                                SizedBox(width: 7,),
+                                Text(username),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: Icon(
+                                    FontAwesomeIcons.circle,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
+                      ),
+                      if(username!=CacheHelper.getData(key: 'username').toString())
+                         Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Card(
+                          color: Colors.transparent,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Spacer(),
+                                IconButton(
+                                  onPressed: () {
+                                    cubit.addLikeToSpecificStory(username: CurrentUsername, storyOwnerUsername: username, storyId: storyList[cubit.currentStoryIndex].storyId);
+                                    // cubit.addToStoriesILiked(storyList[cubit.currentStoryIndex].storyId);
+                                   },
+                                  icon: Icon(
+                                    FontAwesomeIcons.heart,
+                                    color: (cubit.storiesILiked[storyList[cubit.currentStoryIndex].storyId]==true)?Colors.red :Colors.white,
+                                    size: 30.0,
+                                  ),
+                                ),
+                                Transform.rotate(
+                                    angle: 50,
+                                    child: IconButton(
+                                        iconSize: 30.0,
+                                        splashRadius: 15,
+                                        onPressed: () {
+
+                                        },
+                                        icon: Icon(
+                                          Icons.send_outlined,
+                                          color: Colors.white,
+                                        ))),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      if(username==CacheHelper.getData(key: 'username').toString())
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Card(
                             color: Colors.transparent,
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
+                              padding: const EdgeInsets.only(bottom: 20.0,left: 5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
+
+                                  InkWell(
+                                    onTap: (){},
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Stack(
+                                      children: [
+
+                                        if(storyList[cubit.currentStoryIndex].views.length >= 3)
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:30),
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[2]]!.imageUrl),
+                                          ),
+                                        ),
+
+                                        if(storyList[cubit.currentStoryIndex].views.length >= 2)
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 15),
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[1]]!.imageUrl),
+                                          ),
+                                        ),
+
+                                        if(storyList[cubit.currentStoryIndex].views.length >= 1)
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 0),
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[0]]!.imageUrl),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -196,71 +284,23 @@ Widget StoryItem(
                             ),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Card(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      print(-1);
-                                    },
-                                    icon: Icon(
-                                      FontAwesomeIcons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-              image: (cubit.users[username]==null)?NetworkImage(BLACK_IMAGE):NetworkImage(cubit.users[username]!.imageUrl),
+
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: (cubit.users[username] == null)
+                  ? NetworkImage(BLACK_IMAGE)
+                  : NetworkImage(cubit.users[username]!.imageUrl),
               fit: BoxFit.cover,
             ),
-              borderRadius: BorderRadius.circular(100.0),
+            borderRadius: BorderRadius.circular(100.0),
           ),
         ),
       ),

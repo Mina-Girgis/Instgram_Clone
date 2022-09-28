@@ -36,13 +36,12 @@ class HomeCubit extends Cubit<HomeState> {
   String updatingValueField = "";
   UserModel userTmp = UserModel.empty(); // to switch between different profile screens
   PostModel postTmp = PostModel.empty();
-  StoryModel emptyStoryTmp=StoryModel(time: '0', imageUrl: ADD_IMAGE, username: 'Add Story');
   List<FileModel> files = []; // all pics in your phone
   List<PostModel> allPosts = [];
   List<String> userPostsIds = [];
   List<PostModel> userPosts = [];
   List<UserModel> searchList = [];
-  List<List<StoryModel>>activeStories=[];
+  List<List<StoryModel>> activeStories = [];
   List<int> bottomNavBarIndexList = [0]; // to controll navigation (stack)
 
   bool multiPhotos = false;
@@ -103,12 +102,24 @@ class HomeCubit extends Cubit<HomeState> {
   ];
 
   Map<String, UserModel> users = {};
-  Map<String,bool>storiesSeen={};
+  Map<String, bool> storiesSeen = {};
+  Map<String,bool>storiesILiked={};
   FileModel? selectedModel;
   int albumNameIndex = -1;
   int imageIndex = -1;
   int profileRowIndex = 0;
   String userProfileImageTemp = "";
+  int currentStoryIndex=0;
+
+  void addToStoriesILiked(String storyId){
+    storiesILiked[storyId]=true;
+    emit(AddToStoriesILiked());
+  }
+
+  void changeCurrentStoryIndex(int index){
+    currentStoryIndex=index;
+    emit(ChangeCurrentStoryIndex());
+  }
 
   void changeUserProfileImageTemp(String imageurl) {
     userProfileImageTemp = imageurl;
@@ -580,7 +591,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   void uploadNewStory({required context, required username}) async {
     emit(AddNewStoryLoading());
-    int count=0;
+    int count = 0;
     picsAddresses.forEach((element) async {
       File file = File(element);
       await firebase_storage.FirebaseStorage.instance
@@ -588,30 +599,29 @@ class HomeCubit extends Cubit<HomeState> {
           .child('posts/${Uri.file(file.path).pathSegments.last}')
           .putFile(file)
           .then((value) {
-           value.ref.getDownloadURL()
-               .then((value) async {
-            await addNewStory(
-              time: GlobalCubit.get(context).getCurrentTime(),
-              username: username,
-              imageUrl: value,
-            );
-            count++;
-            if(picsAddresses.length==count){
-              emit(AddNewStorySuccess());
-            }
+        value.ref.getDownloadURL().then((value) async {
+          await addNewStory(
+            time: GlobalCubit.get(context).getCurrentTime(),
+            username: username,
+            imageUrl: value,
+          );
+          count++;
+          if (picsAddresses.length == count) {
+            emit(AddNewStorySuccess());
+          }
         }).catchError((error) {
           print(error.toString());
-          toastMessage(text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
+          toastMessage(
+              text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
           emit(UploadNewStoryImageFail());
         });
       }).catchError((error) {
         print(error.toString());
-        toastMessage(text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
+        toastMessage(
+            text: 'Upload Fail', backgroundColor: GREY, textColor: WHITE);
         emit(UploadNewStoryImageFail());
       });
-    }
-    );
-
+    });
   }
 
   Future<void> addNewStory({
@@ -619,22 +629,19 @@ class HomeCubit extends Cubit<HomeState> {
     required String username,
     required String time,
   }) async {
-      StoryModel story = StoryModel(time: time, imageUrl: imageUrl, username: username);
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(username)
-          .collection('stories')
-          .add(story.toMap(story))
-          .then((value) {
-      }).catchError((error){
-        print(error.toString());
-        emit(AddNewStoryFail());
-      });
-
+    StoryModel story =
+        StoryModel(time: time, imageUrl: imageUrl, username: username);
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('stories')
+        .add(story.toMap(story))
+        .then((value) {})
+        .catchError((error) {
+      print(error.toString());
+      emit(AddNewStoryFail());
+    });
   }
-
-
-
 
   Future<void> addNewPost({
     required String image,
@@ -979,78 +986,135 @@ class HomeCubit extends Cubit<HomeState> {
     return comments;
   }
 
-
-  
   // Stories
-  Future<void>getAllStoriesForSpecificUser({required String username})async{
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(username)
-          .collection('stories')
-          .get().then((value) {
-            value.docs.forEach((element) {
-              StoryModel model = StoryModel.fromJson(element.data());
-              model.changeStoryId(element.id);
-              users[username]!.stories.add(model);
-            }
-          );
-            emit(GetAllStoriesForSpecificUserSuccess());
-      })
-          .catchError((error){
-            print(error.toString());
-            emit(GetAllStoriesForSpecificUserFail());
-      });
 
-  }
-  Future<void> getActiveStories({required String username})async{
-    activeStories.clear();
-    if(users[username]!.stories.isNotEmpty){
-        activeStories.add(users[username]!.stories);
-    }
-      users[username]!.following.forEach((key, value) {
-        if(users[key]!.stories.isNotEmpty)
-          activeStories.add(users[key]!.stories);
-      });
-      emit(GetActiveStories());
-  }
-
-  // all Stories i watched
-  Future<void>addToStoriesSeen({required String username , required String storyId})async{
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(username)
-          .collection('storiesSeen')
-          .doc(storyId)
-          .set({})
-          .then((value){
-            emit(AddToStoriesSeenSuccess());
-      })
-          .catchError((error){
-            print(error.toString());
-            emit(AddToStoriesSeenFail());
-      });
-  }
-  
-  // see onw story
-  Future<void>seeSpecificStory({required String storyOwner , required String storyId})async{
-    String myUsername = CacheHelper.getData(key: 'username').toString();
+  Future<void> getAllViewsForSpecificStory({required String username, required String storyId, required StoryModel model}) async {
     await FirebaseFirestore.instance
-          .collection('users')
-          .doc(storyOwner)
-          .collection('stories')
-          .doc(storyId)
-          .collection('views')
-          .doc(myUsername).set({})
-          .then((value) {
-            emit(SeeSpecificStorySuccess());
-    })
-          .catchError((error){
-            print(error.toString());
-            emit(SeeSpecificStoryFail());
+        .collection('users')
+        .doc(username)
+        .collection("stories")
+        .doc(storyId)
+        .collection('views')
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        model.addToViews(element.id);
+      });
+
+      if (value.docs.length == model.views.length) {
+        emit(GetAllViewsForSpecificStorySuccess());
+      }
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetAllViewsForSpecificStoryFail());
     });
   }
-  
-  Future<void>getAllStoriesSeen()async{
+  Future<void> getAllLikesForSpecificStory({required String username ,required String storyId, required StoryModel model})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('stories')
+        .doc(storyId)
+        .collection('likes')
+        .get()
+        .then((value){
+          value.docs.forEach((element) {
+            model.addToStoryLikes(element.id);
+          });
+          if(value.docs.length==model.likes.length){
+            emit(GetAllLikesForSpecificStorySuccess());
+          }
+        })
+        .catchError((error){
+          print(error.toString());
+          emit(GetAllLikesForSpecificStoryFail());
+    });
+  }
+  Future<void> getAllStoriesForSpecificUser({required String username}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('stories')
+        .get()
+        .then((value) async {
+      value.docs.forEach((element) async {
+        StoryModel model = StoryModel.fromJson(element.data());
+        await getAllViewsForSpecificStory(username: username,storyId: element.id, model: model);
+        await getAllLikesForSpecificStory(username: username,storyId: element.id, model: model);
+        model.changeStoryId(element.id);
+        users[username]!.stories.add(model);
+      });
+      emit(GetAllStoriesForSpecificUserSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetAllStoriesForSpecificUserFail());
+    });
+  }
+  Future<void> getActiveStories({required String username}) async {
+    activeStories.clear();
+    if (users[username]!.stories.isNotEmpty) {
+      activeStories.add(users[username]!.stories);
+    }
+    users[username]!.following.forEach((key, value) {
+      if (users[key]!.stories.isNotEmpty)
+        activeStories.add(users[key]!.stories);
+    });
+    emit(GetActiveStories());
+  }
+
+  Future<void>addLikeToSpecificStory({required String username,required String storyOwnerUsername ,required String storyId})async{
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(storyOwnerUsername)
+        .collection('stories')
+        .doc(storyId)
+        .collection('likes')
+        .doc(username)
+        .set({})
+        .then((value){
+          emit(AddLikeToSpecificStorySuccess());
+    })
+        .catchError((error){
+          print(error.toString());
+          emit(AddLikeToSpecificStoryFail());
+    });
+  }
+
+
+  // all Stories i have seen
+  Future<void> addToStoriesSeen({required String username, required String storyId}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(username)
+        .collection('storiesSeen')
+        .doc(storyId)
+        .set({}).then((value) {
+      emit(AddToStoriesSeenSuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(AddToStoriesSeenFail());
+    });
+  }
+
+  // see one story
+  Future<void> seeSpecificStory({required String storyOwner, required String storyId}) async {
+    String myUsername = CacheHelper.getData(key: 'username').toString();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(storyOwner)
+        .collection('stories')
+        .doc(storyId)
+        .collection('views')
+        .doc(myUsername)
+        .set({}).then((value) {
+      emit(SeeSpecificStorySuccess());
+    }).catchError((error) {
+      print(error.toString());
+      emit(SeeSpecificStoryFail());
+    });
+  }
+
+  Future<void> getAllStoriesSeen() async {
     storiesSeen.clear();
     String username = CacheHelper.getData(key: 'username').toString();
     await FirebaseFirestore.instance
@@ -1058,25 +1122,24 @@ class HomeCubit extends Cubit<HomeState> {
         .doc(username)
         .collection('storiesSeen')
         .get()
-        .then((value){
-          value.docs.forEach((element) {
-            storiesSeen[element.id]=true;
-            if(storiesSeen.length == value.docs.length){
-              emit(GetAllStoriesSeenSuccess());
-            }
-          });
-    })
-        .catchError((error){
-          print(error.toString());
-          emit(GetAllStoriesSeenFail());
+        .then((value) {
+      value.docs.forEach((element) {
+        storiesSeen[element.id] = true;
+        if (storiesSeen.length == value.docs.length) {
+          emit(GetAllStoriesSeenSuccess());
+        }
+      });
+    }).catchError((error) {
+      print(error.toString());
+      emit(GetAllStoriesSeenFail());
     });
   }
 
-  bool allSeen(List<StoryModel>list){
-    bool seen=true;
+  bool allSeen(List<StoryModel> list) {
+    bool seen = true;
     list.forEach((element) {
-      if(storiesSeen[element.storyId]==null){
-        seen=false;
+      if (storiesSeen[element.storyId] == null) {
+        seen = false;
       }
     });
     // emit(SeenOrNotSucess());
@@ -1087,7 +1150,10 @@ class HomeCubit extends Cubit<HomeState> {
   // each user with their info ,posts
   Future<void> getAllUsers({bool cahngeUserTmp = true}) async {
     users = {};
-    await FirebaseFirestore.instance.collection('users').get().then((value) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) async {
       value.docs.forEach((element) async {
         UserModel user = UserModel.fromJson(element.data());
         users[element.id] = user;
@@ -1107,8 +1173,9 @@ class HomeCubit extends Cubit<HomeState> {
             changeUserTmpData(user!);
           }
         }
-        if(users.length == value.docs.length){
-          await getActiveStories(username: CacheHelper.getData(key: 'username').toString());
+        if (users.length == value.docs.length) {
+          await getActiveStories(
+              username: CacheHelper.getData(key: 'username').toString());
           await getAllStoriesSeen();
           print("**************************");
           print(storiesSeen.length);
@@ -1140,4 +1207,3 @@ class HomeCubit extends Cubit<HomeState> {
     emit(LogOutSuccess());
   }
 }
-

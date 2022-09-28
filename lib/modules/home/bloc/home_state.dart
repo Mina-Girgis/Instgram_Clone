@@ -212,36 +212,21 @@ class GetAllStoriesSeenFail extends HomeState {}
 
 class SeenOrNotSucess extends HomeState {}
 
+class GetAllViewsForSpecificStorySuccess extends HomeState {}
 
+class GetAllViewsForSpecificStoryFail extends HomeState {}
 
+class ChangeCurrentStoryIndex extends HomeState {}
 
+class GetAllLikesForSpecificStorySuccess extends HomeState {}
 
+class GetAllLikesForSpecificStoryFail extends HomeState {}
 
+class AddLikeToSpecificStorySuccess extends HomeState {}
 
+class AddLikeToSpecificStoryFail extends HomeState {}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class AddToStoriesILiked extends HomeState {}
 
 
 
