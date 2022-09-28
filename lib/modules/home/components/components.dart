@@ -36,15 +36,14 @@ Widget storyDesignItem({
           height: 2.0,
         ),
         //***//
-        StoryItem(
+        storyItem(
           context: context,
           username: storyList[0].username,
           width: 80,
           height: 80,
           storyList: storyList,
           cubit: cubit,
-          ovel: ovel,
-          index:index,
+          index: index,
         ),
         //***//
         SizedBox(
@@ -82,7 +81,7 @@ Widget emptyStoryGesign({required double radius, required HomeCubit cubit}) {
               radius: radius,
             ),
             Padding(
-              padding:  EdgeInsets.only(left: radius*1.5,top: radius*1.4),
+              padding: EdgeInsets.only(left: radius * 1.5, top: radius * 1.4),
               child: Container(
                 width: 20,
                 height: 20,
@@ -90,7 +89,8 @@ Widget emptyStoryGesign({required double radius, required HomeCubit cubit}) {
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(FontAwesomeIcons.add,color: Colors.white,size: 17,),
+                child: Icon(
+                  FontAwesomeIcons.add, color: Colors.white, size: 17,),
               ),
             ),
           ],
@@ -115,210 +115,256 @@ Widget emptyStoryGesign({required double radius, required HomeCubit cubit}) {
   );
 }
 
-Widget StoryItem({
+Widget storyItem({
   required List<StoryModel> storyList,
   required context,
   required String username,
   required double width,
   required double height,
   required HomeCubit cubit,
-  required bool ovel,
   required int index,
 }) {
-  String CurrentUsername=CacheHelper.getData(key: 'username').toString();
+  String CurrentUsername = CacheHelper.getData(key: 'username').toString();
   return CupertinoPageScaffold(
       child: Center(
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100.0),
-        border: Border.all(
-          color: (cubit.allSeen(storyList)) ? Colors.grey : Colors.red,
-          width: 2.0,
-          style: BorderStyle.solid,
-        ),
-      ),
-      width: width,
-      height: height,
-      padding: const EdgeInsets.all(2.0),
-      child: GestureDetector(
-        onTap: () {
-          if (!ovel) {
-            print("-1");
-          } else {
-            showCupertinoDialog(
-              context: context,
-              builder: (context) {
-                return CupertinoPageScaffold(
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding:  EdgeInsets.only(bottom: SizeConfig.screenHeight!*0.1),
-                        child: Story(
-                          onFlashForward: Navigator.of(context).pop,
-                          onFlashBack: Navigator.of(context).pop,
-                          momentCount: storyList.length,
-                          momentDurationGetter: (idx) => Duration(seconds: 5),
-                          momentBuilder: (context, idx) {
-                            cubit.addToStoriesSeen(username: cubit.userTmp.username, storyId: storyList[idx].storyId);
-                            cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
-                            cubit.storiesSeen[storyList[idx].storyId] = true;
-                            cubit.changeCurrentStoryIndex(idx);
-                            return Image.network(storyList[idx].imageUrl, fit: BoxFit.contain,);
-                          },
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Card(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 15.0,left: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 20.0,
-                                  backgroundImage: NetworkImage(cubit.users[username]!.imageUrl),
-                                  backgroundColor: Colors.black,
-                                ),
-                                SizedBox(width: 7,),
-                                Text(username),
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: Icon(
-                                    FontAwesomeIcons.circle,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100.0),
+            border: Border.all(
+              color: cubit.overColor(storyList),
+              width: 2.0,
+              style: BorderStyle.solid,
+            ),
+          ),
+          width: width,
+          height: height,
+          padding: const EdgeInsets.all(2.0),
+          child: GestureDetector(
+            onTap: () {
+              if(cubit.overColor(storyList)!=Colors.transparent){
+                showCupertinoDialog(
+                  context: context,
+                  builder: (context) {
+                    return CupertinoPageScaffold(
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                bottom: SizeConfig.screenHeight! * 0.1),
+                            child: Story(
+                              onFlashForward: Navigator
+                                  .of(context)
+                                  .pop,
+                              onFlashBack: Navigator
+                                  .of(context)
+                                  .pop,
+                              momentCount: storyList.length,
+                              momentDurationGetter: (idx) =>
+                                  Duration(seconds: 5),
+                              momentBuilder: (context, idx) {
+                                cubit.addToStoriesSeen(
+                                    username: cubit.userTmp.username,
+                                    storyId: storyList[idx].storyId);
+                                cubit.seeSpecificStory(
+                                    storyOwner: storyList[idx].username,
+                                    storyId: storyList[idx].storyId);
+                                cubit.storiesSeen[storyList[idx].storyId] =
+                                true;
+                                cubit.changeCurrentStoryIndex(idx);
+                                return Image.network(storyList[idx].imageUrl,
+                                  fit: BoxFit.contain,);
+                              },
                             ),
                           ),
-                        ),
-                      ),
-                      if(username!=CacheHelper.getData(key: 'username').toString())
-                         Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Card(
-                          color: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Spacer(),
-                                IconButton(
-                                  onPressed: () {
-                                    cubit.addLikeToSpecificStory(username: CurrentUsername, storyOwnerUsername: username, storyId: storyList[cubit.currentStoryIndex].storyId);
-                                    // cubit.addToStoriesILiked(storyList[cubit.currentStoryIndex].storyId);
-                                   },
-                                  icon: Icon(
-                                    FontAwesomeIcons.heart,
-                                    color: (cubit.storiesILiked[storyList[cubit.currentStoryIndex].storyId]==true)?Colors.red :Colors.white,
-                                    size: 30.0,
-                                  ),
-                                ),
-                                Transform.rotate(
-                                    angle: 50,
-                                    child: IconButton(
-                                        iconSize: 30.0,
-                                        splashRadius: 15,
-                                        onPressed: () {
-
-                                        },
-                                        icon: Icon(
-                                          Icons.send_outlined,
-                                          color: Colors.white,
-                                        ))),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      if(username==CacheHelper.getData(key: 'username').toString())
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Card(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 30.0,left: 5),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-
-                                  InkWell(
-                                    onTap: (){
-                                       AppNavigator.customNavigator(context: context, screen: StoryViewsScreen(), finish: false);
-                                    },
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Stack(
-                                      children: [
-
-                                        if(storyList[cubit.currentStoryIndex].views.length >= 3)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:30),
-                                          child: CircleAvatar(
-                                            radius: 20,
-                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[2]]!.imageUrl),
-                                          ),
-                                        ),
-
-                                        if(storyList[cubit.currentStoryIndex].views.length >= 2)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 15),
-                                          child: CircleAvatar(
-                                            radius: 20,
-                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[1]]!.imageUrl),
-                                          ),
-                                        ),
-
-                                        if(storyList[cubit.currentStoryIndex].views.length >= 1)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 0),
-                                          child: CircleAvatar(
-                                            radius: 20,
-                                            backgroundImage: NetworkImage(cubit.users[storyList[cubit.currentStoryIndex].views[0]]!.imageUrl),
-                                          ),
-                                        ),
-                                      ],
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Card(
+                              color: Colors.transparent,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 15.0, left: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 20.0,
+                                      backgroundImage: NetworkImage(
+                                          cubit.users[username]!.imageUrl),
+                                      backgroundColor: Colors.black,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 7,),
+                                    Text(username),
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      icon: Icon(
+                                        FontAwesomeIcons.circle,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          if(username != CacheHelper.getData(key: 'username')
+                              .toString())
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Card(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Spacer(),
+                                      IconButton(
+                                        onPressed: () {
+                                          cubit.addLikeToSpecificStory(
+                                              username: CurrentUsername,
+                                              storyOwnerUsername: username,
+                                              storyId: storyList[cubit
+                                                  .currentStoryIndex].storyId);
+                                          // cubit.addToStoriesILiked(storyList[cubit.currentStoryIndex].storyId);
+                                        },
+                                        icon: Icon(
+                                          FontAwesomeIcons.heart,
+                                          color: (cubit
+                                              .storiesILiked[storyList[cubit
+                                              .currentStoryIndex].storyId] ==
+                                              true) ? Colors.red : Colors.white,
+                                          size: 30.0,
+                                        ),
+                                      ),
+                                      Transform.rotate(
+                                          angle: 50,
+                                          child: IconButton(
+                                              iconSize: 30.0,
+                                              splashRadius: 15,
+                                              onPressed: () {
 
-                    ],
-                  ),
+                                              },
+                                              icon: Icon(
+                                                Icons.send_outlined,
+                                                color: Colors.white,
+                                              ))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          if(username == CacheHelper.getData(key: 'username')
+                              .toString())
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Card(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 30.0, left: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+
+                                      InkWell(
+                                        onTap: () {
+                                          AppNavigator.customNavigator(
+                                              context: context,
+                                              screen: StoryViewsScreen(),
+                                              finish: false);
+                                        },
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Stack(
+                                          children: [
+
+                                            if(storyList[cubit
+                                                .currentStoryIndex].views
+                                                .length >= 3)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 30),
+                                                child: CircleAvatar(
+                                                  radius: 20,
+                                                  backgroundImage: NetworkImage(
+                                                      cubit
+                                                          .users[storyList[cubit
+                                                          .currentStoryIndex]
+                                                          .views[2]]!.imageUrl),
+                                                ),
+                                              ),
+
+                                            if(storyList[cubit
+                                                .currentStoryIndex].views
+                                                .length >= 2)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 15),
+                                                child: CircleAvatar(
+                                                  radius: 20,
+                                                  backgroundImage: NetworkImage(
+                                                      cubit
+                                                          .users[storyList[cubit
+                                                          .currentStoryIndex]
+                                                          .views[1]]!.imageUrl),
+                                                ),
+                                              ),
+
+                                            if(storyList[cubit
+                                                .currentStoryIndex].views
+                                                .length >= 1)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 0),
+                                                child: CircleAvatar(
+                                                  radius: 20,
+                                                  backgroundImage: NetworkImage(
+                                                      cubit
+                                                          .users[storyList[cubit
+                                                          .currentStoryIndex]
+                                                          .views[0]]!.imageUrl),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                        ],
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-            cubit.changeCurrentStoryIndex(0);
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: (cubit.users[username] == null)
-                  ? NetworkImage(BLACK_IMAGE)
-                  : NetworkImage(cubit.users[username]!.imageUrl),
-              fit: BoxFit.cover,
+                cubit.changeCurrentStoryIndex(0);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: (cubit.users[username] == null)
+                      ? NetworkImage(BLACK_IMAGE)
+                      : NetworkImage(cubit.users[username]!.imageUrl),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(100.0),
+              ),
             ),
-            borderRadius: BorderRadius.circular(100.0),
           ),
         ),
-      ),
-    ),
-  ));
+      ));
 }
 
 Widget circleAvatarDesign(
     {required HomeCubit cubit, required double radius, String imageUrl = ""}) {
   return CircleAvatar(
-    backgroundImage: picImage(imageUrl, cubit),
+    backgroundImage: NetworkImage(cubit.userTmp.imageUrl),
+    backgroundColor: Colors.transparent,
     radius: radius,
   );
 }
@@ -347,11 +393,11 @@ Widget profilePicWithOvelCircle({
       image: DecorationImage(
         image: (ovelCircle)
             ? AssetImage(
-                'assets/instaOvel2.jpg',
-              )
+          'assets/instaOvel2.jpg',
+        )
             : AssetImage(
-                'assets/black.jpg',
-              ),
+          'assets/black.jpg',
+        ),
       ),
       borderRadius: BorderRadius.circular(100.0),
     ),
@@ -366,13 +412,9 @@ Widget profilePicWithOvelCircle({
   );
 }
 
+
 Widget postDesgin(
-    {required UserModel? user,
-    required index,
-    required context,
-    required HomeCubit cubit,
-    required PostModel model}) {
-  CarouselController buttonCarouselController = CarouselController();
+    {required UserModel? user, required index, required context, required HomeCubit cubit, required PostModel model}) {
   return Container(
     width: SizeConfig.screenWidth,
     // color: Colors.grey,
@@ -380,16 +422,19 @@ Widget postDesgin(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 10.0),
+          padding: const EdgeInsets.only(left: 10.0,top: 5.0),
           child: Row(
             children: [
-              profilePicWithOvelCircle(
-                cubit: cubit,
-                size: 45,
-                radius: 60,
-                ovelCircle: true,
-                padding: 3,
+              storyItem(
+                  storyList: user!.stories,
+                  context: context,
+                  username: user.username,
+                  width: 45,
+                  height: 45,
+                  cubit: cubit,
+                  index: index,
               ),
+
               SizedBox(
                 width: 10.0,
               ),
@@ -399,7 +444,7 @@ Widget postDesgin(
                   minWidth: 10,
                 ),
                 child: Text(
-                  user!.username,
+                  user.username,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -440,7 +485,7 @@ Widget postDesgin(
                 onChanged: () {
                   if (!model.isLiked) {
                     String username =
-                        CacheHelper.getData(key: 'username').toString();
+                    CacheHelper.getData(key: 'username').toString();
                     cubit.likePost(postId: model.postId, username: username);
                     cubit.changeLikeStateInAllPosts(postId: model.postId);
                   }
@@ -451,9 +496,9 @@ Widget postDesgin(
             }).toList(),
             // isLoop: true,
             indicatorColor:
-                (model.photos.length == 1) ? Colors.transparent : Colors.white,
+            (model.photos.length == 1) ? Colors.transparent : Colors.white,
             indicatorBackgroundColor:
-                (model.photos.length == 1) ? Colors.transparent : Colors.grey,
+            (model.photos.length == 1) ? Colors.transparent : Colors.grey,
           ),
         ),
         Row(
@@ -462,7 +507,7 @@ Widget postDesgin(
               splashRadius: 15.0,
               onPressed: () {
                 String username =
-                    CacheHelper.getData(key: 'username').toString();
+                CacheHelper.getData(key: 'username').toString();
                 if (model.isLiked)
                   cubit.unlikePost(postId: model.postId, username: username);
                 else
@@ -555,7 +600,7 @@ Widget postDesgin(
                     onTap: () {
                       cubit.commentController.clear();
                       String username =
-                          CacheHelper.getData(key: 'username').toString();
+                      CacheHelper.getData(key: 'username').toString();
                       commentSection(
                         cubit: cubit,
                         context: context,
@@ -594,6 +639,7 @@ Widget postDesgin(
     ),
   );
 }
+
 
 Widget profileNumbers({required String text, required int number}) {
   return Column(
@@ -657,10 +703,7 @@ Widget editProfileInputField({
 }
 
 AppBar appBar(
-    {required String title,
-    required context,
-    required Function()? onSave,
-    required HomeCubit cubit}) {
+    {required String title, required context, required Function()? onSave, required HomeCubit cubit}) {
   return AppBar(
     backgroundColor: Colors.transparent,
     elevation: 0.0,
@@ -688,10 +731,7 @@ AppBar appBar(
 }
 
 Future<dynamic> commentSection(
-    {required context,
-    required cubit,
-    required PostModel model,
-    required Function() function}) {
+    {required context, required cubit, required PostModel model, required Function() function}) {
   return showModalBottomSheet(
       elevation: 0.0,
       backgroundColor: Colors.black,
@@ -701,7 +741,9 @@ Future<dynamic> commentSection(
         return SingleChildScrollView(
           child: AnimatedPadding(
             duration: const Duration(milliseconds: 100),
-            padding: MediaQuery.of(context).viewInsets,
+            padding: MediaQuery
+                .of(context)
+                .viewInsets,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 15.0),
               child: Column(
@@ -811,9 +853,7 @@ Widget defaulBottomNavBar({required context, required HomeCubit cubit}) {
   );
 }
 
-
-
-Widget searchPersonDesign({required UserModel user,double radius = 32}){
+Widget searchPersonDesign({required UserModel user, double radius = 32}) {
   return Padding(
     padding: const EdgeInsets.all(10.0),
     child: Row(

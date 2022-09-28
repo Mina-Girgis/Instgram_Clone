@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_storage_path/flutter_storage_path.dart';
@@ -1145,6 +1146,18 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(SeenOrNotSucess());
     return seen;
   }
+  Color overColor(List<StoryModel> list){
+    if(list.isEmpty){
+      return Colors.transparent;
+    }
+    else if(allSeen(list)){
+      return Colors.grey;
+    }else{
+      return Colors.red;
+    }
+
+  }
+
 
   // get all users info and store them in a map
   // each user with their info ,posts
@@ -1167,6 +1180,7 @@ class HomeCubit extends Cubit<HomeState> {
         await getAllPostsForSpecificUser(username: element.id);
         await getAllFollowers(username: element.id);
         await getAllFollowRequests(username: element.id);
+        users[element.id]!.sortStories();
         if (cahngeUserTmp) {
           if (element.id == CacheHelper.getData(key: 'username').toString()) {
             UserModel? user = users[element.id];
@@ -1174,12 +1188,8 @@ class HomeCubit extends Cubit<HomeState> {
           }
         }
         if (users.length == value.docs.length) {
-          await getActiveStories(
-              username: CacheHelper.getData(key: 'username').toString());
+          await getActiveStories(username: CacheHelper.getData(key: 'username').toString());
           await getAllStoriesSeen();
-          print("**************************");
-          print(storiesSeen.length);
-          print("**************************");
         }
       });
       emit(GetAllUsersSuccess());

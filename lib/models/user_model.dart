@@ -71,8 +71,7 @@ class UserModel{
     followRequests[username]=true;
   }
 
-  void addToStories(StoryModel story){
-    stories.add(story);
+  void sortStories(){
     stories.sort((a,b)=>int.parse(a.time).compareTo(int.parse(b.time)));
   }
 

@@ -17,7 +17,8 @@ import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   bool fromSearch;
-  ProfileScreen({Key? key,required this.fromSearch}) : super(key: key);
+
+  ProfileScreen({Key? key, required this.fromSearch}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -28,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     var cubit = HomeCubit.get(context);
     UserModel user = cubit.userTmp;
-    List<Widget>profileRow=[
+    List<Widget>profileRow = [
       // edit profile
       Row(
         children: [
@@ -43,12 +44,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color:
               Color.fromRGBO(30, 30, 30, 1.0),
               function: () async {
-                cubit.albumNameIndex=-1;
+                cubit.albumNameIndex = -1;
                 cubit.changeUserProfileImageTemp(cubit.userTmp.imageUrl);
                 cubit.changeNameController(cubit.userTmp.name);
                 cubit.changeUsernameController(cubit.userTmp.username);
                 cubit.changeBioController(cubit.userTmp.bio);
-                AppNavigator.customNavigator(context: context, screen: EditProfileScreen(), finish: false);
+                AppNavigator.customNavigator(context: context,
+                    screen: EditProfileScreen(),
+                    finish: false);
               },
               height: 4,
             ),
@@ -82,15 +85,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                String currentUsername = CacheHelper.getData(key: 'username').toString();
-                cubit.addToFollowRequests(currentUserName: currentUsername, user: user.username).then((value){
+                String currentUsername = CacheHelper.getData(key: 'username')
+                    .toString();
+                cubit.addToFollowRequests(
+                    currentUserName: currentUsername, user: user.username)
+                    .then((value) {
                   setState(() {
                     print("Added request success");
                     cubit.getAllUsers(cahngeUserTmp: false);
-                    cubit.profileRowIndex=2;
+                    cubit.profileRowIndex = 2;
                   });
                 });
-
               },
               child: Text("Follow"),
               style:
@@ -113,15 +118,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ElevatedButton(
               onPressed: () {
                 setState(() {
-                  String currentUsername = CacheHelper.getData(key: 'username').toString();
-                  cubit.removeFromFollowRequests(currentUserName: currentUsername, user: user.username)
-                      .then((value){
-                        cubit.getAllUsers(cahngeUserTmp: false);
-                        cubit.profileRowIndex=1;
+                  String currentUsername = CacheHelper.getData(key: 'username')
+                      .toString();
+                  cubit.removeFromFollowRequests(
+                      currentUserName: currentUsername, user: user.username)
+                      .then((value) {
+                    cubit.getAllUsers(cahngeUserTmp: false);
+                    cubit.profileRowIndex = 1;
                   })
-                      .catchError((error){
-                  });
-
+                      .catchError((error) {});
                 });
               },
               child: Text("Requested"),
@@ -198,20 +203,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
 
       //follow back
-        Row(
+      Row(
         children: [
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                String currentUsername = CacheHelper.getData(key: 'username').toString();
-                cubit.addToFollowRequests(currentUserName: currentUsername, user: user.username).then((value){
+                String currentUsername = CacheHelper.getData(key: 'username')
+                    .toString();
+                cubit.addToFollowRequests(
+                    currentUserName: currentUsername, user: user.username)
+                    .then((value) {
                   setState(() {
                     print("Added request success");
                     cubit.getAllUsers(cahngeUserTmp: false);
-                    cubit.profileRowIndex=2;
+                    cubit.profileRowIndex = 2;
                   });
                 });
-
               },
               child: Text("Follow back"),
               style:
@@ -237,272 +244,293 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, state) {
         return SafeArea(
             child: WillPopScope(
-          onWillPop: () async {
-            if(widget.fromSearch){
-              // from search
-              cubit.setUserTmpAsCurrentUserAgain();
-            }else{
-              // from profile
-              print("pop page");
-              cubit.removeBottomNavBarIndexListTop(context: context);
-            }
+              onWillPop: () async {
+                if (widget.fromSearch) {
+                  // from search
+                  cubit.setUserTmpAsCurrentUserAgain();
+                } else {
+                  // from profile
+                  print("pop page");
+                  cubit.removeBottomNavBarIndexListTop(context: context);
+                }
 
-            return true;
-          },
-          child: Scaffold(
-            // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.transparent,
-              elevation: 0.0,
-              title: Row(
-                children: [
-                  Icon(
-                    FontAwesomeIcons.lock,
-                    size: 20.0,
-                  ),
-                  SizedBox(
-                    width: 8.0,
-                  ),
-                  Container(
-                    constraints: BoxConstraints(
-                      minWidth: 0.0,
-                      maxWidth: SizeConfig.screenWidth! / 2.5,
-                    ),
-                    child: Text(
-                      user.username,
-                      style: TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        fontWeight: FontWeight.bold,
+                return true;
+              },
+              child: Scaffold(
+                // bottomNavigationBar: defaulBottomNavBar(context: context,cubit: cubit),
+                appBar: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0.0,
+                  title: Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.lock,
+                        size: 20.0,
                       ),
-                    ),
-                  ),
-                  ButtonTheme(
-                    child: IconButton(
-                      splashRadius: 15,
-                      iconSize: 30.0,
-                      alignment: Alignment.centerLeft,
-                      onPressed: () {},
-                      icon: Icon(
-                        IconData(
-                          0xf13d,
-                          fontFamily: 'MaterialIcons',
+                      SizedBox(
+                        width: 8.0,
+                      ),
+                      Container(
+                        constraints: BoxConstraints(
+                          minWidth: 0.0,
+                          maxWidth: SizeConfig.screenWidth! / 2.5,
+                        ),
+                        child: Text(
+                          user.username,
+                          style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
+                      ButtonTheme(
+                        child: IconButton(
+                          splashRadius: 15,
+                          iconSize: 30.0,
+                          alignment: Alignment.centerLeft,
+                          onPressed: () {},
+                          icon: Icon(
+                            IconData(
+                              0xf13d,
+                              fontFamily: 'MaterialIcons',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    IconButton(
+                      iconSize: 30.0,
+                      splashRadius: 15,
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.add_box_outlined,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              actions: [
-                IconButton(
-                  iconSize: 30.0,
-                  splashRadius: 15,
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.add_box_outlined,
-                  ),
+                    IconButton(
+                      iconSize: 30.0,
+                      splashRadius: 15,
+                      onPressed: () {
+                        AppNavigator.customNavigator(
+                            context: context,
+                            screen: SideBarScreen(),
+                            finish: false);
+                      },
+                      icon: Icon(
+                        Icons.menu,
+                        size: 35.0,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  iconSize: 30.0,
-                  splashRadius: 15,
-                  onPressed: () {
-                    AppNavigator.customNavigator(
-                        context: context,
-                        screen: SideBarScreen(),
-                        finish: false);
+                body: RefreshIndicator(
+                  onRefresh: () async {
+                    if (widget.fromSearch) {
+                      await cubit.getAllUsers(cahngeUserTmp: false);
+                    } else {
+                      setState(() {});
+                      await cubit.getAllUsers();
+                    }
                   },
-                  icon: Icon(
-                    Icons.menu,
-                    size: 35.0,
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: () async {
-                if(widget.fromSearch){
-                  await cubit.getAllUsers(cahngeUserTmp: false);
-                }else{
-                  setState(() {});
-                  await cubit.getAllUsers();
-                }
-              },
-              child: Stack(
-                children: [
-                  LayoutBuilder(
-                    builder: (context, constraint) {
-                      return SingleChildScrollView(
-                        physics: BouncingScrollPhysics(),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        profilePicWithOvelCircle(
-                                          cubit: cubit,
-                                          radius: 50.0,
-                                          size: SizeConfig.defaultSize! * 11,
-                                          ovelCircle: false,
-                                          padding: 0,
-                                        ),
-                                        profileNumbers(
-                                            text: 'Posts',
-                                            number: user.posts.length),
-                                        profileNumbers(
-                                            text: 'Followers', number: user.followers.length),
-                                        profileNumbers(
-                                            text: 'Following', number: user.following.length),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      user.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                      Text(user.bio),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-
-                                    profileRow[cubit.profileRowIndex],
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    // if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                    // Container(
-                                    //   // color: Colors.grey,
-                                    //   height: 130.0,
-                                    //   child: Padding(
-                                    //     padding: const EdgeInsets.only(
-                                    //         left: 0.0, right: 0.0),
-                                    //     child: ListView.separated(
-                                    //       scrollDirection: Axis.horizontal,
-                                    //       itemCount: 10,
-                                    //       separatorBuilder: (context, index) {
-                                    //         return SizedBox(
-                                    //           width: 15.0,
-                                    //         );
-                                    //       },
-                                    //       itemBuilder: (context, index) {
-                                    //         return storyDesignItem(ovel: false,cubit: cubit,context: context,storyList: []);
-                                    //       },
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                  ],
-                                ),
-                              ),
-                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                DefaultTabController(
-                                length: 2,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: AppBar(
-                                    backgroundColor: Colors.transparent,
-                                    bottom: TabBar(
-                                      indicatorColor: WHITE,
-                                      onTap: (index) {
-                                        print(index);
-                                      },
-                                      physics: ScrollPhysics(),
-                                      isScrollable: false,
-                                      tabs: [
-                                        Tab(
-                                          icon: Icon( Icons.grid_on_outlined,size: 25.0,),
-                                        ),
-                                        Tab(
-                                          icon: Icon(IconData(0xee34, fontFamily: 'MaterialIcons'),size: 25.0,),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                SizedBox(
-                                height: 5,
-                              ),
-                              if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
-                                GridView.count(
-                                shrinkWrap: true,
-                                physics: ScrollPhysics(),
-                                crossAxisCount: 3,
-                                mainAxisSpacing: 3.0,
-                                crossAxisSpacing: 3.0,
-                                children:
-                                    List.generate(user.posts.length, (index) {
-                                  return Container(
-                                    width: SizeConfig.screenWidth! / 3,
-                                    height: 100,
-                                    color: Colors.grey,
-                                    child: Image.network(
-                                      user.posts[index].imageUrl,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                }),
-                              ),
-
-                              if(cubit.profileRowIndex!=0 && cubit.profileRowIndex!=3)
-                                Column(
+                  child: Stack(
+                    children: [
+                      LayoutBuilder(
+                        builder: (context, constraint) {
+                          return SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Divider(thickness: 0,color: GREY,),
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 10.0,right: 10),
-                                    child: Row(
+                                    padding: const EdgeInsets.only(
+                                        left: 10.0, right: 10.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
                                       children: [
-
-                                        CircleAvatar(
-                                          backgroundImage: AssetImage('assets/lock.jpg'),
-                                          backgroundColor: Colors.transparent,
-                                          radius: 32.0,
-                                        ),
-                                        SizedBox(width: 20.0,),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                        SizedBox(height: 15,),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text("This Account Is Private"),
-                                            SizedBox(height: 3.0,),
-                                            Text("Follow this account to see their photos",
-                                              style: TextStyle(
-                                                color: GREY,
-                                              ),
+                                            storyItem(
+                                              storyList: cubit.userTmp.stories,
+                                              context: context,
+                                              username: cubit.userTmp.username,
+                                              width: SizeConfig.screenWidth!*0.27,
+                                              height: SizeConfig.screenWidth!*0.27,
+                                              cubit: cubit,
+                                              index: 0,
                                             ),
+                                            profileNumbers(
+                                                text: 'Posts',
+                                                number: user.posts.length),
+                                            profileNumbers(
+                                                text: 'Followers',
+                                                number: user.followers.length),
+                                            profileNumbers(
+                                                text: 'Following',
+                                                number: user.following.length),
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          user.name,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        if(cubit.profileRowIndex == 0 ||
+                                            cubit.profileRowIndex == 3)
+                                          Text(user.bio),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        profileRow[cubit.profileRowIndex],
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        // if(cubit.profileRowIndex==0 ||cubit.profileRowIndex==3)
+                                        // Container(
+                                        //   // color: Colors.grey,
+                                        //   height: 130.0,
+                                        //   child: Padding(
+                                        //     padding: const EdgeInsets.only(
+                                        //         left: 0.0, right: 0.0),
+                                        //     child: ListView.separated(
+                                        //       scrollDirection: Axis.horizontal,
+                                        //       itemCount: 10,
+                                        //       separatorBuilder: (context, index) {
+                                        //         return SizedBox(
+                                        //           width: 15.0,
+                                        //         );
+                                        //       },
+                                        //       itemBuilder: (context, index) {
+                                        //         return storyDesignItem(ovel: false,cubit: cubit,context: context,storyList: []);
+                                        //       },
+                                        //     ),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ]),
-                      );
-                    },
+                                  if(cubit.profileRowIndex == 0 ||
+                                      cubit.profileRowIndex == 3)
+                                    DefaultTabController(
+                                      length: 2,
+                                      child: SizedBox(
+                                        height: 50,
+                                        child: AppBar(
+                                          backgroundColor: Colors.transparent,
+                                          bottom: TabBar(
+                                            indicatorColor: WHITE,
+                                            onTap: (index) {
+                                              print(index);
+                                            },
+                                            physics: ScrollPhysics(),
+                                            isScrollable: false,
+                                            tabs: [
+                                              Tab(
+                                                icon: Icon(
+                                                  Icons.grid_on_outlined,
+                                                  size: 25.0,),
+                                              ),
+                                              Tab(
+                                                icon: Icon(IconData(0xee34,
+                                                    fontFamily: 'MaterialIcons'),
+                                                  size: 25.0,),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if(cubit.profileRowIndex == 0 ||
+                                      cubit.profileRowIndex == 3)
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                  if(cubit.profileRowIndex == 0 ||
+                                      cubit.profileRowIndex == 3)
+                                    GridView.count(
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      crossAxisCount: 3,
+                                      mainAxisSpacing: 3.0,
+                                      crossAxisSpacing: 3.0,
+                                      children:
+                                      List.generate(user.posts.length, (index) {
+                                        return Container(
+                                          width: SizeConfig.screenWidth! / 3,
+                                          height: 100,
+                                          color: Colors.grey,
+                                          child: Image.network(
+                                            user.posts[index].imageUrl,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+
+                                  if(cubit.profileRowIndex != 0 &&
+                                      cubit.profileRowIndex != 3)
+                                    Column(
+                                      children: [
+                                        Divider(thickness: 0, color: GREY,),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10.0, right: 10),
+                                          child: Row(
+                                            children: [
+
+                                              CircleAvatar(
+                                                backgroundImage: AssetImage(
+                                                    'assets/lock.jpg'),
+                                                backgroundColor: Colors
+                                                    .transparent,
+                                                radius: 32.0,
+                                              ),
+                                              SizedBox(width: 20.0,),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .start,
+                                                children: [
+                                                  Text(
+                                                      "This Account Is Private"),
+                                                  SizedBox(height: 3.0,),
+                                                  Text(
+                                                    "Follow this account to see their photos",
+                                                    style: TextStyle(
+                                                      color: GREY,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ]),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ));
+            ));
       },
     );
   }
