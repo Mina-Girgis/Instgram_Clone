@@ -19,6 +19,7 @@ import '../../../services/utils/size_config.dart';
 import '../../../shared/components/constants.dart';
 import '../screens/profile/update_profile_data_screen.dart';
 import '../screens/story/story_screen.dart';
+import '../screens/story/story_views_screen.dart';
 
 Widget storyDesignItem({
   required context,
@@ -150,18 +151,21 @@ Widget StoryItem({
                 return CupertinoPageScaffold(
                   child: Stack(
                     children: [
-                      Story(
-                        onFlashForward: Navigator.of(context).pop,
-                        onFlashBack: Navigator.of(context).pop,
-                        momentCount: storyList.length,
-                        momentDurationGetter: (idx) => Duration(seconds: 5),
-                        momentBuilder: (context, idx) {
-                          cubit.addToStoriesSeen(username: cubit.userTmp.username, storyId: storyList[idx].storyId);
-                          cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
-                          cubit.storiesSeen[storyList[idx].storyId] = true;
-                          cubit.changeCurrentStoryIndex(idx);
-                          return Image.network(storyList[idx].imageUrl, fit: BoxFit.contain,);
-                        },
+                      Padding(
+                        padding:  EdgeInsets.only(bottom: SizeConfig.screenHeight!*0.1),
+                        child: Story(
+                          onFlashForward: Navigator.of(context).pop,
+                          onFlashBack: Navigator.of(context).pop,
+                          momentCount: storyList.length,
+                          momentDurationGetter: (idx) => Duration(seconds: 5),
+                          momentBuilder: (context, idx) {
+                            cubit.addToStoriesSeen(username: cubit.userTmp.username, storyId: storyList[idx].storyId);
+                            cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
+                            cubit.storiesSeen[storyList[idx].storyId] = true;
+                            cubit.changeCurrentStoryIndex(idx);
+                            return Image.network(storyList[idx].imageUrl, fit: BoxFit.contain,);
+                          },
+                        ),
                       ),
                       Align(
                         alignment: Alignment.topCenter,
@@ -239,13 +243,15 @@ Widget StoryItem({
                           child: Card(
                             color: Colors.transparent,
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0,left: 5),
+                              padding: const EdgeInsets.only(bottom: 30.0,left: 5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
 
                                   InkWell(
-                                    onTap: (){},
+                                    onTap: (){
+                                       AppNavigator.customNavigator(context: context, screen: StoryViewsScreen(), finish: false);
+                                    },
                                     borderRadius: BorderRadius.circular(20),
                                     child: Stack(
                                       children: [
@@ -290,6 +296,7 @@ Widget StoryItem({
                 );
               },
             );
+            cubit.changeCurrentStoryIndex(0);
           }
         },
         child: Container(
@@ -801,5 +808,35 @@ Widget defaulBottomNavBar({required context, required HomeCubit cubit}) {
         label: "item",
       ),
     ],
+  );
+}
+
+
+
+Widget searchPersonDesign({required UserModel user,double radius = 32}){
+  return Padding(
+    padding: const EdgeInsets.all(10.0),
+    child: Row(
+      children: [
+        CircleAvatar(
+          backgroundImage: NetworkImage(user.imageUrl),
+          backgroundColor: Colors.transparent,
+          radius: radius,
+        ),
+        SizedBox(width: 15.0,),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(user.username),
+            SizedBox(height: 3.0,),
+            Text(user.name,
+              style: TextStyle(
+                color: GREY,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }

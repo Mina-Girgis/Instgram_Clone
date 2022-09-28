@@ -15,7 +15,6 @@ import '../modules/signup/signup_screen/signup_info_screen.dart';
 import '../modules/signup/signup_screen/signup_screen.dart';
 import '../modules/signup/signup_screen/verification_screen.dart';
 import '../modules/splach_screen/splach_screen.dart';
-
 class AppRoot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

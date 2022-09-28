@@ -104,7 +104,7 @@ class SearchScreen extends StatelessWidget {
   }
 }
 
-Widget searchPersonDesign({required UserModel user}){
+Widget searchPersonDesign({required UserModel user,double radius = 32}){
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
@@ -112,9 +112,9 @@ Widget searchPersonDesign({required UserModel user}){
           CircleAvatar(
             backgroundImage: NetworkImage(user.imageUrl),
             backgroundColor: Colors.transparent,
-            radius: 32.0,
+            radius: radius,
           ),
-          SizedBox(width: 20.0,),
+          SizedBox(width: 15.0,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
