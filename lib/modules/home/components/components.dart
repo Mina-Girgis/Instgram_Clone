@@ -140,6 +140,9 @@ Widget storyItem({
           height: height,
           padding: const EdgeInsets.all(2.0),
           child: GestureDetector(
+            onPanUpdate: (value){
+              print("update happened");
+            },
             onTap: () {
               if(cubit.overColor(storyList)!=Colors.transparent){
                 showCupertinoDialog(
@@ -152,27 +155,17 @@ Widget storyItem({
                             padding: EdgeInsets.only(
                                 bottom: SizeConfig.screenHeight! * 0.1),
                             child: Story(
-                              onFlashForward: Navigator
-                                  .of(context)
-                                  .pop,
-                              onFlashBack: Navigator
-                                  .of(context)
-                                  .pop,
+                              onFlashForward: Navigator.of(context).pop,
+                              onFlashBack: Navigator.of(context).pop,
                               momentCount: storyList.length,
-                              momentDurationGetter: (idx) =>
-                                  Duration(seconds: 5),
+                              momentDurationGetter: (idx) => Duration(seconds: 5),
                               momentBuilder: (context, idx) {
-                                cubit.addToStoriesSeen(
-                                    username: cubit.userTmp.username,
-                                    storyId: storyList[idx].storyId);
-                                cubit.seeSpecificStory(
-                                    storyOwner: storyList[idx].username,
-                                    storyId: storyList[idx].storyId);
-                                cubit.storiesSeen[storyList[idx].storyId] =
-                                true;
-                                cubit.changeCurrentStoryIndex(idx);
-                                return Image.network(storyList[idx].imageUrl,
-                                  fit: BoxFit.contain,);
+                                  cubit.addToStoriesSeen(username: cubit.userTmp.username, storyId: storyList[idx].storyId);
+                                  cubit.seeSpecificStory(storyOwner: storyList[idx].username, storyId: storyList[idx].storyId);
+                                  cubit.storiesSeen[storyList[idx].storyId] = true;
+                                  cubit.changeCurrentStoryIndex(idx);
+
+                                return Image.network(storyList[idx].imageUrl,fit: BoxFit.contain,);
                               },
                             ),
                           ),
@@ -194,13 +187,17 @@ Widget storyItem({
                                     ),
                                     SizedBox(width: 7,),
                                     Text(username),
+                                    Spacer(),
                                     IconButton(
+                                      splashColor: Colors.transparent,
+                                      splashRadius: 1,
                                       onPressed: () {
                                         Navigator.pop(context);
                                       },
                                       icon: Icon(
-                                        FontAwesomeIcons.circle,
+                                        FontAwesomeIcons.x,
                                         color: Colors.white,
+                                        size: 15,
                                       ),
                                     ),
                                   ],
@@ -268,7 +265,6 @@ Widget storyItem({
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-
                                       InkWell(
                                         onTap: () {
                                           AppNavigator.customNavigator(

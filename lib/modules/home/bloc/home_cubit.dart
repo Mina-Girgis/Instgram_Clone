@@ -45,14 +45,40 @@ class HomeCubit extends Cubit<HomeState> {
   List<List<StoryModel>> activeStories = [];
   List<int> bottomNavBarIndexList = [0]; // to controll navigation (stack)
 
+  Map<String, UserModel> users = {};
+  Map<String, bool> storiesSeen = {};
+  Map<String,bool>storiesILiked={};
+
+  FileModel? selectedModel;
+  int albumNameIndex = -1;
+  int imageIndex = -1;
+  int profileRowIndex = 0;
+  String userProfileImageTemp = "";
+  int currentStoryIndex=0;
   bool multiPhotos = false;
   int addStoryIndex = 0;
   List<String> picsAddresses = [];
+  List<Widget> screens = [
+    HomeScreen(),
+    SearchScreen(),
+    ReelScreen(),
+    ShopScreen(),
+    ProfileScreen(
+      fromSearch: false,
+    ),
+    NotificationScreen(),
+    FollowRequestScreen(),
+  ];
 
-  void changeAddStoryIndex(value) {
-    addStoryIndex = value;
-    emit(ChangeAddStoryIndex());
-  }
+  var nameController = TextEditingController();
+  var usernameController = TextEditingController();
+  var bioController = TextEditingController();
+  var updateController = TextEditingController();
+  var addPostController = TextEditingController();
+  var commentController = TextEditingController();
+  var searchController = TextEditingController();
+
+
 
   void addToPicsAddressesList(String address) {
     if (picsAddresses.length < 10) {
@@ -66,9 +92,38 @@ class HomeCubit extends Cubit<HomeState> {
     emit(AddToPicsAddressesList());
   }
 
+  void addToStoriesILiked(String storyId){
+    storiesILiked[storyId]=true;
+    emit(AddToStoriesILiked());
+  }
+
   void removeFromPicsAddressesList(String address) {
     picsAddresses.remove(address);
     emit(RemoveFromPicsAddressesList());
+  }
+
+  void removeBottomNavBarIndexListTop({required context}) {
+    if (bottomNavBarIndexList.isNotEmpty) {
+      bottomNavBarIndexList.removeLast();
+      bottomNavBarIndexList.forEach((element) {
+        print(element);
+      });
+      if (bottomNavBarIndexList.isNotEmpty) {
+        changeBottomNavigationBarIndex(
+            idx: bottomNavBarIndexList.last, add: false);
+        // print(bottomNavBarIndexList.last);
+      } else {
+        SystemNavigator.pop();
+      }
+    } else {
+      SystemNavigator.pop();
+    }
+    emit(RemoveBottomNavBarIndexListTop());
+  }
+
+  void changeAddStoryIndex(value) {
+    addStoryIndex = value;
+    emit(ChangeAddStoryIndex());
   }
 
   void changeMultiPhotos() {
@@ -88,33 +143,6 @@ class HomeCubit extends Cubit<HomeState> {
     searchList.clear();
     searchList = list;
     emit(ChangeSearchList());
-  }
-
-  List<Widget> screens = [
-    HomeScreen(),
-    SearchScreen(),
-    ReelScreen(),
-    ShopScreen(),
-    ProfileScreen(
-      fromSearch: false,
-    ),
-    NotificationScreen(),
-    FollowRequestScreen(),
-  ];
-
-  Map<String, UserModel> users = {};
-  Map<String, bool> storiesSeen = {};
-  Map<String,bool>storiesILiked={};
-  FileModel? selectedModel;
-  int albumNameIndex = -1;
-  int imageIndex = -1;
-  int profileRowIndex = 0;
-  String userProfileImageTemp = "";
-  int currentStoryIndex=0;
-
-  void addToStoriesILiked(String storyId){
-    storiesILiked[storyId]=true;
-    emit(AddToStoriesILiked());
   }
 
   void changeCurrentStoryIndex(int index){
@@ -177,14 +205,6 @@ class HomeCubit extends Cubit<HomeState> {
     emit(ChangeProfileRowIndex());
   }
 
-  var nameController = TextEditingController();
-  var usernameController = TextEditingController();
-  var bioController = TextEditingController();
-  var updateController = TextEditingController();
-  var addPostController = TextEditingController();
-  var commentController = TextEditingController();
-  var searchController = TextEditingController();
-
   void changeSearchController(String s) {
     searchController.text = s;
     emit(ChangeSearchController());
@@ -236,25 +256,6 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void removeBottomNavBarIndexListTop({required context}) {
-    if (bottomNavBarIndexList.isNotEmpty) {
-      bottomNavBarIndexList.removeLast();
-      bottomNavBarIndexList.forEach((element) {
-        print(element);
-      });
-      if (bottomNavBarIndexList.isNotEmpty) {
-        changeBottomNavigationBarIndex(
-            idx: bottomNavBarIndexList.last, add: false);
-        // print(bottomNavBarIndexList.last);
-      } else {
-        SystemNavigator.pop();
-      }
-    } else {
-      SystemNavigator.pop();
-    }
-    emit(RemoveBottomNavBarIndexListTop());
-  }
-
   void changeBottomNavigationBarIndex({required int idx, bool add = true}) {
     bottomNavigationBarIndex = idx;
     if (add) {
@@ -266,6 +267,7 @@ class HomeCubit extends Cubit<HomeState> {
     }
     emit(ChangeBottomNavigationBarIndex());
   }
+
 
   // Edit profile
   void changePostTempData(PostModel model) {
@@ -285,12 +287,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(SetUserTmpAsCurrentUserAgain());
   }
 
-  Future<void> updateUserData({
-    required String oldUsername,
-    required UserModel user,
-    required context,
-    required imageUrl,
-  }) async {
+  Future<void> updateUserData({required String oldUsername, required UserModel user, required context, required imageUrl,}) async {
     try {
       String username = usernameController.text;
       String name = nameController.text;
@@ -369,67 +366,6 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> deleteUser(String username) async {
-    // DELETE ALL COLLECTIONS
-    List<String> subCollections = ['myPosts'];
-
-    subCollections.forEach((element) async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(username)
-          .collection(element)
-          .get()
-          .then((value) {
-        value.docs.forEach((element) {
-          element.reference.delete();
-        });
-        // emit(DeleteUserSuccess());
-      }).catchError((error) {
-        print(error.toString());
-        emit(DeleteUserFail());
-      });
-    });
-    // delete data
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(username)
-        .delete()
-        .then((value) {
-      emit(DeleteUserSuccess());
-    }).catchError((error) {
-      emit(DeleteUserFail());
-    });
-  }
-
-  Future<void> addUser(
-      String username, Map<String, dynamic> mp, context) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(username)
-        .set(mp)
-        .then((value) {
-      userTmp = UserModel.fromJson(mp);
-      userPostsIds.forEach((element) async {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(username)
-            .collection('myPosts')
-            .doc(element)
-            .set({})
-            .then((value) {})
-            .catchError((error) {
-              print(error.toString());
-            });
-      });
-      emit(AddUserSuccess());
-    }).catchError((error) {
-      print(error.toString());
-      emit(AddUserFail());
-    });
-  }
-
-  // get all posts
-  // check is done .. its working well
   Future<List<String>> getAllPostsIdsForSpecicUser(
       {required String username}) async {
     userPostsIds.clear();
@@ -533,10 +469,15 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   // add post
+
   Future<void> getImagesPath() async {
     emit(GetImagesPathLoading());
     var imagePath = await StoragePath.imagesPath;
+    var videoPath = await StoragePath.videoPath;
+
     var images = jsonDecode(imagePath!) as List;
+    var videos = jsonDecode(videoPath!) as List;
+
     files = images.map<FileModel>((e) => FileModel.fromJson(e)).toList();
     if (files != null && files.length > 0) {
       selectedModel = files[0];
@@ -589,6 +530,8 @@ class HomeCubit extends Cubit<HomeState> {
       });
     });
   }
+
+
 
   void uploadNewStory({required context, required username}) async {
     emit(AddNewStoryLoading());
@@ -688,6 +631,7 @@ class HomeCubit extends Cubit<HomeState> {
     // emit(AddToMyPostsSuccess());
   }
 
+  /*******************************/
   // Follow Functions
   Future<void> getAllFollowers({required String username}) async {
     await FirebaseFirestore.instance
@@ -824,6 +768,8 @@ class HomeCubit extends Cubit<HomeState> {
       emit(RemoveFromMyFollowRequestsFail());
     });
   }
+/*******************************/
+
 
   // likes
   Future<Map<String, bool>> getPostsILiked({required String username}) async {
@@ -940,6 +886,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(UnlikePostSuccess());
   }
 
+
   // comments
   Future<void> addComment(
       {required String time,
@@ -987,8 +934,8 @@ class HomeCubit extends Cubit<HomeState> {
     return comments;
   }
 
-  // Stories
 
+  // Stories
   Future<void> getAllViewsForSpecificStory({required String username, required String storyId, required StoryModel model}) async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -1159,8 +1106,6 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
 
-  // get all users info and store them in a map
-  // each user with their info ,posts
   Future<void> getAllUsers({bool cahngeUserTmp = true}) async {
     users = {};
     await FirebaseFirestore.instance

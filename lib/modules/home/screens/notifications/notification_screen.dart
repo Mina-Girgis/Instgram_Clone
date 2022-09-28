@@ -51,7 +51,8 @@ class NotificationScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                              CircleAvatar(
-                               backgroundImage: AssetImage('assets/person.jpg'),
+                               backgroundImage: (cubit.userTmp.followRequests.isEmpty)?NetworkImage(BLACK_IMAGE) :NetworkImage(cubit.users[cubit.userTmp.followRequests[0]]!.username),
+                               backgroundColor: Colors.black,
                                radius: SizeConfig.screenHeight!*0.034,
                              ),
                              SizedBox(width: 10.0,),

@@ -253,7 +253,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   print("pop page");
                   cubit.removeBottomNavBarIndexListTop(context: context);
                 }
-
                 return true;
               },
               child: Scaffold(
@@ -362,8 +361,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               storyList: cubit.userTmp.stories,
                                               context: context,
                                               username: cubit.userTmp.username,
-                                              width: SizeConfig.screenWidth!*0.27,
-                                              height: SizeConfig.screenWidth!*0.27,
+                                              width: SizeConfig.screenWidth!*0.25,
+                                              height: SizeConfig.screenWidth!*0.25,
                                               cubit: cubit,
                                               index: 0,
                                             ),
